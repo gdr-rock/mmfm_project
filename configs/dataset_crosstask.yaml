@@ -1,0 +1,10 @@
+dataset:
+  name: "crosstask"
+  root: "data/crosstask"
+  annotations_dir: "annotations"
+  videos_dir: "videos"
+  split_files:
+    train: "splits/train.txt"
+    val: "splits/val.txt"
+    test: "splits/test.txt"
+  fps: 1

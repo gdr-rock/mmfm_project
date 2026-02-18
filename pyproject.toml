@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "jepa-grounded-language-planning"
+version = "0.1.0"
+description = "Research scaffold for JEPA-grounded language planning on procedural videos."
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{name = "Research Team"}]
+dependencies = [
+  "numpy>=1.26",
+  "PyYAML>=6.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*"]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]

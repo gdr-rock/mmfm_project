@@ -1,0 +1,8 @@
+eval:
+  metrics:
+    - success_rate
+    - robustness_drop
+    - wall_clock_seconds
+    - consistency_retrieval_at_1
+  confidence_interval: 0.95
+  num_bootstrap_samples: 200
