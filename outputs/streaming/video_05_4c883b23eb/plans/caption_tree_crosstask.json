@@ -1,0 +1,205 @@
+{
+  "goal": "make tea",
+  "candidates": [
+    {
+      "candidate_id": 0,
+      "nodes": [
+        {
+          "step_index": 1,
+          "step": "understand goal: make tea",
+          "delta_s": "after 'understand goal: make tea', world state advances"
+        },
+        {
+          "step_index": 2,
+          "step": "prepare tools and workspace",
+          "delta_s": "after 'prepare tools and workspace', world state advances"
+        },
+        {
+          "step_index": 3,
+          "step": "execute procedure in order",
+          "delta_s": "after 'execute procedure in order', world state advances"
+        },
+        {
+          "step_index": 4,
+          "step": "verify final outcome",
+          "delta_s": "after 'verify final outcome', world state advances"
+        }
+      ]
+    },
+    {
+      "candidate_id": 1,
+      "nodes": [
+        {
+          "step_index": 1,
+          "step": "collect materials",
+          "delta_s": "after 'collect materials', world state advances"
+        },
+        {
+          "step_index": 2,
+          "step": "set initial state",
+          "delta_s": "after 'set initial state', world state advances"
+        },
+        {
+          "step_index": 3,
+          "step": "perform core steps",
+          "delta_s": "after 'perform core steps', world state advances"
+        },
+        {
+          "step_index": 4,
+          "step": "clean up and confirm completion",
+          "delta_s": "after 'clean up and confirm completion', world state advances"
+        }
+      ]
+    },
+    {
+      "candidate_id": 2,
+      "nodes": [
+        {
+          "step_index": 1,
+          "step": "check preconditions",
+          "delta_s": "after 'check preconditions', world state advances"
+        },
+        {
+          "step_index": 2,
+          "step": "start first action",
+          "delta_s": "after 'start first action', world state advances"
+        },
+        {
+          "step_index": 3,
+          "step": "monitor progress",
+          "delta_s": "after 'monitor progress', world state advances"
+        },
+        {
+          "step_index": 4,
+          "step": "finish and validate result",
+          "delta_s": "after 'finish and validate result', world state advances"
+        }
+      ]
+    },
+    {
+      "candidate_id": 3,
+      "nodes": [
+        {
+          "step_index": 1,
+          "step": "understand goal: make tea",
+          "delta_s": "after 'understand goal: make tea', world state advances"
+        },
+        {
+          "step_index": 2,
+          "step": "prepare tools and workspace",
+          "delta_s": "after 'prepare tools and workspace', world state advances"
+        },
+        {
+          "step_index": 3,
+          "step": "execute procedure in order",
+          "delta_s": "after 'execute procedure in order', world state advances"
+        },
+        {
+          "step_index": 4,
+          "step": "verify final outcome",
+          "delta_s": "after 'verify final outcome', world state advances"
+        }
+      ]
+    },
+    {
+      "candidate_id": 4,
+      "nodes": [
+        {
+          "step_index": 1,
+          "step": "collect materials",
+          "delta_s": "after 'collect materials', world state advances"
+        },
+        {
+          "step_index": 2,
+          "step": "set initial state",
+          "delta_s": "after 'set initial state', world state advances"
+        },
+        {
+          "step_index": 3,
+          "step": "perform core steps",
+          "delta_s": "after 'perform core steps', world state advances"
+        },
+        {
+          "step_index": 4,
+          "step": "clean up and confirm completion",
+          "delta_s": "after 'clean up and confirm completion', world state advances"
+        }
+      ]
+    },
+    {
+      "candidate_id": 5,
+      "nodes": [
+        {
+          "step_index": 1,
+          "step": "check preconditions",
+          "delta_s": "after 'check preconditions', world state advances"
+        },
+        {
+          "step_index": 2,
+          "step": "start first action",
+          "delta_s": "after 'start first action', world state advances"
+        },
+        {
+          "step_index": 3,
+          "step": "monitor progress",
+          "delta_s": "after 'monitor progress', world state advances"
+        },
+        {
+          "step_index": 4,
+          "step": "finish and validate result",
+          "delta_s": "after 'finish and validate result', world state advances"
+        }
+      ]
+    },
+    {
+      "candidate_id": 6,
+      "nodes": [
+        {
+          "step_index": 1,
+          "step": "understand goal: make tea",
+          "delta_s": "after 'understand goal: make tea', world state advances"
+        },
+        {
+          "step_index": 2,
+          "step": "prepare tools and workspace",
+          "delta_s": "after 'prepare tools and workspace', world state advances"
+        },
+        {
+          "step_index": 3,
+          "step": "execute procedure in order",
+          "delta_s": "after 'execute procedure in order', world state advances"
+        },
+        {
+          "step_index": 4,
+          "step": "verify final outcome",
+          "delta_s": "after 'verify final outcome', world state advances"
+        }
+      ]
+    },
+    {
+      "candidate_id": 7,
+      "nodes": [
+        {
+          "step_index": 1,
+          "step": "collect materials",
+          "delta_s": "after 'collect materials', world state advances"
+        },
+        {
+          "step_index": 2,
+          "step": "set initial state",
+          "delta_s": "after 'set initial state', world state advances"
+        },
+        {
+          "step_index": 3,
+          "step": "perform core steps",
+          "delta_s": "after 'perform core steps', world state advances"
+        },
+        {
+          "step_index": 4,
+          "step": "clean up and confirm completion",
+          "delta_s": "after 'clean up and confirm completion', world state advances"
+        }
+      ]
+    }
+  ]
+}

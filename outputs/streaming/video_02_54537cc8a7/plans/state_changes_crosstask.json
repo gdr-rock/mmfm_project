@@ -1,0 +1,76 @@
+{
+  "state_changes": [
+    {
+      "candidate_id": 0,
+      "delta_s": [
+        "after 'understand goal: make tea', world state advances",
+        "after 'prepare tools and workspace', world state advances",
+        "after 'execute procedure in order', world state advances",
+        "after 'verify final outcome', world state advances"
+      ]
+    },
+    {
+      "candidate_id": 1,
+      "delta_s": [
+        "after 'collect materials', world state advances",
+        "after 'set initial state', world state advances",
+        "after 'perform core steps', world state advances",
+        "after 'clean up and confirm completion', world state advances"
+      ]
+    },
+    {
+      "candidate_id": 2,
+      "delta_s": [
+        "after 'check preconditions', world state advances",
+        "after 'start first action', world state advances",
+        "after 'monitor progress', world state advances",
+        "after 'finish and validate result', world state advances"
+      ]
+    },
+    {
+      "candidate_id": 3,
+      "delta_s": [
+        "after 'understand goal: make tea', world state advances",
+        "after 'prepare tools and workspace', world state advances",
+        "after 'execute procedure in order', world state advances",
+        "after 'verify final outcome', world state advances"
+      ]
+    },
+    {
+      "candidate_id": 4,
+      "delta_s": [
+        "after 'collect materials', world state advances",
+        "after 'set initial state', world state advances",
+        "after 'perform core steps', world state advances",
+        "after 'clean up and confirm completion', world state advances"
+      ]
+    },
+    {
+      "candidate_id": 5,
+      "delta_s": [
+        "after 'check preconditions', world state advances",
+        "after 'start first action', world state advances",
+        "after 'monitor progress', world state advances",
+        "after 'finish and validate result', world state advances"
+      ]
+    },
+    {
+      "candidate_id": 6,
+      "delta_s": [
+        "after 'understand goal: make tea', world state advances",
+        "after 'prepare tools and workspace', world state advances",
+        "after 'execute procedure in order', world state advances",
+        "after 'verify final outcome', world state advances"
+      ]
+    },
+    {
+      "candidate_id": 7,
+      "delta_s": [
+        "after 'collect materials', world state advances",
+        "after 'set initial state', world state advances",
+        "after 'perform core steps', world state advances",
+        "after 'clean up and confirm completion', world state advances"
+      ]
+    }
+  ]
+}

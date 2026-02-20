@@ -1,0 +1,38 @@
+{
+  "requested_videos": 5,
+  "processed_count": 5,
+  "failed_count": 0,
+  "processed": [
+    {
+      "video_key": "video_01_bfaf918d8a",
+      "source_url": "https://www.youtube.com/watch?v=VIDEO_ID_1",
+      "cache_path": "outputs/streaming/video_01_bfaf918d8a/cache/jepa_latents_crosstask.npz",
+      "tree_path": "outputs/streaming/video_01_bfaf918d8a/plans/caption_tree_crosstask.json"
+    },
+    {
+      "video_key": "video_02_54537cc8a7",
+      "source_url": "https://www.youtube.com/watch?v=VIDEO_ID_2",
+      "cache_path": "outputs/streaming/video_02_54537cc8a7/cache/jepa_latents_crosstask.npz",
+      "tree_path": "outputs/streaming/video_02_54537cc8a7/plans/caption_tree_crosstask.json"
+    },
+    {
+      "video_key": "video_03_46538b25fd",
+      "source_url": "https://www.youtube.com/watch?v=VIDEO_ID_3",
+      "cache_path": "outputs/streaming/video_03_46538b25fd/cache/jepa_latents_crosstask.npz",
+      "tree_path": "outputs/streaming/video_03_46538b25fd/plans/caption_tree_crosstask.json"
+    },
+    {
+      "video_key": "video_04_4f44c61c33",
+      "source_url": "https://www.youtube.com/watch?v=VIDEO_ID_4",
+      "cache_path": "outputs/streaming/video_04_4f44c61c33/cache/jepa_latents_crosstask.npz",
+      "tree_path": "outputs/streaming/video_04_4f44c61c33/plans/caption_tree_crosstask.json"
+    },
+    {
+      "video_key": "video_05_4c883b23eb",
+      "source_url": "https://www.youtube.com/watch?v=VIDEO_ID_5",
+      "cache_path": "outputs/streaming/video_05_4c883b23eb/cache/jepa_latents_crosstask.npz",
+      "tree_path": "outputs/streaming/video_05_4c883b23eb/plans/caption_tree_crosstask.json"
+    }
+  ],
+  "failed": []
+}

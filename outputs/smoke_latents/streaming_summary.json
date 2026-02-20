@@ -1,0 +1,26 @@
+{
+  "requested_videos": 2,
+  "processed_count": 2,
+  "failed_count": 0,
+  "processed": [
+    {
+      "video_key": "video_01_bfaf918d8a",
+      "source_url": "https://www.youtube.com/watch?v=VIDEO_ID_1",
+      "mode": "latents_only",
+      "caption_backend": "",
+      "tree_path": "",
+      "raw_caption_path": "",
+      "latent_cache_path": "outputs/smoke_latents/video_01_bfaf918d8a/cache/perception_encoder_latents.npz"
+    },
+    {
+      "video_key": "video_02_54537cc8a7",
+      "source_url": "https://www.youtube.com/watch?v=VIDEO_ID_2",
+      "mode": "latents_only",
+      "caption_backend": "",
+      "tree_path": "",
+      "raw_caption_path": "",
+      "latent_cache_path": "outputs/smoke_latents/video_02_54537cc8a7/cache/perception_encoder_latents.npz"
+    }
+  ],
+  "failed": []
+}

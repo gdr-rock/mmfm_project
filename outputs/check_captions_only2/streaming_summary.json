@@ -1,0 +1,15 @@
+{
+  "requested_videos": 1,
+  "processed_count": 1,
+  "failed_count": 0,
+  "processed": [
+    {
+      "video_key": "video_01_bfaf918d8a",
+      "source_url": "https://www.youtube.com/watch?v=VIDEO_ID_1",
+      "mode": "captions_only",
+      "cache_path": "",
+      "tree_path": "outputs/check_captions_only2/video_01_bfaf918d8a/plans/caption_tree_crosstask.json"
+    }
+  ],
+  "failed": []
+}

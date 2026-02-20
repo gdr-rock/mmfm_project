@@ -1,0 +1,22 @@
+{
+  "requested_videos": 2,
+  "processed_count": 2,
+  "failed_count": 0,
+  "processed": [
+    {
+      "video_key": "video_01_bfaf918d8a",
+      "source_url": "https://www.youtube.com/watch?v=VIDEO_ID_1",
+      "mode": "captions_only",
+      "cache_path": "",
+      "tree_path": "outputs/check_captions_only/video_01_bfaf918d8a/plans/caption_tree_crosstask.json"
+    },
+    {
+      "video_key": "video_02_54537cc8a7",
+      "source_url": "https://www.youtube.com/watch?v=VIDEO_ID_2",
+      "mode": "captions_only",
+      "cache_path": "",
+      "tree_path": "outputs/check_captions_only/video_02_54537cc8a7/plans/caption_tree_crosstask.json"
+    }
+  ],
+  "failed": []
+}

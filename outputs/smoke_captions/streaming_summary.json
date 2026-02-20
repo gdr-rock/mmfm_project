@@ -1,0 +1,26 @@
+{
+  "requested_videos": 2,
+  "processed_count": 2,
+  "failed_count": 0,
+  "processed": [
+    {
+      "video_key": "video_01_bfaf918d8a",
+      "source_url": "https://www.youtube.com/watch?v=VIDEO_ID_1",
+      "mode": "captions_only",
+      "caption_backend": "fallback",
+      "tree_path": "outputs/smoke_captions/video_01_bfaf918d8a/plans/caption_tree_crosstask.json",
+      "raw_caption_path": "outputs/smoke_captions/video_01_bfaf918d8a/plans/detailed_captions.txt",
+      "latent_cache_path": ""
+    },
+    {
+      "video_key": "video_02_54537cc8a7",
+      "source_url": "https://www.youtube.com/watch?v=VIDEO_ID_2",
+      "mode": "captions_only",
+      "caption_backend": "fallback",
+      "tree_path": "outputs/smoke_captions/video_02_54537cc8a7/plans/caption_tree_crosstask.json",
+      "raw_caption_path": "outputs/smoke_captions/video_02_54537cc8a7/plans/detailed_captions.txt",
+      "latent_cache_path": ""
+    }
+  ],
+  "failed": []
+}

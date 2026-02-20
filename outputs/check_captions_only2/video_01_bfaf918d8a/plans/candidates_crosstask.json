@@ -1,0 +1,32 @@
+{
+  "goal": "make tea",
+  "candidates": [
+    {
+      "candidate_id": 0,
+      "steps": [
+        "understand goal: make tea",
+        "prepare tools and workspace",
+        "execute procedure in order",
+        "verify final outcome"
+      ]
+    },
+    {
+      "candidate_id": 1,
+      "steps": [
+        "collect materials",
+        "set initial state",
+        "perform core steps",
+        "clean up and confirm completion"
+      ]
+    },
+    {
+      "candidate_id": 2,
+      "steps": [
+        "check preconditions",
+        "start first action",
+        "monitor progress",
+        "finish and validate result"
+      ]
+    }
+  ]
+}

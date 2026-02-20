@@ -1,0 +1,18 @@
+{
+  "platform": "Linux-5.15.0-170-generic-x86_64-with-glibc2.35",
+  "python": {
+    "version": "3.10.12 (main, Jan 26 2026, 14:55:28) [GCC 11.4.0]",
+    "ok": true
+  },
+  "binaries": {
+    "ffmpeg": true,
+    "yt-dlp": false
+  },
+  "packages": {
+    "numpy": true
+  },
+  "checkpoint": {
+    "path": "checkpoints/vjepa2.pt",
+    "exists": true
+  }
+}
