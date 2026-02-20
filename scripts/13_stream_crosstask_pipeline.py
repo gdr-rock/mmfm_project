@@ -44,11 +44,35 @@ def read_urls(path: Path) -> list[str]:
     if not path.exists():
         raise FileNotFoundError(f"URL list not found: {path}")
     urls: list[str] = []
+    invalid: list[str] = []
     for line in path.read_text(encoding="utf-8").splitlines():
         value = line.strip()
         if not value or value.startswith("#"):
             continue
-        urls.append(value)
+        if value in {"---", "--", "-"}:
+            continue
+        if "VIDEO_ID_" in value:
+            invalid.append(value)
+            continue
+        match_watch = re.match(r"^https?://(www\.)?youtube\.com/watch\?v=([A-Za-z0-9_-]{11})", value)
+        if match_watch:
+            urls.append(f"https://www.youtube.com/watch?v={match_watch.group(2)}")
+            continue
+        match_short = re.match(r"^https?://youtu\.be/([A-Za-z0-9_-]{11})", value)
+        if match_short:
+            urls.append(f"https://www.youtube.com/watch?v={match_short.group(1)}")
+            continue
+        if re.match(r"^[A-Za-z0-9_-]{11}$", value):
+            urls.append(f"https://www.youtube.com/watch?v={value}")
+            continue
+        invalid.append(value)
+
+    if invalid:
+        preview = ", ".join(invalid[:5])
+        raise ValueError(
+            "Invalid URL entries detected. Use real YouTube URLs or 11-char IDs. "
+            f"Examples: {preview}"
+        )
     return urls
 
 

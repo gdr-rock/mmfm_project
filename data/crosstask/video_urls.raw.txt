@@ -1,0 +1,13 @@
+# Raw input list for automation.
+# Allowed per line:
+# - full YouTube URL
+# - youtu.be short URL
+# - 11-character YouTube video ID
+# Empty lines, comments, and --- separators are ignored.
+
+dQw4w9WgXcQ
+https://youtu.be/9bZkp7q19f0
+---
+https://www.youtube.com/watch?v=3JZ_D3ELwOQ
+M7lc1UVf-VE
+aqz-KE-bpKQ

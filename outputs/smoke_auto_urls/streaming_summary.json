@@ -1,0 +1,26 @@
+{
+  "requested_videos": 2,
+  "processed_count": 2,
+  "failed_count": 0,
+  "processed": [
+    {
+      "video_key": "video_01_df2c6f7afc",
+      "source_url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      "mode": "captions_only",
+      "caption_backend": "fallback",
+      "tree_path": "outputs/smoke_auto_urls/video_01_df2c6f7afc/plans/caption_tree_crosstask.json",
+      "raw_caption_path": "outputs/smoke_auto_urls/video_01_df2c6f7afc/plans/detailed_captions.txt",
+      "latent_cache_path": ""
+    },
+    {
+      "video_key": "video_02_5b17067755",
+      "source_url": "https://www.youtube.com/watch?v=9bZkp7q19f0",
+      "mode": "captions_only",
+      "caption_backend": "fallback",
+      "tree_path": "outputs/smoke_auto_urls/video_02_5b17067755/plans/caption_tree_crosstask.json",
+      "raw_caption_path": "outputs/smoke_auto_urls/video_02_5b17067755/plans/detailed_captions.txt",
+      "latent_cache_path": ""
+    }
+  ],
+  "failed": []
+}

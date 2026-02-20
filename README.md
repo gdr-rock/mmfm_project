@@ -36,15 +36,23 @@ If private HF repo:
 huggingface-cli login
 ```
 
-## 3) Prepare URL list
+## 3) Prepare URL list from official CrossTask only
 
-Edit `data/crosstask/video_urls.txt`:
-```text
-https://www.youtube.com/watch?v=VIDEO_ID_1
-https://www.youtube.com/watch?v=VIDEO_ID_2
-https://www.youtube.com/watch?v=VIDEO_ID_3
-https://www.youtube.com/watch?v=VIDEO_ID_4
-https://www.youtube.com/watch?v=VIDEO_ID_5
+This command downloads the official CrossTask release metadata and extracts only CrossTask-listed YouTube videos:
+```bash
+python3 scripts/03_prepare_official_crosstask_urls.py \
+  --max_videos 5 \
+  --output_url_list data/crosstask/video_urls.txt
+```
+
+Shortcut:
+```bash
+make prepare_urls_official
+```
+
+If you want to use your own list instead, you can still use:
+```bash
+python3 scripts/02_prepare_video_urls.py --input data/crosstask/video_urls.raw.txt --output data/crosstask/video_urls.txt --max_videos 5
 ```
 
 ## 4) Run automatic cycle for N videos
