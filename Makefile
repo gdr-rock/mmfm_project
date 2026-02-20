@@ -1,6 +1,6 @@
 PYTHON ?= python
 
-.PHONY: format lint test smoke prepare_dataset cache_latents train_critic train_bridges evaluate
+.PHONY: format lint test smoke prepare_dataset cache_latents train_critic train_bridges evaluate stream_5
 
 format:
 	$(PYTHON) -m black src scripts tests
@@ -31,3 +31,6 @@ evaluate:
 	$(PYTHON) scripts/09_eval_vpa.py --dataset crosstask --config configs/eval.yaml --output_dir outputs --use_dummy_data
 	$(PYTHON) scripts/10_eval_consistency_retrieval.py --dataset crosstask --config configs/eval.yaml --output_dir outputs --use_dummy_data
 	$(PYTHON) scripts/11_eval_robustness.py --dataset crosstask --config configs/eval.yaml --output_dir outputs --use_dummy_data
+
+stream_5:
+	$(PYTHON) scripts/13_stream_crosstask_pipeline.py --dataset crosstask --url_list data/crosstask/video_urls.txt --max_videos 5 --output_dir outputs/streaming --goal "make tea" --k_candidates 8

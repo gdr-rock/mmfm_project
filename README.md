@@ -152,6 +152,37 @@ python scripts/12_run_ablations.py --config configs/eval.yaml --dataset crosstas
 
 Use the same commands with `--dataset coin` and `configs/dataset_coin.yaml` for COIN.
 
+### 7.1) Streamed 5-video CrossTask run (download one-by-one, then delete)
+
+This mode processes only `N=5` URLs at a time and avoids storing the full video set.
+
+1. Put up to 5+ video URLs in:
+   - `data/crosstask/video_urls.txt`
+2. Run:
+
+```bash
+python3 scripts/13_stream_crosstask_pipeline.py \
+  --dataset crosstask \
+  --url_list data/crosstask/video_urls.txt \
+  --max_videos 5 \
+  --output_dir outputs/streaming \
+  --goal "make tea" \
+  --k_candidates 8
+```
+
+Optional flags:
+- `--skip_download`: useful for local dry checks without network.
+- `--use_dummy_data`: forces dummy dataset behavior for stage scripts.
+- `--keep_downloaded`: do not delete each downloaded video after processing.
+- `--dry_run`: prints/logs flow without executing subprocess stages.
+
+Per-video outputs:
+- `outputs/streaming/<video_key>/cache/jepa_latents_crosstask.npz`
+- `outputs/streaming/<video_key>/plans/candidates_crosstask.json`
+- `outputs/streaming/<video_key>/plans/state_changes_crosstask.json`
+- `outputs/streaming/<video_key>/plans/caption_tree_crosstask.json`
+- run summary: `outputs/streaming/streaming_summary.json`
+
 ## 8) Task List with Dependencies and Validation
 
 ### 1) Dataset setup & splits (CrossTask/COIN)
