@@ -1,9 +1,0 @@
-\section*{Proposed Abstract}
-
-High-level video planners that operate mainly in text space can generate plans whose step-by-step state changes sound correct (“water boiled”, “tea ready”) but are not visually consistent with what would actually happen in the video world. This mismatch becomes worse under domain shift (different camera styles, egocentric video) and noisy step annotations, causing the planner to pick plausible-but-wrong plans.
-
-Current approach. VLWM-style planners compress video into language (actions + state descriptions) and use a learned text critic to score candidate plans. V-JEPA-style video models learn strong predictive video latents, but typically plan with visual goal images, not language goals.
-
-Proposed solution. We combine both by grounding language planning in a predictive latent space: (1) State-change grounding: each predicted textual state-change span is trained to match the corresponding V-JEPA latent transition between adjacent video segments; (2) Goal grounding: we learn a small encoder that maps goal text → goal latent, enabling an energy objective that favors plans whose predicted final latent is close to the goal latent. During planning, we score candidates with a weighted sum of (text critic cost) + (transition inconsistency penalty) + (goal latent distance).
-
-Evaluation. We evaluate plan success, robustness to domain/paraphrase shifts, compute overhead, and text–video consistency on COIN and CrossTask (VPA), WorldPrediction-PP, and a controlled retrieval-style consistency benchmark built from video segment pairs.

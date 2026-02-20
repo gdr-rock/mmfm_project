@@ -1,6 +1,0 @@
-numpy>=1.26
-PyYAML>=6.0
-pytest>=8.0
-ruff>=0.6
-black>=24.0
--e .
