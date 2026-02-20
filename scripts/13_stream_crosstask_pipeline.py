@@ -217,7 +217,12 @@ class PerceptionLMCaptioner:
             return
         try:
             import torch
-            from transformers import AutoModelForCausalLM, AutoModelForVision2Seq, AutoProcessor
+            from transformers import (
+                AutoModelForCausalLM,
+                AutoModelForImageTextToText,
+                AutoModelForVision2Seq,
+                AutoProcessor,
+            )
         except Exception as error:  # noqa: BLE001
             if self.strict:
                 raise RuntimeError("Transformers stack unavailable. Install requirements.") from error
@@ -232,21 +237,32 @@ class PerceptionLMCaptioner:
         try:
             processor = AutoProcessor.from_pretrained(source, trust_remote_code=True)
             try:
-                model = AutoModelForVision2Seq.from_pretrained(
-                    source,
-                    trust_remote_code=True,
-                    torch_dtype=dtype,
-                )
+                model = AutoModelForImageTextToText.from_pretrained(source, trust_remote_code=True, torch_dtype=dtype)
             except Exception:
-                model = AutoModelForCausalLM.from_pretrained(
-                    source,
-                    trust_remote_code=True,
-                    torch_dtype=dtype,
-                )
+                try:
+                    model = AutoModelForVision2Seq.from_pretrained(
+                        source,
+                        trust_remote_code=True,
+                        torch_dtype=dtype,
+                    )
+                except Exception:
+                    model = AutoModelForCausalLM.from_pretrained(
+                        source,
+                        trust_remote_code=True,
+                        torch_dtype=dtype,
+                    )
             model.to(device)
             model.eval()
         except Exception as error:  # noqa: BLE001
             if self.strict:
+                source_path = Path(source)
+                has_pt_only = source_path.is_dir() and any(source_path.glob("*.pt")) and not (source_path / "config.json").exists()
+                if has_pt_only:
+                    raise RuntimeError(
+                        "The provided caption path looks like a PE encoder checkpoint directory (.pt without config.json). "
+                        "For detailed captions use a Perception-LM model (for example facebook/Perception-LM-3B), "
+                        "or pass --caption_model_id facebook/Perception-LM-3B."
+                    ) from error
                 raise RuntimeError(f"Failed to load caption model from {source}") from error
             return
 

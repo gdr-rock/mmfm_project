@@ -27,9 +27,13 @@ python3 scripts/01_download_model.py \
 ```bash
 python3 scripts/01_download_model.py \
   --use_hf \
-  --hf_repo_id "<PERCEPTIONLM_HF_REPO>" \
+  --hf_repo_id "facebook/Perception-LM-3B" \
   --target_dir checkpoints/perceptionlm
 ```
+
+Important:
+- Use a `Perception-LM-*` model for captions (e.g. `facebook/Perception-LM-3B` or `facebook/Perception-LM-8B`).
+- Do not use `PE-*` encoder checkpoints for caption generation.
 
 If private HF repo:
 ```bash
