@@ -209,7 +209,11 @@ class PerceptionLMCaptioner:
         source = self._resolve_source()
         if not source:
             if self.strict:
-                raise RuntimeError("Caption model is required. Set --caption_model_id or --caption_model_path.")
+                raise RuntimeError(
+                    "Caption model not found. "
+                    f"--caption_model_path '{self.model_path}' does not exist. "
+                    "Set --caption_model_id or download model files to that path."
+                )
             return
         try:
             import torch
