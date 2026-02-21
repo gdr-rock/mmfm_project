@@ -220,7 +220,6 @@ class PerceptionLMCaptioner:
             from transformers import (
                 AutoModelForCausalLM,
                 AutoModelForImageTextToText,
-                AutoModelForVision2Seq,
                 AutoProcessor,
             )
         except Exception as error:  # noqa: BLE001
@@ -237,20 +236,17 @@ class PerceptionLMCaptioner:
         try:
             processor = AutoProcessor.from_pretrained(source, trust_remote_code=True)
             try:
-                model = AutoModelForImageTextToText.from_pretrained(source, trust_remote_code=True, torch_dtype=dtype)
+                model = AutoModelForImageTextToText.from_pretrained(
+                    source,
+                    trust_remote_code=True,
+                    dtype=dtype,
+                )
             except Exception:
-                try:
-                    model = AutoModelForVision2Seq.from_pretrained(
-                        source,
-                        trust_remote_code=True,
-                        torch_dtype=dtype,
-                    )
-                except Exception:
-                    model = AutoModelForCausalLM.from_pretrained(
-                        source,
-                        trust_remote_code=True,
-                        torch_dtype=dtype,
-                    )
+                model = AutoModelForCausalLM.from_pretrained(
+                    source,
+                    trust_remote_code=True,
+                    dtype=dtype,
+                )
             model.to(device)
             model.eval()
         except Exception as error:  # noqa: BLE001
