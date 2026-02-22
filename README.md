@@ -50,3 +50,19 @@ Before running, edit `configs/subset_example.yaml`:
 ## Output
 - `output/subset_manifest.jsonl`
 - `output/trees/<video_id>.json`
+
+## Progress So Far
+- CrossTask data download on cluster is implemented via `scripts/setup_crosstask_one_video.sh`.
+- One-video run was completed on cluster for video id `ldCg4aWd4mI`.
+- Generated files:
+  - `output/subset_manifest.jsonl`
+  - `output/trees/ldCg4aWd4mI.json`
+- Current pipeline status:
+  - Perception-style encoder path is active (`timm/PE-Core-B-16`).
+  - Hierarchical agglomerative tree construction is active.
+  - Segment captioning is active through configured caption model.
+
+## Known Notes
+- The repeated `Setting pad_token_id ...` logs during generation are warnings, not failures.
+- `subset_size` selects how many videos to process, not how many segments within a video.
+- For more leaf-level captions, lower `segmentation.min_caption_seconds` (for example `2.0`).
