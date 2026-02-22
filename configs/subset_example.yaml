@@ -1,0 +1,23 @@
+﻿dataset:
+  videos_root: "/home/hpc/v123be/v123be45/datasets/crosstask/videos"
+  subset_size: 1
+  seed: 42
+  include_video_ids_file: "configs/video_ids_example.txt"
+  video_extensions: [".mp4", ".webm", ".mkv", ".avi"]
+
+features:
+  temporal_item_seconds: 2.0
+  frame_sample_per_item: 4
+  encoder_name: "timm/PE-Core-B-16"
+
+segmentation:
+  min_caption_seconds: 2.0
+
+caption:
+  model_name: "facebook/Perception-LM-3B"
+  fallback_model_name: null
+  max_new_tokens: 64
+  max_frames_per_segment: 8
+
+output:
+  output_root: "./output"
