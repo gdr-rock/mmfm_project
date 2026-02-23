@@ -1,68 +1,57 @@
-﻿# Tree of Captions (Paper-Style Pipeline)
+# MMFM - Structured Data Branch
 
-This project implements a paper-style Tree of Captions pipeline:
-1. Extract a temporal feature stream `Z = [z1, ..., zT]` from video using a Perception-style encoder.
-2. Build a hierarchical tree with adjacent agglomerative merges minimizing within-segment variance increase.
-3. Caption each segment node (except very short ones) with PerceptionLM.
-4. Save one hierarchical caption tree JSON per video.
+This branch contains a structured-data pipeline wrapper built on top of Self-Refine.
 
-## Default models
-- Feature encoder: `timm/PE-Core-B-16`
-- Caption model: `facebook/Perception-LM-3B`
+## Pipeline
 
-## Configs
-- `configs/subset_example.yaml`: main paper-style run config.
-- `configs/smoke_local.yaml`: smaller subset run, still paper-style structure.
+1. Accept ToC JSON as input.
+2. Call the Self-Refine stage to generate draft/feedback/revision iteratively.
+3. Validate final output against strict schema.
+4. Write validated structured JSON.
+5. Save per-run metadata/artifacts for traceability.
 
-## Run
-```powershell
-cd tree_of_captions
-.\scripts\create_env.ps1
-.\.venv\Scripts\Activate.ps1
-python -m pip install -r requirements.txt
-$env:HUGGINGFACE_HUB_TOKEN="hf_your_token_here"
-python -m src.toc.main --config configs/subset_example.yaml
+## Output Schema
+
+```json
+{
+  "goal_description": "...",
+  "goal_interpretation": {
+    "initial_world_state": "...",
+    "final_world_state": "..."
+  },
+  "action_description": ["...", "..."],
+  "world_states": ["...", "..."]
+}
 ```
 
-## Cluster Download (One Video)
-If your local internet is limited, run downloads over SSH so data uses cluster bandwidth:
+## Main Scripts
+
+- `scripts/self_refine/run_self_refine.py`
+- `scripts/structured_data_pipeline/run_structured_data_pipeline.py`
+
+## Environment Setup
 
 ```bash
-bash scripts/setup_crosstask_one_video.sh "$HOME/datasets/crosstask"
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -U pip
+pip install torch transformers accelerate sentencepiece
 ```
 
-Then set these values in `configs/subset_example.yaml`:
-- `dataset.videos_root: "/home/<user>/datasets/crosstask/videos"`
-- `dataset.subset_size: 1`
-- `dataset.include_video_ids_file: "configs/video_ids_example.txt"`
+## Run Structured Pipeline
 
-Before running, edit `configs/subset_example.yaml`:
-- Set `dataset.videos_root` to your local video root.
-- Optional fixed subset: set `dataset.include_video_ids_file` to `configs/video_ids_example.txt`.
-- Optional random subset: set `dataset.subset_size`.
+```bash
+python3 scripts/structured_data_pipeline/run_structured_data_pipeline.py \
+  --input ~/tree_of_captions/output/trees/Video_1.json \
+  --output ./outputs/Video_1.structured.json \
+  --pipeline-dir ./outputs/pipeline_runs \
+  --model feeltheAGI/Maverick-7B \
+  --task-name "cross_task_example" \
+  --video-id "Video_1" \
+  --iterations 2
+```
 
-## Key paper-style parameters
-- `features.temporal_item_seconds`: base temporal granularity for feature stream items.
-- `features.frame_sample_per_item`: sampled frames per temporal item for encoder features.
-- `segmentation.min_caption_seconds`: minimum segment duration to caption.
-- `caption.max_frames_per_segment`: keyframes sent to caption model per segment node.
+## Notes
 
-## Output
-- `output/subset_manifest.jsonl`
-- `output/trees/<video_id>.json`
-
-## Progress So Far
-- CrossTask data download on cluster is implemented via `scripts/setup_crosstask_one_video.sh`.
-- One-video run was completed on cluster for video id `ldCg4aWd4mI`.
-- Generated files:
-  - `output/subset_manifest.jsonl`
-  - `output/trees/ldCg4aWd4mI.json`
-- Current pipeline status:
-  - Perception-style encoder path is active (`timm/PE-Core-B-16`).
-  - Hierarchical agglomerative tree construction is active.
-  - Segment captioning is active through configured caption model.
-
-## Known Notes
-- The repeated `Setting pad_token_id ...` logs during generation are warnings, not failures.
-- `subset_size` selects how many videos to process, not how many segments within a video.
-- For more leaf-level captions, lower `segmentation.min_caption_seconds` (for example `2.0`).
+- This branch is intended for producing validated structured outputs.
+- For direct iterative loop only, see branch `self_refine`.
