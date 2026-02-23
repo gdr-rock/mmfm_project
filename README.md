@@ -1,4 +1,4 @@
-﻿# Tree of Captions (Paper-Style Pipeline)
+﻿# Tree of Captions 
 
 This project implements a paper-style Tree of Captions pipeline:
 1. Extract a temporal feature stream `Z = [z1, ..., zT]` from video using a Perception-style encoder.
