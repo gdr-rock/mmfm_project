@@ -1,0 +1,42 @@
+﻿experiment_name: baseline_training
+seed: 42
+
+datasets:
+  sources:
+    - COIN
+    - CrossTask
+    - YouCook2
+    - HowTo100M
+    - EPIC-KITCHENS-100
+    - EgoExo4D
+
+model:
+  name: vlm-baseline
+  pretrained: perceptionlm-8b
+  decoder_context_tokens: 4096  # baseline uses model default context, not VLWM 11.5k
+  image_frames: 32
+  image_resolution: 448
+
+training:
+  batch_size: 128
+  epochs: 1
+  learning_rate: 2.0e-5
+  weight_decay: 0.01
+  grad_clip_norm: 1.0
+  mixed_precision: bf16
+  optimizer: adamw
+  scheduler: cosine
+  warmup_ratio: 0.03
+
+objective:
+  type: next_token_cross_entropy
+  behavior_cloning: true
+  target_fields:
+    - action_only_trajectory
+  use_critic_loss: false
+  use_auxiliary_losses: false
+
+io:
+  train_jsonl: data/baseline_train.jsonl
+  val_jsonl: data/baseline_val.jsonl
+  output_dir: outputs/baseline

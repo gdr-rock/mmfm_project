@@ -1,0 +1,10 @@
+﻿# Core runtime
+PyYAML>=6.0
+transformers>=4.46.0
+
+# Deep learning backend (choose CUDA/CPU build as needed)
+# If pip install torch fails, install from https://pytorch.org/get-started/locally/
+torch>=2.2.0
+
+# Common tokenizer backend dependency used by many HF models
+sentencepiece>=0.1.99

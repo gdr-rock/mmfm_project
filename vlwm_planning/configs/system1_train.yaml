@@ -1,0 +1,42 @@
+﻿experiment_name: system1_training
+seed: 42
+
+datasets:
+  sources:
+    - COIN
+    - CrossTask
+    - YouCook2
+    - HowTo100M
+    - EPIC-KITCHENS-100
+    - EgoExo4D
+
+model:
+  name: vlwm-system1
+  pretrained: perceptionlm-8b
+  max_context_tokens: 11500
+  image_frames: 32
+  image_resolution: 448
+
+training:
+  batch_size: 128
+  epochs: 1
+  learning_rate: 2.0e-5
+  weight_decay: 0.01
+  grad_clip_norm: 1.0
+  mixed_precision: bf16
+  optimizer: adamw
+  scheduler: cosine
+  warmup_ratio: 0.03
+
+objective:
+  type: next_token_cross_entropy
+  target_fields:
+    - goal_description
+    - goal_interpretation
+    - action_state_trajectory
+  use_auxiliary_losses: false
+
+io:
+  train_jsonl: data/system1_train.jsonl
+  val_jsonl: data/system1_val.jsonl
+  output_dir: outputs/system1
