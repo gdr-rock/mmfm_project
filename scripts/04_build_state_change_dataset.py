@@ -313,14 +313,28 @@ def build_dataset(crosstask_dir: str) -> List[dict]:
                 # Progress = fraction of unique canonical steps seen so far
                 progress = round(len(seen_canonical) / n_canonical, 3)
 
-                # Whether the transition respects canonical ordering
-                is_in_order = nxt_step_idx >= cur_step_idx
+                # --- ordering flags ---
+                # is_canonical_next: does the next step follow the recipe order?
+                is_canonical_next = nxt_step_idx >= cur_step_idx
+                # is_time_ordered: sanity check — next segment starts after current
+                # (should always be True since we sort by start_sec)
+                is_time_ordered = nxt_start >= cur_start
+
+                # --- segment position (chronological index in this video) ---
+                seg_pos = i
+                next_seg_pos = i + 1
+                transition_id = f"{tid}_{vid}_{seg_pos}"
 
                 row = {
                     # --- identifiers ---
                     "task_id":              tid,
                     "task_name":            task["name"],
                     "video_id":             vid,
+                    "transition_id":        transition_id,
+
+                    # --- segment position (chronological) ---
+                    "seg_pos":              seg_pos,
+                    "next_seg_pos":         next_seg_pos,
 
                     # --- current action ---
                     "step_idx":             cur_step_idx,
@@ -338,10 +352,11 @@ def build_dataset(crosstask_dir: str) -> List[dict]:
                     "next_action_start":    nxt_start,
                     "next_action_end":      nxt_end,
 
-                    # --- canonical position ---
+                    # --- canonical position & ordering ---
                     "canonical_order":      cur_step_idx,
                     "next_canonical_order": nxt_step_idx,
-                    "is_in_order":          is_in_order,
+                    "is_canonical_next":    is_canonical_next,
+                    "is_time_ordered":      is_time_ordered,
 
                     # --- goal model ---
                     "task_goal":            task["goal"],
@@ -384,11 +399,12 @@ def main():
 
     # Write CSV
     fieldnames = [
-        "task_id", "task_name", "video_id",
+        "task_id", "task_name", "video_id", "transition_id",
+        "seg_pos", "next_seg_pos",
         "step_idx", "action", "state_change",
         "next_step_idx", "next_action", "next_state_change",
         "action_start", "action_end", "next_action_start", "next_action_end",
-        "canonical_order", "next_canonical_order", "is_in_order",
+        "canonical_order", "next_canonical_order", "is_canonical_next", "is_time_ordered",
         "task_goal", "remaining_plan", "plan_progress",
     ]
     with open(args.output, "w", newline="") as f:
@@ -401,21 +417,23 @@ def main():
     # --- Summary statistics ---
     tasks_seen = set(r["task_id"] for r in rows)
     videos_seen = set((r["task_id"], r["video_id"]) for r in rows)
-    in_order_count = sum(1 for r in rows if r["is_in_order"])
+    canonical_next_count = sum(1 for r in rows if r["is_canonical_next"])
+    time_ordered_count = sum(1 for r in rows if r["is_time_ordered"])
     print(f"\n--- Summary ---")
-    print(f"  Tasks:          {len(tasks_seen)}")
-    print(f"  Videos:         {len(videos_seen)}")
-    print(f"  Transitions:    {len(rows)}")
-    print(f"  In-order:       {in_order_count} ({100*in_order_count/len(rows):.1f}%)")
-    print(f"  Out-of-order:   {len(rows)-in_order_count} ({100*(len(rows)-in_order_count)/len(rows):.1f}%)")
+    print(f"  Tasks:              {len(tasks_seen)}")
+    print(f"  Videos:             {len(videos_seen)}")
+    print(f"  Transitions:        {len(rows)}")
+    print(f"  Canonical-next:     {canonical_next_count} ({100*canonical_next_count/len(rows):.1f}%)")
+    print(f"  Non-canonical-next: {len(rows)-canonical_next_count} ({100*(len(rows)-canonical_next_count)/len(rows):.1f}%)")
+    print(f"  Time-ordered:       {time_ordered_count} ({100*time_ordered_count/len(rows):.1f}%) — should be 100%")
 
     # Print a few examples
     print(f"\n--- Sample rows ---")
     for r in rows[:5]:
-        print(f"  [{r['task_name']}] {r['action']} -> {r['next_action']}")
+        print(f"  [{r['task_name']}] seg {r['seg_pos']}->{r['next_seg_pos']}  {r['action']} -> {r['next_action']}")
         print(f"    ΔS:  {r['state_change']}")
         print(f"    ΔS': {r['next_state_change']}")
-        print(f"    progress={r['plan_progress']}, in_order={r['is_in_order']}")
+        print(f"    progress={r['plan_progress']}, canonical_next={r['is_canonical_next']}, tid={r['transition_id']}")
         print()
 
 
