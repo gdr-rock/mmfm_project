@@ -1,4 +1,4 @@
-# VLWM Planning Training (Paper-Aligned)
+# VLWM Planning Training 
 
 This module provides executable training pipelines for both tracks from the paper setup:
 
