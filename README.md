@@ -1,4 +1,4 @@
-﻿# VLWM Planning Training 
+# VLWM Planning Training (Paper-Aligned)
 
 This module provides executable training pipelines for both tracks from the paper setup:
 
@@ -105,6 +105,42 @@ Optional flags:
 - Loss: autoregressive next-token cross-entropy only
 - Masking: conditioning tokens are excluded from CE (`ignore_index=-100`)
 - No critic/ranking/auxiliary losses
+
+## Pipeline Summary
+
+### System-1 loss pipeline
+- Build conditioning input: `[config/system_prompt, visual_context, optional_asr, goal]`
+- Build target text: `[goal_description, goal_interpretation, <A0, DeltaS0>, ..., <AN, DeltaSN>]`
+- Tokenize `input = conditioning + target`
+- Create labels from `input_ids`
+- Mask conditioning tokens in labels with `ignore_index = -100`
+- Run model forward pass to get logits
+- Apply autoregressive shift (`logits[:, :-1]` vs `labels[:, 1:]`)
+- Compute token-level cross-entropy over unmasked target tokens only
+- Backprop + optimizer step (AdamW, warmup + cosine)
+
+### System prompts + goal + environment pipeline
+- Define system/config prompt (for example: `predict goal-plan trajectory`)
+- Load environment context (visual embeddings from video prefix + optional ASR text)
+- Load goal description (task intent)
+- Concatenate into conditioning prefix in fixed order:
+  `[CONFIG] -> [VISUAL_CONTEXT] -> [AUX/ASR optional] -> [GOAL]`
+- Keep this prefix as context-only (not supervised target)
+- Generate/prepare structured supervision target separately
+- Train model to decode target autoregressively conditioned on this prefix
+
+### Baseline training pipeline
+- Use same video/task splits as System-1 for fair comparison
+- Build conditioning input:
+  `[config/system_prompt, visual_context, optional_asr, goal]`
+- Build action-only target:
+  `[A0, A1, ..., AN]` (no DeltaState, no goal interpretation in target)
+- Tokenize `input = conditioning + action_target`
+- Mask conditioning tokens in labels (`ignore_index = -100`)
+- Forward pass through pretrained VLM baseline
+- Compute next-token cross-entropy on action tokens only
+- Train with behavior cloning setup (no critic/ranking/aux losses)
+- Save checkpoints + evaluate on the same benchmark splits
 
 ## Outputs
 
