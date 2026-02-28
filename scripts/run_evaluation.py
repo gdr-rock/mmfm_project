@@ -106,15 +106,57 @@ def extract_step_strings(output_text: str) -> list:
 # System-1 evaluation (greedy decode)
 # ---------------------------------------------------------------------------
 
-def evaluate_system1(test_data_path: str, model_path: str, device, max_samples=None):
-    """Run System-1 greedy decoding on test set and compute metrics."""
-    from transformers import AutoTokenizer, T5ForConditionalGeneration
+def _load_system1_model(model_path, device, model_type="t5", base_model_name=None):
+    """Load System-1 model. Returns (model, tokenizer, gen_mode)."""
+    from transformers import AutoTokenizer
 
-    print(f"  Loading model: {model_path}")
-    tokenizer = AutoTokenizer.from_pretrained(model_path)
-    model = T5ForConditionalGeneration.from_pretrained(model_path)
-    model.to(device)
-    model.eval()
+    if model_type == "t5":
+        from transformers import T5ForConditionalGeneration
+        tokenizer = AutoTokenizer.from_pretrained(model_path)
+        model = T5ForConditionalGeneration.from_pretrained(model_path)
+        model.to(device)
+        model.eval()
+        return model, tokenizer, "seq2seq"
+
+    elif model_type == "plm":
+        from transformers import AutoModelForCausalLM
+        from peft import PeftModel
+
+        if base_model_name is None:
+            base_model_name = "facebook/Perception-LM-1B"
+
+        tokenizer = AutoTokenizer.from_pretrained(base_model_name, use_fast=True)
+        if tokenizer.pad_token is None:
+            tokenizer.pad_token = tokenizer.eos_token
+            tokenizer.pad_token_id = tokenizer.eos_token_id
+
+        # Try VLM class, fallback to causal LM
+        try:
+            from transformers import AutoModelForImageTextToText
+            base = AutoModelForImageTextToText.from_pretrained(
+                base_model_name, torch_dtype=torch.bfloat16, trust_remote_code=True,
+            )
+        except Exception:
+            base = AutoModelForCausalLM.from_pretrained(
+                base_model_name, torch_dtype=torch.bfloat16, trust_remote_code=True,
+            )
+
+        model = PeftModel.from_pretrained(base, model_path)
+        model.to(device)
+        model.eval()
+        return model, tokenizer, "causal"
+
+    else:
+        raise ValueError(f"Unknown system1_type: {model_type}")
+
+
+def evaluate_system1(test_data_path: str, model_path: str, device,
+                     max_samples=None, model_type="t5", base_model_name=None):
+    """Run System-1 greedy decoding on test set and compute metrics."""
+    print(f"  Loading model ({model_type}): {model_path}")
+    model, tokenizer, gen_mode = _load_system1_model(
+        model_path, device, model_type, base_model_name
+    )
 
     print(f"  Loading test data: {test_data_path}")
     samples = []
@@ -140,12 +182,20 @@ def evaluate_system1(test_data_path: str, model_path: str, device, max_samples=N
         enc = tokenizer(
             input_text, max_length=512, truncation=True, return_tensors="pt"
         ).to(device)
+        prompt_len = enc.input_ids.shape[1]
 
         with torch.no_grad():
             gen_ids = model.generate(
                 **enc, max_new_tokens=256, num_beams=1, do_sample=False,
             )
-        pred_text = tokenizer.decode(gen_ids[0], skip_special_tokens=True)
+
+        if gen_mode == "causal":
+            # Strip prompt tokens for causal LM
+            completion_ids = gen_ids[0][prompt_len:]
+            pred_text = tokenizer.decode(completion_ids, skip_special_tokens=True).strip()
+        else:
+            pred_text = tokenizer.decode(gen_ids[0], skip_special_tokens=True)
+
         pred_steps = extract_step_strings(pred_text)
 
         sr = compute_sr(pred_steps, gold_steps)
@@ -260,6 +310,10 @@ def main():
                         default="system1")
     parser.add_argument("--test_data", default="data/crosstask/system1_test.jsonl")
     parser.add_argument("--system1_model", default="checkpoints/system1/best_model")
+    parser.add_argument("--system1_type", choices=["t5", "plm"], default="t5",
+                        help="System-1 model type: t5 (seq2seq) or plm (causal LM + LoRA)")
+    parser.add_argument("--plm_base_model", default=None,
+                        help="Base model name for PLM (e.g. facebook/Perception-LM-1B)")
     parser.add_argument("--planning_output", default=None,
                         help="JSONL from run_planning.py (for system2 mode)")
     parser.add_argument("--max_samples", type=int, default=None)
@@ -286,7 +340,9 @@ def main():
 
         if mode == "system1":
             results = evaluate_system1(
-                args.test_data, args.system1_model, device, args.max_samples
+                args.test_data, args.system1_model, device, args.max_samples,
+                model_type=args.system1_type,
+                base_model_name=args.plm_base_model,
             )
         else:
             results = evaluate_system2(args.planning_output)

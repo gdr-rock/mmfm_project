@@ -151,10 +151,13 @@ def format_input_text(
     lines.append(f"Goal: {goal}")
     lines.append(f"Interpretation: {interpretation}")
     lines.append("")
-    lines.append("Progress so far:")
 
-    for i, (action, state_change) in enumerate(prefix_steps, 1):
-        lines.append(f"  {i}) {action} | {state_change}")
+    if prefix_steps:
+        lines.append("Progress so far:")
+        for i, (action, state_change) in enumerate(prefix_steps, 1):
+            lines.append(f"  {i}) {action} | {state_change}")
+    else:
+        lines.append("No progress yet.")
 
     lines.append("")
     lines.append(
@@ -192,14 +195,22 @@ def build_system1_samples(
     max_prefix: int,
     k_values: List[int],
     rng: random.Random,
+    zero_prefix_prob: float = 0.0,
 ) -> List[dict]:
-    """Generate System-1 training samples."""
+    """Generate System-1 training samples.
+
+    Args:
+        zero_prefix_prob: probability of generating a zero-prefix sample
+            (goal-only, no observed steps). VLWM natively supports this
+            since it generates the full trajectory from [config, context, goal].
+            Set to ~0.15 for 15% zero-prefix samples.
+    """
     samples = []
 
     for (task_id, video_id), steps in trajectories.items():
         n = len(steps)
-        if n < 3:
-            # Need at least 1 prefix step + 1 target step + margin
+        if n < 2:
+            # Need at least 1 target step
             continue
 
         info = task_info[task_id]
@@ -209,11 +220,18 @@ def build_system1_samples(
         for _ in range(samples_per_video):
             k = rng.choice(k_values)
 
-            # prefix_len t: at least 1, at most min(n - k, max_prefix)
-            max_t = min(n - k, max_prefix)
-            if max_t < 1:
-                continue
-            t = rng.randint(1, max_t)
+            # Decide: zero-prefix or normal
+            if zero_prefix_prob > 0 and rng.random() < zero_prefix_prob:
+                # Zero-prefix: predict from the start of the trajectory
+                t = 0
+                # k must not exceed trajectory length
+                k = min(k, n)
+            else:
+                # prefix_len t: at least 1, at most min(n - k, max_prefix)
+                max_t = min(n - k, max_prefix)
+                if max_t < 1:
+                    continue
+                t = rng.randint(1, max_t)
 
             prefix_steps = steps[:t]
             target_steps = steps[t : t + k]
@@ -279,6 +297,14 @@ def main():
         type=int,
         default=42,
     )
+    parser.add_argument(
+        "--zero_prefix_prob",
+        type=float,
+        default=0.15,
+        help="Probability of generating zero-prefix (goal-only) samples. "
+             "Matches VLWM's full-trajectory generation from [config, context, goal]. "
+             "Set to 0.0 to disable (original behavior).",
+    )
     args = parser.parse_args()
 
     k_values = [int(x) for x in args.k_values.split(",")]
@@ -294,10 +320,12 @@ def main():
 
     print(f"[2/5] Building System-1 samples "
           f"(samples_per_video={args.samples_per_video}, "
-          f"max_prefix={args.max_prefix}, k∈{{{args.k_values}}})")
+          f"max_prefix={args.max_prefix}, k∈{{{args.k_values}}}, "
+          f"zero_prefix_prob={args.zero_prefix_prob})")
     samples = build_system1_samples(
         trajectories, task_info, task_steps,
         args.samples_per_video, args.max_prefix, k_values, rng,
+        zero_prefix_prob=args.zero_prefix_prob,
     )
     print(f"       Generated {len(samples)} training samples")
 

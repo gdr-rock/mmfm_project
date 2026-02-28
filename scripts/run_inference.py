@@ -1,0 +1,706 @@
+#!/usr/bin/env python3
+"""
+Standalone inference for the VLWM-style planning pipeline.
+
+╔══════════════════════════════════════════════════════════════════╗
+║  WHAT THIS SCRIPT DOES                                         ║
+║  1. System-1 (fast):   goal + prefix → next-step predictions   ║
+║  2. System-2 (search): generate K plans → rerank with Critic   ║
+║                        + optional V-JEPA energy → pick best    ║
+╚══════════════════════════════════════════════════════════════════╝
+
+Inputs at inference time
+────────────────────────
+  • Goal:   free-text description of the task
+            e.g. "Complete the task: Make Pancakes."
+  • Prefix: list of already-observed steps, each "action | state_change"
+            e.g. ["pour egg | Egg is now poured in.",
+                   "add flour | Flour is now added to the mixture."]
+  • k:      how many future steps to predict (default: 3)
+
+The script constructs the same prompt format used during training:
+
+    Goal: Complete the task: Make Pancakes.
+    Interpretation: <optional>
+
+    Progress so far:
+      1) pour egg | Egg is now poured in.
+      2) add flour | Flour is now added to the mixture.
+
+    Predict the next 3 step(s). Output JSON only: {"next_steps": [{"action": "...", "state_change": "..."}, ...]}
+
+Model variants supported
+────────────────────────
+  System-1:  --system1_type t5   → T5-small seq2seq (default)
+             --system1_type plm  → PerceptionLM-1B + LoRA (causal LM)
+
+  Critic:    --critic_type mlp   → MiniLM + MLP head (default)
+             --critic_type llm   → Llama-3.2-1B + LoRA + cost head
+
+  Energy:    --latent_dir        → V-JEPA latent directory (optional)
+
+Usage examples
+──────────────
+  # 1) System-1 greedy (T5, text-only) — quickest
+  python3 scripts/run_inference.py \\
+      --system1_model checkpoints/system1/best_model \\
+      --goal "Complete the task: Make Pancakes." \\
+      --prefix "pour egg | Egg is now poured in." \\
+               "add flour | Flour is now added to the mixture." \\
+      --k 3
+
+  # 2) System-2 with T5 + MiniLM critic
+  python3 scripts/run_inference.py \\
+      --mode system2 \\
+      --system1_model checkpoints/system1/best_model \\
+      --critic_model  checkpoints/critic/best_model.pt \\
+      --goal "Complete the task: Make Pancakes." \\
+      --prefix "pour egg | Egg is now poured in." \\
+      --K 5 --temperature 0.8
+
+  # 3) System-2 with PLM+LoRA + LLM critic + V-JEPA energy
+  python3 scripts/run_inference.py \\
+      --mode system2 \\
+      --system1_type plm \\
+      --system1_model checkpoints/system1_plm_lora/best_adapter \\
+      --plm_base_model facebook/Perception-LM-1B \\
+      --critic_type llm \\
+      --critic_model checkpoints/critic_llm_lora/best_adapter \\
+      --llm_base_critic meta-llama/Llama-3.2-1B \\
+      --latent_dir data/crosstask/vjepa_latents \\
+      --task_id 91515 --video_id KUDnfzXsB3w \\
+      --goal "Complete the task: Make Pancakes." \\
+      --prefix "pour egg | Egg is now poured in." \\
+      --K 5 --alpha 0.7 --beta 0.3
+
+  # 4) From a test JSONL sample (auto-fills goal, prefix, meta)
+  python3 scripts/run_inference.py \\
+      --mode system2 \\
+      --from_jsonl data/crosstask/system1_test.jsonl \\
+      --sample_idx 0 \\
+      --system1_model checkpoints/system1/best_model \\
+      --critic_model  checkpoints/critic/best_model.pt \\
+      --K 5
+
+  # 5) Goal model inference (what is the task given a partial trajectory?)
+  python3 scripts/run_inference.py \\
+      --mode goal \\
+      --goal_model checkpoints/goal_model/best_model \\
+      --prefix "pour egg | Egg is now poured in." \\
+               "add flour | Flour is now added to the mixture."
+"""
+
+import argparse
+import json
+import os
+import sys
+from pathlib import Path
+
+import torch
+
+# ─────────────────────────────────────────────────────────────────
+# Prompt construction
+# ─────────────────────────────────────────────────────────────────
+
+def build_system1_prompt(goal: str, prefix_steps: list, k: int,
+                         interpretation: str = "") -> str:
+    """
+    Build the exact prompt format used in System-1 training data.
+
+    This matches scripts/06_build_system1_dataset.py output.
+    """
+    lines = [f"Goal: {goal}"]
+    if interpretation:
+        lines.append(f"Interpretation: {interpretation}")
+    lines.append("")
+    if prefix_steps:
+        lines.append("Progress so far:")
+        for i, step in enumerate(prefix_steps, 1):
+            lines.append(f"  {i}) {step}")
+    else:
+        lines.append("Progress so far:")
+        lines.append("  (No steps observed yet.)")
+    lines.append("")
+    lines.append(
+        f'Predict the next {k} step(s). Output JSON only: '
+        '{"next_steps": [{"action": "...", "state_change": "..."}, ...]}'
+    )
+    return "\n".join(lines)
+
+
+def build_goal_prompt(prefix_steps: list) -> str:
+    """Build the prompt format used in Goal Model training data."""
+    lines = ["Observed steps:"]
+    for i, step in enumerate(prefix_steps, 1):
+        lines.append(f"  {i}) {step}")
+    lines.append("")
+    lines.append("Identify the overall goal of this task.")
+    return "\n".join(lines)
+
+
+def parse_plan_json(text: str) -> list:
+    """Parse model output JSON into list of 'action | state_change' strings."""
+    try:
+        parsed = json.loads(text)
+        steps = parsed.get("next_steps", [])
+        return [f"{s['action']} | {s['state_change']}" for s in steps]
+    except (json.JSONDecodeError, KeyError, TypeError):
+        return []
+
+
+# ─────────────────────────────────────────────────────────────────
+# Model loaders
+# ─────────────────────────────────────────────────────────────────
+
+def load_system1(model_path: str, device, model_type: str = "t5",
+                 base_model_name: str = None):
+    """Load System-1 model. Returns (model, tokenizer, gen_mode)."""
+    from transformers import AutoTokenizer
+
+    if model_type == "t5":
+        from transformers import T5ForConditionalGeneration
+        print(f"Loading System-1 (T5): {model_path}")
+        tokenizer = AutoTokenizer.from_pretrained(model_path)
+        model = T5ForConditionalGeneration.from_pretrained(model_path)
+        model.to(device).eval()
+        return model, tokenizer, "seq2seq"
+
+    elif model_type == "plm":
+        from transformers import AutoModelForCausalLM
+        from peft import PeftModel
+
+        if base_model_name is None:
+            base_model_name = "facebook/Perception-LM-1B"
+        print(f"Loading System-1 (PLM+LoRA): base={base_model_name}, adapter={model_path}")
+
+        tokenizer = AutoTokenizer.from_pretrained(base_model_name, use_fast=True)
+        if tokenizer.pad_token is None:
+            tokenizer.pad_token = tokenizer.eos_token
+
+        try:
+            from transformers import AutoModelForImageTextToText
+            base = AutoModelForImageTextToText.from_pretrained(
+                base_model_name, torch_dtype=torch.bfloat16, trust_remote_code=True
+            )
+        except Exception:
+            base = AutoModelForCausalLM.from_pretrained(
+                base_model_name, torch_dtype=torch.bfloat16, trust_remote_code=True
+            )
+
+        model = PeftModel.from_pretrained(base, model_path)
+        model.to(device).eval()
+        return model, tokenizer, "causal"
+
+    else:
+        raise ValueError(f"Unknown system1_type: {model_type}")
+
+
+def load_critic(model_path: str, device, critic_type: str = "mlp",
+                base_model_name: str = None):
+    """Load Critic model. Returns (model, tokenizer, format_fn)."""
+    from transformers import AutoTokenizer
+    import importlib.util
+
+    if critic_type == "mlp":
+        from transformers import AutoModel
+        print(f"Loading Critic (MiniLM+MLP): {model_path}")
+        spec = importlib.util.spec_from_file_location(
+            "train_critic",
+            os.path.join(os.path.dirname(__file__), "train_critic.py"),
+        )
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+
+        ckpt = torch.load(model_path, map_location=device, weights_only=False)
+        encoder_name = ckpt.get("encoder_name", "sentence-transformers/all-MiniLM-L6-v2")
+        model = mod.CriticModel(encoder_name)
+        model.load_state_dict(ckpt["model_state_dict"])
+        model.to(device).eval()
+
+        tokenizer = AutoTokenizer.from_pretrained(encoder_name)
+        return model, tokenizer, mod.format_trajectory_text
+
+    elif critic_type == "llm":
+        from transformers import AutoModelForCausalLM
+        from peft import PeftModel
+
+        if base_model_name is None:
+            base_model_name = "meta-llama/Llama-3.2-1B"
+        print(f"Loading Critic (LLM+LoRA): base={base_model_name}, adapter={model_path}")
+
+        spec = importlib.util.spec_from_file_location(
+            "train_critic_llm_lora",
+            os.path.join(os.path.dirname(__file__), "train_critic_llm_lora.py"),
+        )
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+
+        tokenizer = AutoTokenizer.from_pretrained(base_model_name, use_fast=True)
+        if tokenizer.pad_token is None:
+            tokenizer.pad_token = tokenizer.eos_token
+
+        base = AutoModelForCausalLM.from_pretrained(
+            base_model_name, torch_dtype=torch.bfloat16, trust_remote_code=True
+        )
+        peft_model = PeftModel.from_pretrained(base, model_path)
+        peft_model.eval()
+
+        hidden_dim = base.config.hidden_size
+        critic = mod.LLMCriticWithHead(peft_model, hidden_dim)
+
+        head_path = os.path.join(model_path, "cost_head.pt")
+        if os.path.exists(head_path):
+            critic.load_head(head_path)
+        else:
+            print(f"  ⚠️  cost_head.pt not found at {head_path}")
+
+        critic.to(device).eval()
+        return critic, tokenizer, mod.format_trajectory
+
+    else:
+        raise ValueError(f"Unknown critic_type: {critic_type}")
+
+
+def load_goal_model(model_path: str, device):
+    """Load Goal Model (T5 seq2seq)."""
+    from transformers import AutoTokenizer, T5ForConditionalGeneration
+    print(f"Loading Goal Model: {model_path}")
+    tokenizer = AutoTokenizer.from_pretrained(model_path)
+    model = T5ForConditionalGeneration.from_pretrained(model_path)
+    model.to(device).eval()
+    return model, tokenizer
+
+
+# ─────────────────────────────────────────────────────────────────
+# V-JEPA energy scoring
+# ─────────────────────────────────────────────────────────────────
+
+def compute_energy(latent_dir: str, task_id: str, video_id: str,
+                   plan_steps: list, n_prefix: int) -> float:
+    """
+    Compute Energy(z_predicted, z_goal) = ||z_pred − z_goal||₂².
+
+    z_goal = last segment latent (V-JEPA).
+    z_pred = segment latent at the position the plan would reach.
+    Latents are mean-pooled from (T_tokens, D) → (D,).
+    """
+    vid_dir = os.path.join(latent_dir, str(task_id), str(video_id))
+    if not os.path.exists(vid_dir):
+        return 0.0
+
+    latent_files = sorted(
+        [f for f in os.listdir(vid_dir)
+         if f.endswith(".pt") and f.startswith("segment_")],
+        key=lambda f: int(f.split("_")[1].split(".")[0]),
+    )
+    if not latent_files:
+        return 0.0
+
+    def _load_pool(path):
+        z = torch.load(path, weights_only=True)
+        return z.mean(dim=0) if z.dim() == 2 else z
+
+    z_goal = _load_pool(os.path.join(vid_dir, latent_files[-1]))
+
+    target_idx = min(len(latent_files) - 1, n_prefix + len(plan_steps))
+    z_pred = _load_pool(os.path.join(vid_dir, latent_files[target_idx]))
+
+    return torch.norm(z_pred - z_goal, p=2).item() ** 2
+
+
+# ─────────────────────────────────────────────────────────────────
+# Generation
+# ─────────────────────────────────────────────────────────────────
+
+def generate_plan(model, tokenizer, prompt: str, device,
+                  gen_mode: str = "seq2seq",
+                  temperature: float = 0.0,
+                  top_p: float = 0.9,
+                  max_new_tokens: int = 256) -> str:
+    """Generate a single plan from a prompt."""
+    enc = tokenizer(
+        prompt, max_length=512, truncation=True, return_tensors="pt"
+    ).to(device)
+    prompt_len = enc.input_ids.shape[1]
+
+    do_sample = temperature > 0
+    with torch.no_grad():
+        gen_ids = model.generate(
+            **enc,
+            max_new_tokens=max_new_tokens,
+            do_sample=do_sample,
+            temperature=temperature if do_sample else None,
+            top_p=top_p if do_sample else None,
+            num_beams=1,
+        )
+
+    if gen_mode == "causal":
+        completion_ids = gen_ids[0][prompt_len:]
+        return tokenizer.decode(completion_ids, skip_special_tokens=True).strip()
+    else:
+        return tokenizer.decode(gen_ids[0], skip_special_tokens=True)
+
+
+# ─────────────────────────────────────────────────────────────────
+# Main inference modes
+# ─────────────────────────────────────────────────────────────────
+
+def run_system1(args, device):
+    """System-1 only: greedy decode (or temperature sampling) from one prompt."""
+    model, tokenizer, gen_mode = load_system1(
+        args.system1_model, device, args.system1_type, args.plm_base_model
+    )
+
+    prompt = build_system1_prompt(
+        goal=args.goal,
+        prefix_steps=args.prefix or [],
+        k=args.k,
+        interpretation=args.interpretation or "",
+    )
+
+    print(f"\n{'─'*60}")
+    print("PROMPT:")
+    print(prompt)
+    print(f"{'─'*60}\n")
+
+    raw = generate_plan(
+        model, tokenizer, prompt, device,
+        gen_mode=gen_mode,
+        temperature=args.temperature,
+        max_new_tokens=args.max_new_tokens,
+    )
+
+    steps = parse_plan_json(raw)
+
+    print("RAW OUTPUT:")
+    print(raw)
+    print(f"\nPARSED STEPS ({len(steps)}):")
+    for i, s in enumerate(steps, 1):
+        print(f"  {i}) {s}")
+    if not steps:
+        print("  (no valid JSON parsed)")
+
+    return {"raw": raw, "steps": steps}
+
+
+def run_system2(args, device):
+    """System-2: generate K plans, rerank with Critic + optional Energy."""
+    # Load models
+    s1_model, s1_tokenizer, gen_mode = load_system1(
+        args.system1_model, device, args.system1_type, args.plm_base_model
+    )
+    critic_model, critic_tokenizer, format_traj_fn = load_critic(
+        args.critic_model, device, args.critic_type, args.llm_base_critic
+    )
+
+    prompt = build_system1_prompt(
+        goal=args.goal,
+        prefix_steps=args.prefix or [],
+        k=args.k,
+        interpretation=args.interpretation or "",
+    )
+
+    print(f"\n{'─'*60}")
+    print("PROMPT:")
+    print(prompt)
+    print(f"{'─'*60}\n")
+
+    # Generate K plans
+    print(f"Generating {args.K} candidate plans (T={args.temperature})...")
+    plans = []
+    for i in range(args.K):
+        raw = generate_plan(
+            s1_model, s1_tokenizer, prompt, device,
+            gen_mode=gen_mode,
+            temperature=args.temperature,
+            top_p=args.top_p,
+            max_new_tokens=args.max_new_tokens,
+        )
+        steps = parse_plan_json(raw)
+        plans.append({
+            "raw": raw,
+            "steps": steps,
+            "valid": len(steps) > 0,
+        })
+        status = f"{len(steps)} steps" if steps else "invalid JSON"
+        print(f"  Plan {i+1}: {status}")
+
+    # Score with critic
+    print(f"\nScoring with Critic ({args.critic_type})...")
+    prefix_steps = args.prefix or []
+    critic_scores = []
+    for plan in plans:
+        if not plan["valid"]:
+            critic_scores.append(float("inf"))
+            continue
+        full_steps = prefix_steps + plan["steps"]
+        text = format_traj_fn(args.goal, full_steps)
+        enc = critic_tokenizer(
+            text, max_length=512, truncation=True, return_tensors="pt"
+        ).to(device)
+        with torch.no_grad():
+            cost = critic_model(enc.input_ids, enc.attention_mask).item()
+        critic_scores.append(cost)
+
+    # Score with energy (optional)
+    energy_scores = [0.0] * len(plans)
+    use_energy = (
+        args.latent_dir and os.path.isdir(args.latent_dir or "")
+        and args.task_id and args.video_id
+    )
+    if use_energy:
+        print(f"Computing V-JEPA energy (α={args.alpha}, β={args.beta})...")
+        for i, plan in enumerate(plans):
+            if not plan["valid"]:
+                energy_scores[i] = float("inf")
+                continue
+            energy_scores[i] = compute_energy(
+                args.latent_dir, args.task_id, args.video_id,
+                plan["steps"], len(prefix_steps),
+            )
+    else:
+        args.alpha = 1.0
+        args.beta = 0.0
+
+    # Combined scores
+    combined = [
+        args.alpha * c + args.beta * e
+        for c, e in zip(critic_scores, energy_scores)
+    ]
+    best_idx = min(range(len(combined)), key=lambda i: combined[i])
+
+    # Print results
+    print(f"\n{'─'*60}")
+    print("PLAN RANKING:")
+    print(f"{'─'*60}")
+    for i, (p, cs, es, comb) in enumerate(
+        zip(plans, critic_scores, energy_scores, combined)
+    ):
+        marker = " ◀ BEST" if i == best_idx else ""
+        status = "✓" if p["valid"] else "✗"
+        print(f"  [{status}] Plan {i+1}: critic={cs:.4f}  "
+              f"energy={es:.4f}  combined={comb:.4f}{marker}")
+        if p["steps"]:
+            for j, s in enumerate(p["steps"], 1):
+                print(f"        {j}) {s}")
+
+    print(f"\n{'─'*60}")
+    print(f"BEST PLAN (#{best_idx+1}, score={combined[best_idx]:.4f}):")
+    print(f"{'─'*60}")
+    for j, s in enumerate(plans[best_idx]["steps"], 1):
+        print(f"  {j}) {s}")
+
+    return {
+        "best_idx": best_idx,
+        "best_plan": plans[best_idx],
+        "best_score": combined[best_idx],
+        "all_plans": plans,
+        "critic_scores": critic_scores,
+        "energy_scores": energy_scores,
+    }
+
+
+def run_goal(args, device):
+    """Goal Model inference: predict the task goal from observed steps."""
+    model, tokenizer = load_goal_model(args.goal_model, device)
+
+    prompt = build_goal_prompt(args.prefix or [])
+
+    print(f"\n{'─'*60}")
+    print("PROMPT:")
+    print(prompt)
+    print(f"{'─'*60}\n")
+
+    enc = tokenizer(
+        prompt, max_length=384, truncation=True, return_tensors="pt"
+    ).to(device)
+
+    with torch.no_grad():
+        gen_ids = model.generate(
+            **enc, max_new_tokens=128, num_beams=1, do_sample=False
+        )
+    pred_goal = tokenizer.decode(gen_ids[0], skip_special_tokens=True)
+
+    print(f"PREDICTED GOAL: {pred_goal}")
+    return {"predicted_goal": pred_goal}
+
+
+# ─────────────────────────────────────────────────────────────────
+# CLI
+# ─────────────────────────────────────────────────────────────────
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="VLWM-style planning inference",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  # System-1 greedy
+  python3 scripts/run_inference.py \\
+      --system1_model checkpoints/system1/best_model \\
+      --goal "Complete the task: Make Pancakes." \\
+      --prefix "pour egg | Egg is now poured in."
+
+  # System-2 with critic reranking
+  python3 scripts/run_inference.py --mode system2 \\
+      --system1_model checkpoints/system1/best_model \\
+      --critic_model  checkpoints/critic/best_model.pt \\
+      --goal "Complete the task: Make Pancakes." \\
+      --prefix "pour egg | Egg is now poured in." \\
+      --K 5 --temperature 0.8
+
+  # Goal prediction
+  python3 scripts/run_inference.py --mode goal \\
+      --goal_model checkpoints/goal_model/best_model \\
+      --prefix "pour egg | Egg is now poured in." \\
+               "add flour | Flour is now added."
+        """
+    )
+
+    # Mode
+    parser.add_argument("--mode", choices=["system1", "system2", "goal"],
+                        default="system1",
+                        help="system1=greedy plan, system2=K plans+reranking, "
+                             "goal=predict task goal from observations")
+
+    # Input (free-text)
+    parser.add_argument("--goal", type=str, default="",
+                        help="Task goal text (e.g. 'Complete the task: Make Pancakes.')")
+    parser.add_argument("--prefix", nargs="*", default=None,
+                        help="Observed steps, each 'action | state_change'")
+    parser.add_argument("--interpretation", type=str, default="",
+                        help="Optional task interpretation line")
+    parser.add_argument("--k", type=int, default=3,
+                        help="Number of future steps to predict")
+
+    # Input (from JSONL)
+    parser.add_argument("--from_jsonl", type=str, default=None,
+                        help="Load a sample from a test JSONL file instead of --goal/--prefix")
+    parser.add_argument("--sample_idx", type=int, default=0,
+                        help="Sample index within the JSONL file")
+
+    # System-1 model
+    parser.add_argument("--system1_type", choices=["t5", "plm"], default="t5")
+    parser.add_argument("--system1_model", default="checkpoints/system1/best_model")
+    parser.add_argument("--plm_base_model", default=None,
+                        help="HuggingFace base model for PLM (e.g. facebook/Perception-LM-1B)")
+
+    # Critic model (system2 only)
+    parser.add_argument("--critic_type", choices=["mlp", "llm"], default="mlp")
+    parser.add_argument("--critic_model", default="checkpoints/critic/best_model.pt")
+    parser.add_argument("--llm_base_critic", default=None,
+                        help="HuggingFace base model for LLM critic")
+
+    # Goal model (goal mode only)
+    parser.add_argument("--goal_model", default="checkpoints/goal_model/best_model")
+
+    # V-JEPA energy (system2 only, optional)
+    parser.add_argument("--latent_dir", default=None,
+                        help="V-JEPA latent directory (enables energy scoring)")
+    parser.add_argument("--task_id", default=None,
+                        help="CrossTask task ID (needed for energy scoring)")
+    parser.add_argument("--video_id", default=None,
+                        help="CrossTask video ID (needed for energy scoring)")
+    parser.add_argument("--alpha", type=float, default=0.7,
+                        help="Critic weight in combined score")
+    parser.add_argument("--beta", type=float, default=0.3,
+                        help="Energy weight in combined score")
+
+    # Generation params
+    parser.add_argument("--K", type=int, default=5,
+                        help="Number of candidate plans (system2 only)")
+    parser.add_argument("--temperature", type=float, default=0.0,
+                        help="Sampling temperature (0=greedy, >0=stochastic)")
+    parser.add_argument("--top_p", type=float, default=0.9)
+    parser.add_argument("--max_new_tokens", type=int, default=256)
+
+    # Output
+    parser.add_argument("--output_json", type=str, default=None,
+                        help="Save results to a JSON file")
+
+    args = parser.parse_args()
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print(f"Device: {device}")
+
+    # ── Load from JSONL if specified ──
+    if args.from_jsonl:
+        print(f"Loading sample {args.sample_idx} from {args.from_jsonl}")
+        samples = []
+        with open(args.from_jsonl) as f:
+            for line in f:
+                if line.strip():
+                    samples.append(json.loads(line))
+        if args.sample_idx >= len(samples):
+            print(f"ERROR: sample_idx {args.sample_idx} out of range "
+                  f"(file has {len(samples)} samples)")
+            sys.exit(1)
+
+        sample = samples[args.sample_idx]
+        meta = sample.get("meta", {})
+
+        # Parse the input_text to extract goal, interpretation, and prefix
+        input_text = sample["input_text"]
+        parsed_goal = ""
+        parsed_interp = ""
+        parsed_prefix = []
+        for line in input_text.split("\n"):
+            if line.startswith("Goal:"):
+                parsed_goal = line[len("Goal:"):].strip()
+            elif line.startswith("Interpretation:"):
+                parsed_interp = line[len("Interpretation:"):].strip()
+            elif line.strip() == "(No steps observed yet.)":
+                # Zero-prefix sample — leave parsed_prefix empty
+                pass
+            elif line.strip() and line.strip()[0].isdigit() and ")" in line:
+                step_text = line.strip().split(")", 1)[1].strip()
+                parsed_prefix.append(step_text)
+
+        if not args.goal:
+            args.goal = parsed_goal
+        if not args.interpretation:
+            args.interpretation = parsed_interp
+        if not args.prefix:
+            args.prefix = parsed_prefix
+        if not args.k:
+            args.k = meta.get("k", 3)
+        if not args.task_id:
+            args.task_id = str(meta.get("task_id", ""))
+        if not args.video_id:
+            args.video_id = str(meta.get("video_id", ""))
+
+        # Show gold for comparison
+        gold_steps = parse_plan_json(sample.get("output_text", ""))
+        if gold_steps:
+            print(f"GOLD STEPS ({len(gold_steps)}):")
+            for i, s in enumerate(gold_steps, 1):
+                print(f"  {i}) {s}")
+            print()
+
+    # ── Validate inputs ──
+    if args.mode in ("system1", "system2") and not args.goal:
+        print("ERROR: --goal is required (or use --from_jsonl)")
+        sys.exit(1)
+    if args.mode == "goal" and not args.prefix:
+        print("ERROR: --prefix is required for goal mode")
+        sys.exit(1)
+
+    # ── Dispatch ──
+    if args.mode == "system1":
+        result = run_system1(args, device)
+    elif args.mode == "system2":
+        result = run_system2(args, device)
+    elif args.mode == "goal":
+        result = run_goal(args, device)
+    else:
+        raise ValueError(f"Unknown mode: {args.mode}")
+
+    # ── Save ──
+    if args.output_json:
+        Path(args.output_json).parent.mkdir(parents=True, exist_ok=True)
+        with open(args.output_json, "w") as f:
+            json.dump(result, f, indent=2, ensure_ascii=False, default=str)
+        print(f"\nSaved to {args.output_json}")
+
+
+if __name__ == "__main__":
+    main()

@@ -413,16 +413,25 @@ python3 scripts/06_build_system1_dataset.py
 python3 scripts/07_build_goal_dataset.py
 python3 scripts/08_split_datasets.py
 
-# ─── Phase 2: Training (GPU, run one at a time) ───
-python3 scripts/train_system1.py      # ~30-60 min on 1× A100
-python3 scripts/train_goal_model.py   # ~20-40 min on 1× A100
-python3 scripts/train_critic.py       # ~15-30 min on 1× A100
-
-# ─── Phase 3: Plots (CPU, <1 min) ───
-python3 scripts/plot_training.py
-
-# ─── Phase 4: V-JEPA Latents (GPU, long, optional) ───
+# ─── Phase 2: V-JEPA Latent Extraction (GPU, long) ───
+#   MUST run before training if you plan to use --latent_dir
+#   for latent grounding (VLWM §3.1.1 InfoNCE loss).
+#   Without this, training falls back to text-only (still works).
 python3 scripts/extract_vjepa_latents.py --max_videos 100
+
+# ─── Phase 3: Training (GPU, run one at a time) ───
+#   Text-only (no latent grounding):
+python3 scripts/train_system1.py
+python3 scripts/train_goal_model.py
+python3 scripts/train_critic.py
+#   With latent grounding (requires Phase 2):
+python3 scripts/train_system1.py --latent_dir data/crosstask/vjepa_latents
+#   VLWM-scale (PLM + LoRA System-1, LLM + LoRA Critic):
+python3 scripts/train_system1_plm_lora.py --latent_dir data/crosstask/vjepa_latents
+python3 scripts/train_critic_llm_lora.py
+
+# ─── Phase 4: Plots (CPU, <1 min) ───
+python3 scripts/plot_training.py
 
 # ─── Phase 5: Inference (GPU, ~10-30 min) ───
 python3 scripts/run_planning.py
