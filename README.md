@@ -13,6 +13,7 @@
 | **Critic LLM+LoRA** (System-2 Scorer) | `meta-llama/Llama-3.2-1B` + LoRA | 1.2B (3M trainable) | Causal LM → last-token → scalar cost (VLWM-faithful) |
 | **V-JEPA 2 Encoder** | `facebookresearch/vjepa2` ViT-L | 300M | Extract predictive video latents (1024-dim) |
 | **Latent Projection Head** | MLP (2-layer + GELU + L2-norm) | ~2M | Project LLM hidden states → V-JEPA space (InfoNCE) |
+| **PLM Vision Tower** (inference) | Built-in to PLM-1B/8B | — | Generate vision-grounded interpretation from frames (Optional, `--frames`) |
 
 > **Scale note:** VLWM uses PerceptionLM-8B (System-1) and Llama-3.2-1B (Critic) trained on 180k videos.
 > We have ~2.7k CrossTask videos (~12k training samples). We provide **two options** for each:
@@ -374,6 +375,111 @@ python3 scripts/run_evaluation.py \
 - **mAcc** (Mean Accuracy) — step-level accuracy at each position
 - **mIoU** (Mean IoU) — set overlap between predicted and gold steps
 
+### 8. Standalone Inference (`run_inference.py`)
+
+```bash
+# System-1 greedy (text-only, rule-based interpretation)
+python3 scripts/run_inference.py \
+    --system1_model checkpoints/system1/best_model \
+    --goal "Complete the task: Make Pancakes." \
+    --prefix "pour egg | Egg is now poured in." \
+    --k 3
+
+# From a test JSONL sample (goal, prefix, interpretation auto-filled)
+python3 scripts/run_inference.py \
+    --from_jsonl data/crosstask/system1_test.jsonl \
+    --sample_idx 0 \
+    --system1_model checkpoints/system1/best_model
+
+# Zero-prefix (no observed steps — plan from scratch)
+python3 scripts/run_inference.py \
+    --system1_model checkpoints/system1/best_model \
+    --goal "Complete the task: Make Pancakes." \
+    --interpretation "The task begins with 'add flour' and is done once 'take pancake from pan' is done." \
+    --k 3
+```
+
+### 8b. Vision-Grounded Interpretation (Option 3 — PLM Frames → Text)
+
+When `--frames` is provided, PLM's vision tower processes the initial video
+frames (or a short clip) and generates a natural-language **Interpretation** line
+that replaces the rule-based template. This is the closest our pipeline gets to
+the VLWM paper's approach, where visual context informs the plan.
+
+```bash
+# From a video file (PLM-1B, 8 frames)
+python3 scripts/run_inference.py \
+    --system1_model checkpoints/system1/best_model \
+    --goal "Complete the task: Make Pancakes." \
+    --frames path/to/pancakes_video.mp4 \
+    --num_frames 8 \
+    --k 3
+
+# From a directory of frame images
+python3 scripts/run_inference.py \
+    --system1_model checkpoints/system1/best_model \
+    --goal "Complete the task: Make Pancakes." \
+    --frames path/to/initial_frames/ \
+    --k 3
+
+# With PLM+LoRA System-1 (same PLM used for both interpretation and planning)
+python3 scripts/run_inference.py \
+    --system1_type plm \
+    --system1_model checkpoints/system1_plm_lora/best_adapter \
+    --plm_base_model facebook/Perception-LM-1B \
+    --goal "Complete the task: Make Pancakes." \
+    --frames path/to/video.mp4 \
+    --interp_model facebook/Perception-LM-1B \
+    --k 3
+```
+
+**How it works:**
+1. **Initial frames only** — when given a video file, the script extracts the
+   **first N frames** (default 8) using `decord`, NOT uniformly sampled across
+   the video. This ensures PLM sees the **starting scene state** before any
+   actions are performed.
+2. Frames → PLM `AutoProcessor` (chat template with `<image>` tokens per frame)
+3. PLM generates: *"The person has eggs and flour on the counter and is about to mix batter for pancakes."*
+4. This text is injected as `Interpretation: ...` in the System-1 prompt
+5. System-1 model plans forward conditioned on this richer, vision-grounded context
+
+```
+Inference flow:
+                                                    
+  Initial video frames           PLM Vision Tower             System-1
+  (first 8 from .mp4     →    (frozen, bfloat16)    →    (T5 or PLM+LoRA)
+   or frame directory)     generates Interpretation     predicts next k steps
+                                                    
+  ┌───────────────┐        ┌──────────────────────┐    ┌──────────────────────┐
+  │ Frame 0       │        │ "The person has eggs  │    │ {"next_steps": [     │
+  │ Frame 1       │───────▶│  and flour on the     │───▶│   {"action": "add    │
+  │  ...          │        │  counter, preparing   │    │    flour", ...},     │
+  │ Frame 7       │        │  to make pancakes."   │    │   ...                │
+  └───────────────┘        └──────────────────────┘    └──────────────────────┘
+                           Interpretation: line         {"next_steps": [...]}
+```
+
+**VRAM requirements:**
+- PLM-1B: ~4GB (bfloat16) for interpretation alone
+- PLM-1B + T5-small System-1: ~5GB total
+- PLM-1B + PLM-1B+LoRA System-1: ~4GB (same model reused)
+
+**Dependencies:** `pip install decord` (for video loading). Frame directory mode uses PIL only.
+
+> **Impact on training/evaluation:** NONE. This feature is inference-time only.
+> Training data still uses rule-based `make_interpretation()`. Evaluation scripts
+> read `input_text` directly from JSONL (interpretation already baked in). The
+> `--frames` option only affects `run_inference.py` when running standalone inference.
+
+#### Interpretation Sources Comparison
+
+| Source | When | Quality | Cost |
+|--------|------|---------|------|
+| **Rule-based** (`06_build`) | Training data, JSONL eval | Template from first/last canonical steps | Free |
+| **`--interpretation` CLI** | Manual inference | User-provided text | Free |
+| **`--from_jsonl`** | Test samples | Extracted from baked `input_text` | Free |
+| **`--frames`** (Option 3) | Inference with video access | Vision-grounded, PLM-generated | ~4GB VRAM |
+
 ---
 
 ## Model Storage Summary
@@ -450,6 +556,10 @@ python3 scripts/run_evaluation.py --mode both \
 3. **Energy scoring is a heuristic**: The current `Energy(z_pred, z_goal)` uses direct latent lookup. A proper implementation would train a lightweight latent predictor that maps text state-changes to predicted latent transitions. This is a natural extension.
 
 4. **Data scale vs VLWM**: Our models are 100–200× smaller than VLWM's. Expect lower absolute numbers but the relative improvements (System-2 > System-1) should still hold if the architecture is sound.
+
+5. **Zero-prefix support**: Training data can include zero-prefix samples (controlled by `--zero_prefix_prob`, default 15%). At inference time, System-1 and System-2 modes accept empty `--prefix` (or omit it entirely) for planning from scratch.
+
+6. **Vision-grounded interpretation (`--frames`)**: This is an inference-time-only feature. It does NOT change any training data, training loops, or evaluation metrics. The System-1 model was trained on rule-based interpretations, so it may respond differently to PLM-generated richer text. In practice, the interpretation line has a small effect (~0.6% in VLWM ablations, Table 6), so this is a nice-to-have rather than critical.
 
 ## References
 

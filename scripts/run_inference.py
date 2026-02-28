@@ -88,6 +88,26 @@ Usage examples
       --goal_model checkpoints/goal_model/best_model \\
       --prefix "pour egg | Egg is now poured in." \\
                "add flour | Flour is now added to the mixture."
+
+  # 6) Vision-grounded interpretation from initial video frames
+  #    PLM's vision tower generates the Interpretation: line from frames.
+  python3 scripts/run_inference.py \\
+      --system1_model checkpoints/system1/best_model \\
+      --goal "Complete the task: Make Pancakes." \\
+      --frames path/to/video.mp4 \\
+      --num_frames 8 \\
+      --k 3
+
+  # 7) Vision-grounded interpretation with PLM+LoRA (model reuse)
+  #    If --interp_model matches --plm_base_model, we can share the model.
+  python3 scripts/run_inference.py \\
+      --system1_type plm \\
+      --system1_model checkpoints/system1_plm_lora/best_adapter \\
+      --plm_base_model facebook/Perception-LM-1B \\
+      --goal "Complete the task: Make Pancakes." \\
+      --frames initial_frames/ \\
+      --interp_model facebook/Perception-LM-1B \\
+      --k 3
 """
 
 import argparse
@@ -269,6 +289,158 @@ def load_goal_model(model_path: str, device):
     model = T5ForConditionalGeneration.from_pretrained(model_path)
     model.to(device).eval()
     return model, tokenizer
+
+
+# ─────────────────────────────────────────────────────────────────
+# Vision-grounded interpretation  (Option 3: PLM frames → text)
+# ─────────────────────────────────────────────────────────────────
+
+DEFAULT_INTERP_PROMPT = (
+    "Given these initial frames of the video, describe in one sentence "
+    "what the person is about to do and what the end result should look like."
+)
+
+
+def generate_interpretation_from_frames(
+    frames_path: str,
+    device,
+    model_name: str = "facebook/Perception-LM-1B",
+    num_frames: int = 8,
+    prompt: str = DEFAULT_INTERP_PROMPT,
+    max_new_tokens: int = 128,
+    preloaded_model=None,
+    preloaded_processor=None,
+) -> str:
+    """
+    Use PLM's vision tower to generate a scene interpretation from video
+    frames or a short video clip.
+
+    Parameters
+    ----------
+    frames_path : str
+        Path to a video file (.mp4/.webm) **or** a directory of frame images
+        (.jpg/.png). If a directory, the first ``num_frames`` images (sorted
+        alphabetically) are used.  If a video file, the first ``num_frames``
+        frames are extracted (NOT uniformly sampled — we deliberately take the
+        opening frames so PLM sees the *initial* scene state).
+    device : torch.device
+    model_name : str
+        HuggingFace model ID for PLM (1B or 8B).
+    num_frames : int
+        Number of frames to sample from the video (only for video files).
+    prompt : str
+        The text prompt sent alongside the visual input.
+    max_new_tokens : int
+        Max tokens for the generated interpretation.
+    preloaded_model : optional
+        An already-loaded ``AutoModelForImageTextToText`` (avoids double-loading
+        when ``--system1_type plm`` is also in use).
+    preloaded_processor : optional
+        The corresponding ``AutoProcessor``.
+
+    Returns
+    -------
+    str
+        The generated interpretation text.
+    """
+    from transformers import AutoProcessor, AutoModelForImageTextToText
+
+    # ── Load model / processor (or reuse) ──
+    if preloaded_model is not None and preloaded_processor is not None:
+        model = preloaded_model
+        processor = preloaded_processor
+        print("  (reusing preloaded PLM for interpretation)")
+    else:
+        print(f"Loading PLM for interpretation: {model_name}")
+        processor = AutoProcessor.from_pretrained(model_name, use_fast=True)
+        model = AutoModelForImageTextToText.from_pretrained(
+            model_name, torch_dtype=torch.bfloat16, trust_remote_code=True
+        ).to(device).eval()
+
+    # ── Build conversation payload ──
+    frames_p = Path(frames_path)
+    if frames_p.is_dir():
+        # Directory of frame images — take first num_frames (sorted)
+        from PIL import Image
+        exts = {".jpg", ".jpeg", ".png", ".bmp", ".webp"}
+        img_files = sorted(
+            [f for f in frames_p.iterdir() if f.suffix.lower() in exts]
+        )[:num_frames]
+        if not img_files:
+            print(f"  ⚠️  No images found in {frames_path}")
+            return ""
+        content = []
+        for img_f in img_files:
+            content.append({"type": "image", "url": str(img_f)})
+        content.append({"type": "text", "text": prompt})
+        print(f"  Using {len(img_files)} frame images from directory")
+    elif frames_p.is_file():
+        # Video file — extract the FIRST num_frames frames (initial scene).
+        # We deliberately avoid the processor's default uniform sampling,
+        # which would spread frames across the whole video.  We only want
+        # the opening scene so PLM describes the starting state.
+        from PIL import Image
+        try:
+            import decord
+            decord.bridge.set_bridge("native")
+            vr = decord.VideoReader(str(frames_p))
+            total = len(vr)
+            n = min(num_frames, total)
+            # Take the very first n frames
+            frame_indices = list(range(n))
+            frames_np = vr.get_batch(frame_indices).asnumpy()  # (N, H, W, 3)
+            pil_frames = [Image.fromarray(f) for f in frames_np]
+        except ImportError:
+            # Fallback: OpenCV
+            import cv2
+            cap = cv2.VideoCapture(str(frames_p))
+            pil_frames = []
+            for _ in range(num_frames):
+                ret, frame = cap.read()
+                if not ret:
+                    break
+                pil_frames.append(
+                    Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
+                )
+            cap.release()
+
+        if not pil_frames:
+            print(f"  ⚠️  Could not extract frames from {frames_path}")
+            return ""
+
+        # Save temporary frames and pass as images (not video)
+        # so we bypass the processor's uniform video sampling.
+        content = []
+        for pil_f in pil_frames:
+            content.append({"type": "image", "image": pil_f})
+        content.append({"type": "text", "text": prompt})
+        print(f"  Extracted first {len(pil_frames)} frames from video "
+              f"(total: {len(vr) if 'vr' in dir() else '?'} frames)")
+    else:
+        print(f"  ⚠️  frames path not found: {frames_path}")
+        return ""
+
+    conversation = [{"role": "user", "content": content}]
+
+    # ── Tokenize & generate ──
+    apply_kwargs = dict(
+        add_generation_prompt=True,
+        tokenize=True,
+        return_dict=True,
+        return_tensors="pt",
+    )
+
+    inputs = processor.apply_chat_template([conversation], **apply_kwargs)
+    inputs = inputs.to(device)
+
+    with torch.no_grad():
+        gen_ids = model.generate(**inputs, max_new_tokens=max_new_tokens)
+    input_length = inputs["input_ids"].shape[1]
+    gen_text = processor.batch_decode(
+        gen_ids[:, input_length:], skip_special_tokens=True
+    )[0].strip()
+
+    return gen_text
 
 
 # ─────────────────────────────────────────────────────────────────
@@ -606,6 +778,24 @@ Examples:
     parser.add_argument("--beta", type=float, default=0.3,
                         help="Energy weight in combined score")
 
+    # Vision-grounded interpretation (Option 3 — PLM frames → interpretation)
+    parser.add_argument("--frames", type=str, default=None,
+                        help="Path to a video file (.mp4/.webm) or directory of "
+                             "frame images (.jpg/.png). When provided, PLM's "
+                             "vision tower generates the Interpretation: line "
+                             "from visual input (overrides --interpretation).")
+    parser.add_argument("--interp_model", type=str,
+                        default="facebook/Perception-LM-1B",
+                        help="HuggingFace model for frame interpretation "
+                             "(default: Perception-LM-1B). If --system1_type plm "
+                             "and the base model matches, the same model is reused.")
+    parser.add_argument("--num_frames", type=int, default=8,
+                        help="Number of frames to sample from video "
+                             "(only for video files, default: 8)")
+    parser.add_argument("--interp_prompt", type=str,
+                        default=DEFAULT_INTERP_PROMPT,
+                        help="Custom prompt for frame interpretation")
+
     # Generation params
     parser.add_argument("--K", type=int, default=5,
                         help="Number of candidate plans (system2 only)")
@@ -683,6 +873,25 @@ Examples:
     if args.mode == "goal" and not args.prefix:
         print("ERROR: --prefix is required for goal mode")
         sys.exit(1)
+
+    # ── Vision-grounded interpretation (Option 3) ──
+    if args.frames and args.mode in ("system1", "system2"):
+        if args.interpretation:
+            print("NOTE: --interpretation provided alongside --frames; "
+                  "overriding with vision-grounded interpretation.")
+        print(f"\nGenerating interpretation from frames: {args.frames}")
+        args.interpretation = generate_interpretation_from_frames(
+            frames_path=args.frames,
+            device=device,
+            model_name=args.interp_model,
+            num_frames=args.num_frames,
+            prompt=args.interp_prompt,
+        )
+        if args.interpretation:
+            print(f"  → Interpretation: {args.interpretation}\n")
+        else:
+            print("  ⚠️  Interpretation generation returned empty — "
+                  "continuing without.\n")
 
     # ── Dispatch ──
     if args.mode == "system1":
