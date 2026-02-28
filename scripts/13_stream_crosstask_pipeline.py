@@ -32,6 +32,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--device", type=str, default="auto", choices=["auto", "cpu", "cuda"])
     parser.add_argument("--max_new_tokens", type=int, default=256)
+    parser.add_argument("--device_map", type=str, default="auto", choices=["auto", "none"])
+    parser.add_argument("--disable_low_cpu_mem_usage", action="store_true")
     parser.add_argument("--yt_dlp_format", type=str, default="bv*[height<=360]+ba/b[height<=360]")
     parser.add_argument("--skip_download", action="store_true")
     parser.add_argument("--keep_downloaded", action="store_true")
@@ -182,12 +184,16 @@ class PerceptionLMCaptioner:
         model_id: str,
         model_path: str,
         device: str,
+        device_map: str,
+        low_cpu_mem_usage: bool,
         max_new_tokens: int,
         strict: bool,
     ) -> None:
         self.model_id = model_id.strip()
         self.model_path = Path(model_path)
         self.device_preference = device
+        self.device_map = device_map
+        self.low_cpu_mem_usage = low_cpu_mem_usage
         self.max_new_tokens = max_new_tokens
         self.strict = strict
         self.backend = "fallback"
@@ -235,19 +241,25 @@ class PerceptionLMCaptioner:
 
         try:
             processor = AutoProcessor.from_pretrained(source, trust_remote_code=True)
+            load_kwargs = {
+                "trust_remote_code": True,
+                "dtype": dtype,
+                "low_cpu_mem_usage": self.low_cpu_mem_usage,
+            }
+            if self.device_map == "auto":
+                load_kwargs["device_map"] = "auto"
             try:
                 model = AutoModelForImageTextToText.from_pretrained(
                     source,
-                    trust_remote_code=True,
-                    dtype=dtype,
+                    **load_kwargs,
                 )
             except Exception:
                 model = AutoModelForCausalLM.from_pretrained(
                     source,
-                    trust_remote_code=True,
-                    dtype=dtype,
+                    **load_kwargs,
                 )
-            model.to(device)
+            if self.device_map != "auto":
+                model.to(device)
             model.eval()
         except Exception as error:  # noqa: BLE001
             if self.strict:
@@ -398,6 +410,8 @@ def main() -> None:
             model_id=args.caption_model_id,
             model_path=args.caption_model_path,
             device=args.device,
+            device_map=args.device_map,
+            low_cpu_mem_usage=not args.disable_low_cpu_mem_usage,
             max_new_tokens=args.max_new_tokens,
             strict=args.strict_caption_model,
         )
