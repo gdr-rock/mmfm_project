@@ -201,14 +201,24 @@ def collate_fn(batch, tokenizer, max_input_len, max_target_len):
         truncation=True,
         return_tensors="pt",
     )
-    with tokenizer.as_target_tokenizer():
+    # transformers>=4.44 removes as_target_tokenizer() for some tokenizers.
+    try:
         target_enc = tokenizer(
-            list(targets),
+            text_target=list(targets),
             max_length=max_target_len,
             padding="max_length",
             truncation=True,
             return_tensors="pt",
         )
+    except TypeError:
+        with tokenizer.as_target_tokenizer():
+            target_enc = tokenizer(
+                list(targets),
+                max_length=max_target_len,
+                padding="max_length",
+                truncation=True,
+                return_tensors="pt",
+            )
     # Replace pad token id with -100 so loss ignores them
     labels = target_enc.input_ids.clone()
     labels[labels == tokenizer.pad_token_id] = -100
