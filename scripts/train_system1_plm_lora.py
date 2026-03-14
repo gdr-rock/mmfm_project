@@ -526,6 +526,52 @@ def collate_fn(batch, pad_token_id: int):
 # Model loading
 # ---------------------------------------------------------------------------
 
+def _infer_hidden_dim(model) -> int:
+    """
+    Infer decoder hidden size across different model/config layouts.
+
+    PerceptionLM may store text-model dimensions under nested configs
+    (e.g., config.text_config.hidden_size) instead of config.hidden_size.
+    """
+    cfg = getattr(model, "config", None)
+    if cfg is not None:
+        # Common single-config attributes
+        for attr in ("hidden_size", "d_model", "n_embd", "dim", "model_dim"):
+            val = getattr(cfg, attr, None)
+            if isinstance(val, int) and val > 0:
+                return val
+
+        # Common nested text/decoder config attributes
+        for sub_name in ("text_config", "language_config", "llm_config", "decoder_config"):
+            sub_cfg = getattr(cfg, sub_name, None)
+            if sub_cfg is None:
+                continue
+            for attr in ("hidden_size", "d_model", "n_embd", "dim", "model_dim"):
+                val = getattr(sub_cfg, attr, None)
+                if isinstance(val, int) and val > 0:
+                    return val
+
+    # Fallback to embedding matrices
+    try:
+        emb = model.get_input_embeddings()
+        if emb is not None and hasattr(emb, "weight") and emb.weight.ndim == 2:
+            return int(emb.weight.shape[1])
+    except Exception:
+        pass
+
+    try:
+        out_emb = model.get_output_embeddings()
+        if out_emb is not None and hasattr(out_emb, "weight") and out_emb.weight.ndim == 2:
+            return int(out_emb.weight.shape[1])
+    except Exception:
+        pass
+
+    raise AttributeError(
+        "Could not infer model hidden dimension from config or embeddings. "
+        f"Config type: {type(cfg).__name__ if cfg is not None else 'None'}"
+    )
+
+
 def load_model_and_tokenizer(args):
     """
     Load PerceptionLM as a causal language model with LoRA.
@@ -621,7 +667,7 @@ def load_model_and_tokenizer(args):
     print(f"  Trainable (LoRA):     {trainable:>12,}  ({pct:.2f}%)")
 
     # Get hidden dimension for latent projection head
-    hidden_dim = model.config.hidden_size
+    hidden_dim = _infer_hidden_dim(model)
     print(f"  Hidden dimension:     {hidden_dim}")
 
     return model, tokenizer, hidden_dim
