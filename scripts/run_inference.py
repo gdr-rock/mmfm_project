@@ -113,6 +113,7 @@ Usage examples
 import argparse
 import json
 import os
+import re
 import sys
 import importlib.util
 from pathlib import Path
@@ -160,13 +161,78 @@ def build_goal_prompt(prefix_steps: list) -> str:
 
 
 def parse_plan_json(text: str) -> list:
-    """Parse model output JSON into list of 'action | state_change' strings."""
-    try:
-        parsed = json.loads(text)
-        steps = parsed.get("next_steps", [])
-        return [f"{s['action']} | {s['state_change']}" for s in steps]
-    except (json.JSONDecodeError, KeyError, TypeError):
+    """Parse model output into list of 'action | state_change' strings."""
+
+    def _decode_json_string(s: str) -> str:
+        try:
+            return json.loads(f"\"{s}\"")
+        except Exception:
+            return s
+
+    def _steps_from_list(step_list):
+        if not isinstance(step_list, list):
+            return []
+        out = []
+        for s in step_list:
+            if not isinstance(s, dict):
+                continue
+            action = s.get("action")
+            state_change = s.get("state_change")
+            if isinstance(action, str) and isinstance(state_change, str):
+                out.append(f"{action.strip()} | {state_change.strip()}")
+        return out
+
+    text = (text or "").strip()
+    if not text:
         return []
+
+    # Common cleanup: fenced code block payloads.
+    if "```" in text:
+        m = re.search(r"```(?:json)?\s*(.*?)\s*```", text, flags=re.IGNORECASE | re.DOTALL)
+        if m:
+            text = m.group(1).strip()
+
+    # Try several JSON candidates (raw, wrapped, extracted object).
+    candidates = [text]
+    if '"next_steps"' in text and not text.lstrip().startswith("{"):
+        candidates.append("{" + text + "}")
+    first_brace = text.find("{")
+    last_brace = text.rfind("}")
+    if first_brace != -1 and last_brace > first_brace:
+        candidates.append(text[first_brace:last_brace + 1])
+
+    for cand in candidates:
+        try:
+            parsed = json.loads(cand)
+        except json.JSONDecodeError:
+            continue
+
+        if isinstance(parsed, dict):
+            steps = _steps_from_list(parsed.get("next_steps", []))
+            if steps:
+                return steps
+        elif isinstance(parsed, list):
+            steps = _steps_from_list(parsed)
+            if steps:
+                return steps
+
+    # Fallback: recover quoted key-value pairs from malformed JSON-like output.
+    action_vals = [
+        _decode_json_string(v)
+        for v in re.findall(r'"action"\s*:\s*"((?:\\.|[^"\\])*)"', text)
+    ]
+    state_vals = [
+        _decode_json_string(v)
+        for v in re.findall(r'"state_change"\s*:\s*"((?:\\.|[^"\\])*)"', text)
+    ]
+    n = min(len(action_vals), len(state_vals))
+    if n > 0:
+        return [
+            f"{action_vals[i].strip()} | {state_vals[i].strip()}"
+            for i in range(n)
+        ]
+
+    return []
 
 
 # ─────────────────────────────────────────────────────────────────
