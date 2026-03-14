@@ -22,6 +22,9 @@ planning pipeline:
 - `System-2` reranks multiple candidate plans with a learned critic.
 - Optional `V-JEPA` video latents ground the text model during training and can also
   contribute an energy term during reranking.
+- A learned `goal-latent` model is available to map goal text and
+  action/state-change trajectories into a shared latent space for energy scoring:
+  `E = ||z_traj - z_goal||^2`.
 
 The project is centered on `CrossTask` as the dataset and aims to bridge:
 
@@ -50,6 +53,8 @@ Main project files:
 - `scripts/train_system1.py`: T5 System-1 training.
 - `scripts/train_system1_plm_lora.py`: Perception-LM System-1 LoRA training.
 - `scripts/train_goal_model.py`: goal model training.
+- `scripts/train_goal_latent_model.py`: goal/trajectory latent alignment model
+  (text -> V-JEPA-like latent space) for learned energy scoring.
 - `scripts/train_critic.py`: MiniLM + MLP critic training.
 - `scripts/train_critic_llm_lora.py`: Llama critic LoRA training.
 - `scripts/extract_vjepa_latents.py`: per-segment latent extraction from video.
