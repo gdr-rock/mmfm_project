@@ -54,6 +54,7 @@ import argparse
 import json
 import os
 import time
+import importlib.util
 from datetime import datetime
 from pathlib import Path
 
@@ -229,6 +230,30 @@ def load_critic(model_path: str, device, critic_type: str = "mlp",
 
     else:
         raise ValueError(f"Unknown critic_type: {critic_type}")
+
+
+def load_goal_latent_model(model_path: str, device):
+    """Load learned goal-latent model used for energy scoring."""
+    _lazy_hf()
+
+    spec = importlib.util.spec_from_file_location(
+        "train_goal_latent_model",
+        os.path.join(os.path.dirname(__file__), "train_goal_latent_model.py"),
+    )
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+
+    ckpt = torch.load(model_path, map_location=device, weights_only=False)
+    model = mod.GoalLatentModel(
+        encoder_name=ckpt["encoder_name"],
+        latent_dim=ckpt["latent_dim"],
+        hidden_dim=ckpt.get("hidden_dim", 384),
+    )
+    model.load_state_dict(ckpt["model_state_dict"])
+    model.to(device).eval()
+
+    tokenizer = AutoTokenizer.from_pretrained(ckpt["encoder_name"])
+    return model, tokenizer, mod.format_trajectory_for_energy
 
 
 # ---------------------------------------------------------------------------
@@ -407,6 +432,54 @@ def score_plans_energy(
     return energies
 
 
+def score_plans_learned_energy(
+    goal_latent_model,
+    goal_latent_tokenizer,
+    format_traj_fn,
+    goal: str,
+    prefix_steps: list,
+    plans: list,
+    device,
+    max_goal_len: int = 64,
+    max_traj_len: int = 384,
+) -> list:
+    """Score plans with learned energy E=||z_traj(goal,prefix+plan)-z_goal(goal)||^2."""
+    goal_enc = goal_latent_tokenizer(
+        [goal],
+        max_length=max_goal_len,
+        truncation=True,
+        return_tensors="pt",
+    ).to(device)
+    with torch.no_grad():
+        z_goal = goal_latent_model.encode_goal(
+            goal_enc.input_ids,
+            goal_enc.attention_mask,
+        )[0]
+
+    energies = []
+    for plan in plans:
+        if not plan["valid"] or not plan["steps"]:
+            energies.append(float("inf"))
+            continue
+        full_steps = prefix_steps + plan["steps"]
+        traj_text = format_traj_fn(goal, full_steps)
+        traj_enc = goal_latent_tokenizer(
+            [traj_text],
+            max_length=max_traj_len,
+            truncation=True,
+            return_tensors="pt",
+        ).to(device)
+        with torch.no_grad():
+            z_traj = goal_latent_model.encode_traj(
+                traj_enc.input_ids,
+                traj_enc.attention_mask,
+            )[0]
+            energy = torch.norm(z_traj - z_goal, p=2).item() ** 2
+        energies.append(energy)
+
+    return energies
+
+
 # ---------------------------------------------------------------------------
 # Main pipeline
 # ---------------------------------------------------------------------------
@@ -430,13 +503,27 @@ def run_planning(args):
         base_model_name=args.llm_base_critic,
     )
 
-    use_energy = args.latent_dir and os.path.exists(args.latent_dir)
-    if use_energy:
+    goal_latent_model = None
+    goal_latent_tokenizer = None
+    goal_latent_format = None
+    use_learned_energy = bool(args.goal_latent_model and os.path.exists(args.goal_latent_model))
+    use_latent_lookup_energy = bool(args.latent_dir and os.path.exists(args.latent_dir))
+
+    if use_learned_energy:
+        print(f"Loading learned goal-latent energy model: {args.goal_latent_model}")
+        goal_latent_model, goal_latent_tokenizer, goal_latent_format = load_goal_latent_model(
+            args.goal_latent_model,
+            device,
+        )
+        print(f"Using learned energy E(z_traj, z_goal)")
+        print(f"  α (critic weight): {args.alpha}")
+        print(f"  β (energy weight): {args.beta}")
+    elif use_latent_lookup_energy:
         print(f"Using latent energy from: {args.latent_dir}")
         print(f"  α (critic weight): {args.alpha}")
         print(f"  β (energy weight): {args.beta}")
     else:
-        print("No latent directory — running critic-only reranking")
+        print("No energy backend — running critic-only reranking")
         args.alpha = 1.0
         args.beta = 0.0
 
@@ -494,7 +581,17 @@ def run_planning(args):
 
         # Score with energy (if available)
         energy_scores = [0.0] * len(plans)
-        if use_energy:
+        if use_learned_energy:
+            energy_scores = score_plans_learned_energy(
+                goal_latent_model,
+                goal_latent_tokenizer,
+                goal_latent_format,
+                goal,
+                prefix_steps,
+                plans,
+                device,
+            )
+        elif use_latent_lookup_energy:
             energy_scores = score_plans_energy(
                 args.latent_dir,
                 meta.get("video_id", ""),
@@ -582,6 +679,9 @@ def main():
     # Energy / latents
     parser.add_argument("--latent_dir", default=None,
                         help="Directory with V-JEPA latents (optional)")
+    parser.add_argument("--goal_latent_model", default=None,
+                        help="Path to learned goal-latent checkpoint (.pt). "
+                             "If provided, energy uses goal+trajectory latent distance.")
     parser.add_argument("--alpha", type=float, default=0.7,
                         help="Weight for critic score")
     parser.add_argument("--beta", type=float, default=0.3,

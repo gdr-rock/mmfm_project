@@ -1,0 +1,6294 @@
+{
+  "tasks": {
+    "0": {
+      "task_id": "0",
+      "recipe_type": 0,
+      "task_name": "UseAnalyticalBalance",
+      "task_name_human": "Use Analytical Balance",
+      "goal": "Complete the task: Use Analytical Balance.",
+      "canonical_steps": [
+        {
+          "action_id": 65,
+          "action": "clean inner wall of container",
+          "step_idx": 1
+        },
+        {
+          "action_id": 66,
+          "action": "place a piece of paper on weighing pan",
+          "step_idx": 2
+        },
+        {
+          "action_id": 67,
+          "action": "zeroing set",
+          "step_idx": 3
+        },
+        {
+          "action_id": 68,
+          "action": "place weighing sample on weighing pan and read",
+          "step_idx": 4
+        }
+      ]
+    },
+    "1": {
+      "task_id": "1",
+      "recipe_type": 1,
+      "task_name": "PasteCarSticker",
+      "task_name_human": "Paste Car Sticker",
+      "goal": "Complete the task: Paste Car Sticker.",
+      "canonical_steps": [
+        {
+          "action_id": 460,
+          "action": "clean the window surface",
+          "step_idx": 1
+        },
+        {
+          "action_id": 461,
+          "action": "tear off the front of the sticker",
+          "step_idx": 2
+        },
+        {
+          "action_id": 462,
+          "action": "put the sticker on the window",
+          "step_idx": 3
+        },
+        {
+          "action_id": 463,
+          "action": "press the sticker",
+          "step_idx": 4
+        },
+        {
+          "action_id": 464,
+          "action": "tear off the other side of the sticker",
+          "step_idx": 5
+        }
+      ]
+    },
+    "2": {
+      "task_id": "2",
+      "recipe_type": 2,
+      "task_name": "AssembleBed",
+      "task_name_human": "Assemble Bed",
+      "goal": "Complete the task: Assemble Bed.",
+      "canonical_steps": [
+        {
+          "action_id": 559,
+          "action": "place the bed board",
+          "step_idx": 1
+        },
+        {
+          "action_id": 560,
+          "action": "place the board on each side",
+          "step_idx": 2
+        },
+        {
+          "action_id": 561,
+          "action": "place board at the bottom",
+          "step_idx": 3
+        },
+        {
+          "action_id": 562,
+          "action": "install legs on the bed",
+          "step_idx": 4
+        },
+        {
+          "action_id": 563,
+          "action": "put all bed boxes together",
+          "step_idx": 5
+        },
+        {
+          "action_id": 564,
+          "action": "install head of the bed",
+          "step_idx": 6
+        },
+        {
+          "action_id": 565,
+          "action": "place mattress on the bed",
+          "step_idx": 7
+        }
+      ]
+    },
+    "3": {
+      "task_id": "3",
+      "recipe_type": 3,
+      "task_name": "AssembleSofa",
+      "task_name_human": "Assemble Sofa",
+      "goal": "Complete the task: Assemble Sofa.",
+      "canonical_steps": [
+        {
+          "action_id": 434,
+          "action": "install the sofa back",
+          "step_idx": 1
+        },
+        {
+          "action_id": 435,
+          "action": "install armrest on sofa",
+          "step_idx": 2
+        },
+        {
+          "action_id": 436,
+          "action": "install stand of the seat",
+          "step_idx": 3
+        },
+        {
+          "action_id": 437,
+          "action": "place cushion and backrest",
+          "step_idx": 4
+        },
+        {
+          "action_id": 438,
+          "action": "install legs of sofa",
+          "step_idx": 5
+        },
+        {
+          "action_id": 439,
+          "action": "put on sofa cover",
+          "step_idx": 6
+        },
+        {
+          "action_id": 440,
+          "action": "put every parts mentioned together",
+          "step_idx": 7
+        }
+      ]
+    },
+    "4": {
+      "task_id": "4",
+      "recipe_type": 4,
+      "task_name": "AssembleCabinet",
+      "task_name_human": "Assemble Cabinet",
+      "goal": "Complete the task: Assemble Cabinet.",
+      "canonical_steps": [
+        {
+          "action_id": 612,
+          "action": "assemble the frame",
+          "step_idx": 1
+        },
+        {
+          "action_id": 613,
+          "action": "install horizontal boards",
+          "step_idx": 2
+        },
+        {
+          "action_id": 614,
+          "action": "install vertical boards",
+          "step_idx": 3
+        }
+      ]
+    },
+    "5": {
+      "task_id": "5",
+      "recipe_type": 5,
+      "task_name": "AssembleDesktopPC",
+      "task_name_human": "Assemble Desktop PC",
+      "goal": "Complete the task: Assemble Desktop PC.",
+      "canonical_steps": [
+        {
+          "action_id": 270,
+          "action": "install the motherboard",
+          "step_idx": 1
+        },
+        {
+          "action_id": 271,
+          "action": "install the fan",
+          "step_idx": 2
+        },
+        {
+          "action_id": 272,
+          "action": "install peripherals inside the case",
+          "step_idx": 3
+        },
+        {
+          "action_id": 273,
+          "action": "plug cable and wire",
+          "step_idx": 4
+        },
+        {
+          "action_id": 274,
+          "action": "install peripherals outside the case",
+          "step_idx": 5
+        }
+      ]
+    },
+    "6": {
+      "task_id": "6",
+      "recipe_type": 6,
+      "task_name": "BandageDogPaw",
+      "task_name_human": "Bandage Dog Paw",
+      "goal": "Complete the task: Bandage Dog Paw.",
+      "canonical_steps": [
+        {
+          "action_id": 58,
+          "action": "cover injury with bandage",
+          "step_idx": 1
+        },
+        {
+          "action_id": 59,
+          "action": "wind legs with bandage",
+          "step_idx": 2
+        },
+        {
+          "action_id": 60,
+          "action": "cut the bandage",
+          "step_idx": 3
+        }
+      ]
+    },
+    "7": {
+      "task_id": "7",
+      "recipe_type": 7,
+      "task_name": "ChangeBikeChain",
+      "task_name_human": "Change Bike Chain",
+      "goal": "Complete the task: Change Bike Chain.",
+      "canonical_steps": [
+        {
+          "action_id": 114,
+          "action": "check the old chain",
+          "step_idx": 1
+        },
+        {
+          "action_id": 115,
+          "action": "cut the old chain",
+          "step_idx": 2
+        },
+        {
+          "action_id": 116,
+          "action": "take old chain away",
+          "step_idx": 3
+        },
+        {
+          "action_id": 117,
+          "action": "install the new chain",
+          "step_idx": 4
+        },
+        {
+          "action_id": 118,
+          "action": "ajust the chain length",
+          "step_idx": 5
+        },
+        {
+          "action_id": 119,
+          "action": "link the new chain",
+          "step_idx": 6
+        }
+      ]
+    },
+    "8": {
+      "task_id": "8",
+      "recipe_type": 8,
+      "task_name": "DrawBlood",
+      "task_name_human": "Draw Blood",
+      "goal": "Complete the task: Draw Blood.",
+      "canonical_steps": [
+        {
+          "action_id": 676,
+          "action": "tie the tourniquet",
+          "step_idx": 1
+        },
+        {
+          "action_id": 677,
+          "action": "disinfect",
+          "step_idx": 2
+        },
+        {
+          "action_id": 678,
+          "action": "collect blood",
+          "step_idx": 3
+        },
+        {
+          "action_id": 679,
+          "action": "pull out the needle and press with cotton",
+          "step_idx": 4
+        }
+      ]
+    },
+    "9": {
+      "task_id": "9",
+      "recipe_type": 9,
+      "task_name": "BlowSugar",
+      "task_name_human": "Blow Sugar",
+      "goal": "Complete the task: Blow Sugar.",
+      "canonical_steps": [
+        {
+          "action_id": 154,
+          "action": "knead the raw sugar",
+          "step_idx": 1
+        },
+        {
+          "action_id": 155,
+          "action": "blow the raw sugar",
+          "step_idx": 2
+        },
+        {
+          "action_id": 156,
+          "action": "paint on sugar",
+          "step_idx": 3
+        }
+      ]
+    },
+    "10": {
+      "task_id": "10",
+      "recipe_type": 10,
+      "task_name": "BoilNoodles",
+      "task_name_human": "Boil Noodles",
+      "goal": "Complete the task: Boil Noodles.",
+      "canonical_steps": [
+        {
+          "action_id": 548,
+          "action": "add seasoning to the boiling water",
+          "step_idx": 1
+        },
+        {
+          "action_id": 549,
+          "action": "pour the noodles into the water and stir",
+          "step_idx": 2
+        },
+        {
+          "action_id": 550,
+          "action": "take a little bit noodles and taste it",
+          "step_idx": 3
+        },
+        {
+          "action_id": 551,
+          "action": "pour the cooked noodles",
+          "step_idx": 4
+        }
+      ]
+    },
+    "11": {
+      "task_id": "11",
+      "recipe_type": 11,
+      "task_name": "PolishCar",
+      "task_name_human": "Polish Car",
+      "goal": "Complete the task: Polish Car.",
+      "canonical_steps": [
+        {
+          "action_id": 713,
+          "action": "clean the surface",
+          "step_idx": 1
+        },
+        {
+          "action_id": 714,
+          "action": "apply polishing paste on the surface",
+          "step_idx": 2
+        },
+        {
+          "action_id": 715,
+          "action": "polish with polisher",
+          "step_idx": 3
+        },
+        {
+          "action_id": 716,
+          "action": "clean the scratch",
+          "step_idx": 4
+        }
+      ]
+    },
+    "12": {
+      "task_id": "12",
+      "recipe_type": 12,
+      "task_name": "FuelCar",
+      "task_name_human": "Fuel Car",
+      "goal": "Complete the task: Fuel Car.",
+      "canonical_steps": [
+        {
+          "action_id": 684,
+          "action": "open the fuel tank cap",
+          "step_idx": 1
+        },
+        {
+          "action_id": 685,
+          "action": "insert oil gun in the car",
+          "step_idx": 2
+        },
+        {
+          "action_id": 686,
+          "action": "operate the control panel",
+          "step_idx": 3
+        },
+        {
+          "action_id": 687,
+          "action": "pullthe  oil gun out",
+          "step_idx": 4
+        },
+        {
+          "action_id": 688,
+          "action": "close the fuel tank cap",
+          "step_idx": 5
+        }
+      ]
+    },
+    "13": {
+      "task_id": "13",
+      "recipe_type": 13,
+      "task_name": "ChangeCarTire",
+      "task_name_human": "Change Car Tire",
+      "goal": "Complete the task: Change Car Tire.",
+      "canonical_steps": [
+        {
+          "action_id": 259,
+          "action": "unscrew the screw",
+          "step_idx": 1
+        },
+        {
+          "action_id": 260,
+          "action": "jack up the car",
+          "step_idx": 2
+        },
+        {
+          "action_id": 261,
+          "action": "remove the tire",
+          "step_idx": 3
+        },
+        {
+          "action_id": 262,
+          "action": "put on the tire",
+          "step_idx": 4
+        },
+        {
+          "action_id": 263,
+          "action": "tighten screws",
+          "step_idx": 5
+        }
+      ]
+    },
+    "14": {
+      "task_id": "14",
+      "recipe_type": 14,
+      "task_name": "CarvePumpkin",
+      "task_name_human": "Carve Pumpkin",
+      "goal": "Complete the task: Carve Pumpkin.",
+      "canonical_steps": [
+        {
+          "action_id": 724,
+          "action": "clean the pumpkin",
+          "step_idx": 1
+        },
+        {
+          "action_id": 725,
+          "action": "remove pumpkin pedicle",
+          "step_idx": 2
+        },
+        {
+          "action_id": 726,
+          "action": "clean up the interior of thepumpkin",
+          "step_idx": 3
+        },
+        {
+          "action_id": 727,
+          "action": "draw an outline",
+          "step_idx": 4
+        },
+        {
+          "action_id": 728,
+          "action": "carve along the outline",
+          "step_idx": 5
+        },
+        {
+          "action_id": 729,
+          "action": "place light into pumpkin",
+          "step_idx": 6
+        }
+      ]
+    },
+    "15": {
+      "task_id": "15",
+      "recipe_type": 15,
+      "task_name": "ChangeBatteryOfWatch",
+      "task_name_human": "Change Battery Of Watch",
+      "goal": "Complete the task: Change Battery Of Watch.",
+      "canonical_steps": [
+        {
+          "action_id": 79,
+          "action": "check the type of the back cover",
+          "step_idx": 1
+        },
+        {
+          "action_id": 80,
+          "action": "open the back cover",
+          "step_idx": 2
+        },
+        {
+          "action_id": 81,
+          "action": "replace the battery",
+          "step_idx": 3
+        },
+        {
+          "action_id": 82,
+          "action": "install the back cover and waterproof ring",
+          "step_idx": 4
+        }
+      ]
+    },
+    "16": {
+      "task_id": "16",
+      "recipe_type": 16,
+      "task_name": "ChangeBikeTires",
+      "task_name_human": "Change Bike Tires",
+      "goal": "Complete the task: Change Bike Tires.",
+      "canonical_steps": [
+        {
+          "action_id": 232,
+          "action": "unload the wheel",
+          "step_idx": 1
+        },
+        {
+          "action_id": 233,
+          "action": "remove the inner tube",
+          "step_idx": 2
+        },
+        {
+          "action_id": 234,
+          "action": "remove the tire",
+          "step_idx": 3
+        },
+        {
+          "action_id": 235,
+          "action": "load the tire",
+          "step_idx": 4
+        },
+        {
+          "action_id": 236,
+          "action": "load the inner tube",
+          "step_idx": 5
+        },
+        {
+          "action_id": 237,
+          "action": "pump up the tire",
+          "step_idx": 6
+        },
+        {
+          "action_id": 238,
+          "action": "load the wheel",
+          "step_idx": 7
+        }
+      ]
+    },
+    "17": {
+      "task_id": "17",
+      "recipe_type": 17,
+      "task_name": "ChangeGuitarStrings",
+      "task_name_human": "Change Guitar Strings",
+      "goal": "Complete the task: Change Guitar Strings.",
+      "canonical_steps": [
+        {
+          "action_id": 275,
+          "action": "cut off and remove the old string",
+          "step_idx": 1
+        },
+        {
+          "action_id": 276,
+          "action": "fix the new string on the lower part of the guitar",
+          "step_idx": 2
+        },
+        {
+          "action_id": 277,
+          "action": "fix the new string on the head of the guitar",
+          "step_idx": 3
+        },
+        {
+          "action_id": 278,
+          "action": "adjust the tightness of the new string",
+          "step_idx": 4
+        }
+      ]
+    },
+    "18": {
+      "task_id": "18",
+      "recipe_type": 18,
+      "task_name": "ChangeTonerCartridge",
+      "task_name_human": "Change Toner Cartridge",
+      "goal": "Complete the task: Change Toner Cartridge.",
+      "canonical_steps": [
+        {
+          "action_id": 608,
+          "action": "open the front door or cover of the printer",
+          "step_idx": 1
+        },
+        {
+          "action_id": 609,
+          "action": "take out the toner cartridge",
+          "step_idx": 2
+        },
+        {
+          "action_id": 610,
+          "action": "insert a new toner cartridge",
+          "step_idx": 3
+        },
+        {
+          "action_id": 611,
+          "action": "close the front door or cover of the printer",
+          "step_idx": 4
+        }
+      ]
+    },
+    "19": {
+      "task_id": "19",
+      "recipe_type": 19,
+      "task_name": "CleanLaptopKeyboard",
+      "task_name_human": "Clean Laptop Keyboard",
+      "goal": "Complete the task: Clean Laptop Keyboard.",
+      "canonical_steps": [
+        {
+          "action_id": 538,
+          "action": "power off",
+          "step_idx": 1
+        },
+        {
+          "action_id": 539,
+          "action": "pick up the button",
+          "step_idx": 2
+        },
+        {
+          "action_id": 540,
+          "action": "clean the inside of the button",
+          "step_idx": 3
+        },
+        {
+          "action_id": 541,
+          "action": "wipe the keyboard",
+          "step_idx": 4
+        }
+      ]
+    },
+    "20": {
+      "task_id": "20",
+      "recipe_type": 20,
+      "task_name": "CleanRustyPot",
+      "task_name_human": "Clean Rusty Pot",
+      "goal": "Complete the task: Clean Rusty Pot.",
+      "canonical_steps": [
+        {
+          "action_id": 207,
+          "action": "pour salt and rust removal liquid",
+          "step_idx": 1
+        },
+        {
+          "action_id": 208,
+          "action": "rub back and forth with potatoes or rust remover",
+          "step_idx": 2
+        },
+        {
+          "action_id": 209,
+          "action": "rinse the pot",
+          "step_idx": 3
+        },
+        {
+          "action_id": 210,
+          "action": "add some oil to the pot",
+          "step_idx": 4
+        },
+        {
+          "action_id": 211,
+          "action": "heat the pot",
+          "step_idx": 5
+        }
+      ]
+    },
+    "21": {
+      "task_id": "21",
+      "recipe_type": 21,
+      "task_name": "CleanHamsterCage",
+      "task_name_human": "Clean Hamster Cage",
+      "goal": "Complete the task: Clean Hamster Cage.",
+      "canonical_steps": [
+        {
+          "action_id": 593,
+          "action": "remove the hamster from the hamster cage",
+          "step_idx": 1
+        },
+        {
+          "action_id": 594,
+          "action": "remove the toy and paper bed from the hamster cage",
+          "step_idx": 2
+        },
+        {
+          "action_id": 595,
+          "action": "clean toys and hamster cages",
+          "step_idx": 3
+        },
+        {
+          "action_id": 596,
+          "action": "move the toy and paper bed into the hamster cage",
+          "step_idx": 4
+        },
+        {
+          "action_id": 597,
+          "action": "put the hamster back into the hamster cage",
+          "step_idx": 5
+        }
+      ]
+    },
+    "22": {
+      "task_id": "22",
+      "recipe_type": 22,
+      "task_name": "CleanFish",
+      "task_name_human": "Clean Fish",
+      "goal": "Complete the task: Clean Fish.",
+      "canonical_steps": [
+        {
+          "action_id": 105,
+          "action": "cut the head",
+          "step_idx": 1
+        },
+        {
+          "action_id": 106,
+          "action": "remove the intestines and blood vessels",
+          "step_idx": 2
+        },
+        {
+          "action_id": 107,
+          "action": "scratch scales",
+          "step_idx": 3
+        },
+        {
+          "action_id": 108,
+          "action": "cut off the tail and fin",
+          "step_idx": 4
+        },
+        {
+          "action_id": 109,
+          "action": "remove the gill",
+          "step_idx": 5
+        }
+      ]
+    },
+    "23": {
+      "task_id": "23",
+      "recipe_type": 23,
+      "task_name": "CleanShrimp",
+      "task_name_human": "Clean Shrimp",
+      "goal": "Complete the task: Clean Shrimp.",
+      "canonical_steps": [
+        {
+          "action_id": 705,
+          "action": "remove the head",
+          "step_idx": 1
+        },
+        {
+          "action_id": 706,
+          "action": "remove the shrimp shell",
+          "step_idx": 2
+        },
+        {
+          "action_id": 707,
+          "action": "remove the tail",
+          "step_idx": 3
+        },
+        {
+          "action_id": 708,
+          "action": "remove the vein",
+          "step_idx": 4
+        }
+      ]
+    },
+    "24": {
+      "task_id": "24",
+      "recipe_type": 24,
+      "task_name": "CleanToilet",
+      "task_name_human": "Clean Toilet",
+      "goal": "Complete the task: Clean Toilet.",
+      "canonical_steps": [
+        {
+          "action_id": 299,
+          "action": "apply detergent to the intertior of the toilet",
+          "step_idx": 1
+        },
+        {
+          "action_id": 300,
+          "action": "scrub the toilet interior",
+          "step_idx": 2
+        },
+        {
+          "action_id": 301,
+          "action": "flush and wash the interior",
+          "step_idx": 3
+        },
+        {
+          "action_id": 302,
+          "action": "apply detergent to the external side",
+          "step_idx": 4
+        },
+        {
+          "action_id": 303,
+          "action": "wipe the external side",
+          "step_idx": 5
+        }
+      ]
+    },
+    "25": {
+      "task_id": "25",
+      "recipe_type": 25,
+      "task_name": "CleanBathtub",
+      "task_name_human": "Clean Bathtub",
+      "goal": "Complete the task: Clean Bathtub.",
+      "canonical_steps": [
+        {
+          "action_id": 46,
+          "action": "make the detergent",
+          "step_idx": 1
+        },
+        {
+          "action_id": 47,
+          "action": "apply detergent to bathtub",
+          "step_idx": 2
+        },
+        {
+          "action_id": 48,
+          "action": "dip detergent with rag",
+          "step_idx": 3
+        },
+        {
+          "action_id": 49,
+          "action": "scrub the bathtub",
+          "step_idx": 4
+        },
+        {
+          "action_id": 50,
+          "action": "clean bathtub with water",
+          "step_idx": 5
+        }
+      ]
+    },
+    "26": {
+      "task_id": "26",
+      "recipe_type": 26,
+      "task_name": "CleanCementFloor",
+      "task_name_human": "Clean Cement Floor",
+      "goal": "Complete the task: Clean Cement Floor.",
+      "canonical_steps": [
+        {
+          "action_id": 527,
+          "action": "make the detergent",
+          "step_idx": 1
+        },
+        {
+          "action_id": 528,
+          "action": "dip detergent with rag or apply detergent",
+          "step_idx": 2
+        },
+        {
+          "action_id": 529,
+          "action": "clean the floor",
+          "step_idx": 3
+        },
+        {
+          "action_id": 530,
+          "action": "wash the floor",
+          "step_idx": 4
+        },
+        {
+          "action_id": 531,
+          "action": "polish the floor",
+          "step_idx": 5
+        }
+      ]
+    },
+    "27": {
+      "task_id": "27",
+      "recipe_type": 27,
+      "task_name": "CleanWoodenFloor",
+      "task_name_human": "Clean Wooden Floor",
+      "goal": "Complete the task: Clean Wooden Floor.",
+      "canonical_steps": [
+        {
+          "action_id": 641,
+          "action": "sweep the floor",
+          "step_idx": 1
+        },
+        {
+          "action_id": 642,
+          "action": "use vacuum cleaner to clean",
+          "step_idx": 2
+        },
+        {
+          "action_id": 643,
+          "action": "wet the mop",
+          "step_idx": 3
+        },
+        {
+          "action_id": 644,
+          "action": "make the  detergent",
+          "step_idx": 4
+        },
+        {
+          "action_id": 645,
+          "action": "apply detergent",
+          "step_idx": 5
+        },
+        {
+          "action_id": 646,
+          "action": "mop the floor",
+          "step_idx": 6
+        },
+        {
+          "action_id": 647,
+          "action": "wash the floor",
+          "step_idx": 7
+        }
+      ]
+    },
+    "28": {
+      "task_id": "28",
+      "recipe_type": 28,
+      "task_name": "CookOmelet",
+      "task_name_human": "Cook Omelet",
+      "goal": "Complete the task: Cook Omelet.",
+      "canonical_steps": [
+        {
+          "action_id": 16,
+          "action": "pour the egg into the bowl",
+          "step_idx": 1
+        },
+        {
+          "action_id": 17,
+          "action": "stir the egg",
+          "step_idx": 2
+        },
+        {
+          "action_id": 18,
+          "action": "pour the egg into the pot",
+          "step_idx": 3
+        },
+        {
+          "action_id": 19,
+          "action": "fry eggs",
+          "step_idx": 4
+        },
+        {
+          "action_id": 20,
+          "action": "put seasoning in the egg",
+          "step_idx": 5
+        },
+        {
+          "action_id": 21,
+          "action": "pour the egg onto the plate",
+          "step_idx": 6
+        }
+      ]
+    },
+    "29": {
+      "task_id": "29",
+      "recipe_type": 29,
+      "task_name": "PlayCurling",
+      "task_name_human": "Play Curling",
+      "goal": "Complete the task: Play Curling.",
+      "canonical_steps": [
+        {
+          "action_id": 257,
+          "action": "push curling",
+          "step_idx": 1
+        },
+        {
+          "action_id": 258,
+          "action": "brush ice floor",
+          "step_idx": 2
+        }
+      ]
+    },
+    "30": {
+      "task_id": "30",
+      "recipe_type": 30,
+      "task_name": "CutMango",
+      "task_name_human": "Cut Mango",
+      "goal": "Complete the task: Cut Mango.",
+      "canonical_steps": [
+        {
+          "action_id": 340,
+          "action": "cut the wide side",
+          "step_idx": 1
+        },
+        {
+          "action_id": 341,
+          "action": "remove the core",
+          "step_idx": 2
+        },
+        {
+          "action_id": 342,
+          "action": "cut into strips and pieces",
+          "step_idx": 3
+        },
+        {
+          "action_id": 343,
+          "action": "cut the flesh",
+          "step_idx": 4
+        },
+        {
+          "action_id": 344,
+          "action": "peel",
+          "step_idx": 5
+        }
+      ]
+    },
+    "31": {
+      "task_id": "31",
+      "recipe_type": 31,
+      "task_name": "CutAndRestoreRopeTrick",
+      "task_name_human": "Cut And Restore Rope Trick",
+      "goal": "Complete the task: Cut And Restore Rope Trick.",
+      "canonical_steps": [
+        {
+          "action_id": 225,
+          "action": "show the whole rope again",
+          "step_idx": 1
+        },
+        {
+          "action_id": 226,
+          "action": "knot the rope",
+          "step_idx": 2
+        },
+        {
+          "action_id": 227,
+          "action": "cut the rope",
+          "step_idx": 3
+        },
+        {
+          "action_id": 228,
+          "action": "show the whole rope again",
+          "step_idx": 4
+        }
+      ]
+    },
+    "32": {
+      "task_id": "32",
+      "recipe_type": 32,
+      "task_name": "CutCantaloupe",
+      "task_name_human": "Cut Cantaloupe",
+      "goal": "Complete the task: Cut Cantaloupe.",
+      "canonical_steps": [
+        {
+          "action_id": 603,
+          "action": "cut off the edge",
+          "step_idx": 1
+        },
+        {
+          "action_id": 604,
+          "action": "peel",
+          "step_idx": 2
+        },
+        {
+          "action_id": 605,
+          "action": "cut in half",
+          "step_idx": 3
+        },
+        {
+          "action_id": 606,
+          "action": "dig out the seeds with spoon",
+          "step_idx": 4
+        },
+        {
+          "action_id": 607,
+          "action": "slice the pulp",
+          "step_idx": 5
+        }
+      ]
+    },
+    "33": {
+      "task_id": "33",
+      "recipe_type": 33,
+      "task_name": "CutGrapeFruit",
+      "task_name_human": "Cut Grape Fruit",
+      "goal": "Complete the task: Cut Grape Fruit.",
+      "canonical_steps": [
+        {
+          "action_id": 637,
+          "action": "cut both ends and remove fruit seeds",
+          "step_idx": 1
+        },
+        {
+          "action_id": 638,
+          "action": "remove the peel",
+          "step_idx": 2
+        },
+        {
+          "action_id": 639,
+          "action": "slice the pulp",
+          "step_idx": 3
+        },
+        {
+          "action_id": 640,
+          "action": "cut in half",
+          "step_idx": 4
+        }
+      ]
+    },
+    "34": {
+      "task_id": "34",
+      "recipe_type": 34,
+      "task_name": "WashDish",
+      "task_name_human": "Wash Dish",
+      "goal": "Complete the task: Wash Dish.",
+      "canonical_steps": [
+        {
+          "action_id": 360,
+          "action": "add detergent and make bubble",
+          "step_idx": 1
+        },
+        {
+          "action_id": 361,
+          "action": "wipe the dish",
+          "step_idx": 2
+        },
+        {
+          "action_id": 362,
+          "action": "rinse the dish",
+          "step_idx": 3
+        },
+        {
+          "action_id": 363,
+          "action": "put dish in dishwasher",
+          "step_idx": 4
+        },
+        {
+          "action_id": 364,
+          "action": "take dish out",
+          "step_idx": 5
+        }
+      ]
+    },
+    "35": {
+      "task_id": "35",
+      "recipe_type": 35,
+      "task_name": "RaiseFlag",
+      "task_name_human": "Raise Flag",
+      "goal": "Complete the task: Raise Flag.",
+      "canonical_steps": [
+        {
+          "action_id": 345,
+          "action": "line up for admission",
+          "step_idx": 1
+        },
+        {
+          "action_id": 346,
+          "action": "expand the flag",
+          "step_idx": 2
+        },
+        {
+          "action_id": 347,
+          "action": "raise the national flag",
+          "step_idx": 3
+        }
+      ]
+    },
+    "36": {
+      "task_id": "36",
+      "recipe_type": 36,
+      "task_name": "GluePingPongRubber",
+      "task_name_human": "Glue Ping Pong Rubber",
+      "goal": "Complete the task: Glue Ping Pong Rubber.",
+      "canonical_steps": [
+        {
+          "action_id": 69,
+          "action": "remove old rubber and glue",
+          "step_idx": 1
+        },
+        {
+          "action_id": 70,
+          "action": "glue on the back of the rubber",
+          "step_idx": 2
+        },
+        {
+          "action_id": 71,
+          "action": "glue on the paddle",
+          "step_idx": 3
+        },
+        {
+          "action_id": 72,
+          "action": "put rubber on paddle",
+          "step_idx": 4
+        },
+        {
+          "action_id": 73,
+          "action": "cut the rubber",
+          "step_idx": 5
+        },
+        {
+          "action_id": 74,
+          "action": "attach tape to the edge of the paddle",
+          "step_idx": 6
+        }
+      ]
+    },
+    "37": {
+      "task_id": "37",
+      "recipe_type": 37,
+      "task_name": "Graft",
+      "task_name_human": "Graft",
+      "goal": "Complete the task: Graft.",
+      "canonical_steps": [
+        {
+          "action_id": 328,
+          "action": "cut branches",
+          "step_idx": 1
+        },
+        {
+          "action_id": 329,
+          "action": "connect branches",
+          "step_idx": 2
+        },
+        {
+          "action_id": 330,
+          "action": "wind the junction to fasten the connection",
+          "step_idx": 3
+        }
+      ]
+    },
+    "38": {
+      "task_id": "38",
+      "recipe_type": 38,
+      "task_name": "ThrowHammer",
+      "task_name_human": "Throw Hammer",
+      "goal": "Complete the task: Throw Hammer.",
+      "canonical_steps": [
+        {
+          "action_id": 776,
+          "action": "pre-swing",
+          "step_idx": 1
+        },
+        {
+          "action_id": 777,
+          "action": "rotate body and accelerate the hammer",
+          "step_idx": 2
+        },
+        {
+          "action_id": 778,
+          "action": "throw the hammer out",
+          "step_idx": 3
+        }
+      ]
+    },
+    "39": {
+      "task_id": "39",
+      "recipe_type": 39,
+      "task_name": "HangWallpaper",
+      "task_name_human": "Hang Wallpaper",
+      "goal": "Complete the task: Hang Wallpaper.",
+      "canonical_steps": [
+        {
+          "action_id": 469,
+          "action": "measure and mark the wall",
+          "step_idx": 1
+        },
+        {
+          "action_id": 470,
+          "action": "crop the wallpaper",
+          "step_idx": 2
+        },
+        {
+          "action_id": 471,
+          "action": "apply glue to the wall and wallpaper",
+          "step_idx": 3
+        },
+        {
+          "action_id": 472,
+          "action": "paste and level the wallpaper",
+          "step_idx": 4
+        },
+        {
+          "action_id": 473,
+          "action": "cut out a hole",
+          "step_idx": 5
+        },
+        {
+          "action_id": 474,
+          "action": "loosen the outer cover of a switch or socket",
+          "step_idx": 6
+        },
+        {
+          "action_id": 475,
+          "action": "stuff the wallpaper into the loose outer cover",
+          "step_idx": 7
+        },
+        {
+          "action_id": 476,
+          "action": "tighten the outer cover of the switch or socket",
+          "step_idx": 8
+        },
+        {
+          "action_id": 477,
+          "action": "clean the wall",
+          "step_idx": 9
+        },
+        {
+          "action_id": 478,
+          "action": "wipe or polish the wall",
+          "step_idx": 10
+        },
+        {
+          "action_id": 479,
+          "action": "make the glue",
+          "step_idx": 11
+        },
+        {
+          "action_id": 480,
+          "action": "dip the glue",
+          "step_idx": 12
+        }
+      ]
+    },
+    "40": {
+      "task_id": "40",
+      "recipe_type": 40,
+      "task_name": "BandageHead",
+      "task_name_human": "Bandage Head",
+      "goal": "Complete the task: Bandage Head.",
+      "canonical_steps": [
+        {
+          "action_id": 717,
+          "action": "place gasket at injury",
+          "step_idx": 1
+        },
+        {
+          "action_id": 718,
+          "action": "wind bandage around head",
+          "step_idx": 2
+        },
+        {
+          "action_id": 719,
+          "action": "knot at the end of the bandage",
+          "step_idx": 3
+        }
+      ]
+    },
+    "41": {
+      "task_id": "41",
+      "recipe_type": 41,
+      "task_name": "ArcWeld",
+      "task_name_human": "Arc Weld",
+      "goal": "Complete the task: Arc Weld.",
+      "canonical_steps": [
+        {
+          "action_id": 585,
+          "action": "hold electrode with a welding tong",
+          "step_idx": 1
+        },
+        {
+          "action_id": 586,
+          "action": "wear a eye protection helmet",
+          "step_idx": 2
+        },
+        {
+          "action_id": 587,
+          "action": "weld along the weld line",
+          "step_idx": 3
+        },
+        {
+          "action_id": 588,
+          "action": "clean weld line with a hammer",
+          "step_idx": 4
+        }
+      ]
+    },
+    "42": {
+      "task_id": "42",
+      "recipe_type": 42,
+      "task_name": "CleanLeatherSeat",
+      "task_name_human": "Clean Leather Seat",
+      "goal": "Complete the task: Clean Leather Seat.",
+      "canonical_steps": [
+        {
+          "action_id": 516,
+          "action": "apply detergent to leather",
+          "step_idx": 1
+        },
+        {
+          "action_id": 517,
+          "action": "wipe the detergent",
+          "step_idx": 2
+        },
+        {
+          "action_id": 518,
+          "action": "clean the surface",
+          "step_idx": 3
+        }
+      ]
+    },
+    "43": {
+      "task_id": "43",
+      "recipe_type": 43,
+      "task_name": "DoLinoPrinting",
+      "task_name_human": "Do Lino Printing",
+      "goal": "Complete the task: Do Lino Printing.",
+      "canonical_steps": [
+        {
+          "action_id": 441,
+          "action": "draw black patterns",
+          "step_idx": 1
+        },
+        {
+          "action_id": 442,
+          "action": "transfer pattern to board or tarpaulin",
+          "step_idx": 2
+        },
+        {
+          "action_id": 443,
+          "action": "scrape tarpaulin without ink",
+          "step_idx": 3
+        },
+        {
+          "action_id": 444,
+          "action": "cut the tarpaulin",
+          "step_idx": 4
+        },
+        {
+          "action_id": 445,
+          "action": "mark the area that needs to be inked",
+          "step_idx": 5
+        },
+        {
+          "action_id": 446,
+          "action": "ink the marked area",
+          "step_idx": 6
+        },
+        {
+          "action_id": 447,
+          "action": "transfer print",
+          "step_idx": 7
+        }
+      ]
+    },
+    "44": {
+      "task_id": "44",
+      "recipe_type": 44,
+      "task_name": "DrillHole",
+      "task_name_human": "Drill Hole",
+      "goal": "Complete the task: Drill Hole.",
+      "canonical_steps": [
+        {
+          "action_id": 407,
+          "action": "draw lines to mark the hole",
+          "step_idx": 1
+        },
+        {
+          "action_id": 408,
+          "action": "find the position of the hole",
+          "step_idx": 2
+        },
+        {
+          "action_id": 409,
+          "action": "drill with an electric drill",
+          "step_idx": 3
+        }
+      ]
+    },
+    "45": {
+      "task_id": "45",
+      "recipe_type": 45,
+      "task_name": "FixLaptopScreenScratches",
+      "task_name_human": "Fix Laptop Screen Scratches",
+      "goal": "Complete the task: Fix Laptop Screen Scratches.",
+      "canonical_steps": [
+        {
+          "action_id": 34,
+          "action": "apply toothpaste or other cleaning agent to scratch",
+          "step_idx": 1
+        },
+        {
+          "action_id": 35,
+          "action": "wipe the scratch with cloth",
+          "step_idx": 2
+        },
+        {
+          "action_id": 36,
+          "action": "wipe the toothpaste",
+          "step_idx": 3
+        }
+      ]
+    },
+    "46": {
+      "task_id": "46",
+      "recipe_type": 46,
+      "task_name": "LoadGreaseGun",
+      "task_name_human": "Load Grease Gun",
+      "goal": "Complete the task: Load Grease Gun.",
+      "canonical_steps": [
+        {
+          "action_id": 313,
+          "action": "pull out a lock lever at bottom of gun",
+          "step_idx": 1
+        },
+        {
+          "action_id": 314,
+          "action": "unscrew gun head",
+          "step_idx": 2
+        },
+        {
+          "action_id": 315,
+          "action": "take out old grease container",
+          "step_idx": 3
+        },
+        {
+          "action_id": 316,
+          "action": "put in a new grease container",
+          "step_idx": 4
+        },
+        {
+          "action_id": 317,
+          "action": "open the lid of new container",
+          "step_idx": 5
+        },
+        {
+          "action_id": 318,
+          "action": "screw gun head back",
+          "step_idx": 6
+        },
+        {
+          "action_id": 319,
+          "action": "try to press gun head, spray residual old grease",
+          "step_idx": 7
+        }
+      ]
+    },
+    "47": {
+      "task_id": "47",
+      "recipe_type": 47,
+      "task_name": "MakeFlowerCrown",
+      "task_name_human": "Make Flower Crown",
+      "goal": "Complete the task: Make Flower Crown.",
+      "canonical_steps": [
+        {
+          "action_id": 304,
+          "action": "prepare the frame",
+          "step_idx": 1
+        },
+        {
+          "action_id": 305,
+          "action": "prepare flower",
+          "step_idx": 2
+        },
+        {
+          "action_id": 306,
+          "action": "stick or bind flower to the frame",
+          "step_idx": 3
+        }
+      ]
+    },
+    "48": {
+      "task_id": "48",
+      "recipe_type": 48,
+      "task_name": "MakeFlowerPress",
+      "task_name_human": "Make Flower Press",
+      "goal": "Complete the task: Make Flower Press.",
+      "canonical_steps": [
+        {
+          "action_id": 666,
+          "action": "put flower in book",
+          "step_idx": 1
+        },
+        {
+          "action_id": 667,
+          "action": "press book or heat flower",
+          "step_idx": 2
+        },
+        {
+          "action_id": 668,
+          "action": "take out dry flowers",
+          "step_idx": 3
+        },
+        {
+          "action_id": 669,
+          "action": "use dried flower to place pattern and fix it",
+          "step_idx": 4
+        }
+      ]
+    },
+    "49": {
+      "task_id": "49",
+      "recipe_type": 49,
+      "task_name": "MakeChocolate",
+      "task_name_human": "Make Chocolate",
+      "goal": "Complete the task: Make Chocolate.",
+      "canonical_steps": [
+        {
+          "action_id": 157,
+          "action": "add raw materials",
+          "step_idx": 1
+        },
+        {
+          "action_id": 158,
+          "action": "mix raw materials",
+          "step_idx": 2
+        },
+        {
+          "action_id": 159,
+          "action": "put materials into mold",
+          "step_idx": 3
+        },
+        {
+          "action_id": 160,
+          "action": "take out chocolate",
+          "step_idx": 4
+        }
+      ]
+    },
+    "50": {
+      "task_id": "50",
+      "recipe_type": 50,
+      "task_name": "MakeCookie",
+      "task_name_human": "Make Cookie",
+      "goal": "Complete the task: Make Cookie.",
+      "canonical_steps": [
+        {
+          "action_id": 293,
+          "action": "pour raw materials",
+          "step_idx": 1
+        },
+        {
+          "action_id": 294,
+          "action": "mix raw materials",
+          "step_idx": 2
+        },
+        {
+          "action_id": 295,
+          "action": "shape cookie",
+          "step_idx": 3
+        },
+        {
+          "action_id": 296,
+          "action": "bake cookies",
+          "step_idx": 4
+        }
+      ]
+    },
+    "51": {
+      "task_id": "51",
+      "recipe_type": 51,
+      "task_name": "MakeHummus",
+      "task_name_human": "Make Hummus",
+      "goal": "Complete the task: Make Hummus.",
+      "canonical_steps": [
+        {
+          "action_id": 194,
+          "action": "add raw materials",
+          "step_idx": 1
+        },
+        {
+          "action_id": 195,
+          "action": "mix raw materials",
+          "step_idx": 2
+        },
+        {
+          "action_id": 196,
+          "action": "pour bean paste into plate",
+          "step_idx": 3
+        },
+        {
+          "action_id": 197,
+          "action": "invert seasoning",
+          "step_idx": 4
+        }
+      ]
+    },
+    "52": {
+      "task_id": "52",
+      "recipe_type": 52,
+      "task_name": "MakePaperEasterBaskets",
+      "task_name_human": "Make Paper Easter Baskets",
+      "goal": "Complete the task: Make Paper Easter Baskets.",
+      "canonical_steps": [
+        {
+          "action_id": 381,
+          "action": "process (crop, fold) paper",
+          "step_idx": 1
+        },
+        {
+          "action_id": 382,
+          "action": "paste paper into base of paper basket",
+          "step_idx": 2
+        },
+        {
+          "action_id": 383,
+          "action": "stick handle to paper basket",
+          "step_idx": 3
+        }
+      ]
+    },
+    "53": {
+      "task_id": "53",
+      "recipe_type": 53,
+      "task_name": "MakeYoutiao",
+      "task_name_human": "Make Youtiao",
+      "goal": "Complete the task: Make Youtiao.",
+      "canonical_steps": [
+        {
+          "action_id": 552,
+          "action": "pour raw materials",
+          "step_idx": 1
+        },
+        {
+          "action_id": 553,
+          "action": "stir raw materials",
+          "step_idx": 2
+        },
+        {
+          "action_id": 554,
+          "action": "knead together",
+          "step_idx": 3
+        },
+        {
+          "action_id": 555,
+          "action": "flatten the dough",
+          "step_idx": 4
+        },
+        {
+          "action_id": 556,
+          "action": "cut into strips",
+          "step_idx": 5
+        },
+        {
+          "action_id": 557,
+          "action": "press the strips in the middle with a board",
+          "step_idx": 6
+        },
+        {
+          "action_id": 558,
+          "action": "fry the dough",
+          "step_idx": 7
+        }
+      ]
+    },
+    "54": {
+      "task_id": "54",
+      "recipe_type": 54,
+      "task_name": "PatchBikeInnerTube",
+      "task_name_human": "Patch Bike Inner Tube",
+      "goal": "Complete the task: Patch Bike Inner Tube.",
+      "canonical_steps": [
+        {
+          "action_id": 401,
+          "action": "remove inner tube",
+          "step_idx": 1
+        },
+        {
+          "action_id": 402,
+          "action": "look for leaks",
+          "step_idx": 2
+        },
+        {
+          "action_id": 403,
+          "action": "use sandpaper/metal to polish rubber near leak",
+          "step_idx": 3
+        },
+        {
+          "action_id": 404,
+          "action": "apply glue",
+          "step_idx": 4
+        },
+        {
+          "action_id": 405,
+          "action": "paste patch",
+          "step_idx": 5
+        },
+        {
+          "action_id": 406,
+          "action": "put inner tube back",
+          "step_idx": 6
+        }
+      ]
+    },
+    "55": {
+      "task_id": "55",
+      "recipe_type": 55,
+      "task_name": "RefillMechanicalPencils",
+      "task_name_human": "Refill Mechanical Pencils",
+      "goal": "Complete the task: Refill Mechanical Pencils.",
+      "canonical_steps": [
+        {
+          "action_id": 545,
+          "action": "remove cap",
+          "step_idx": 1
+        },
+        {
+          "action_id": 546,
+          "action": "put lead into the pen",
+          "step_idx": 2
+        },
+        {
+          "action_id": 547,
+          "action": "buckle the cap",
+          "step_idx": 3
+        }
+      ]
+    },
+    "56": {
+      "task_id": "56",
+      "recipe_type": 56,
+      "task_name": "RemoveCrayonFromWalls",
+      "task_name_human": "Remove Crayon From Walls",
+      "goal": "Complete the task: Remove Crayon From Walls.",
+      "canonical_steps": [
+        {
+          "action_id": 133,
+          "action": "apply cleaning agent",
+          "step_idx": 1
+        },
+        {
+          "action_id": 134,
+          "action": "use a hair dryer to blow hot wall",
+          "step_idx": 2
+        },
+        {
+          "action_id": 135,
+          "action": "wipe wall with detergent",
+          "step_idx": 3
+        },
+        {
+          "action_id": 136,
+          "action": "clean wall with a clean cloth",
+          "step_idx": 4
+        }
+      ]
+    },
+    "57": {
+      "task_id": "57",
+      "recipe_type": 57,
+      "task_name": "ReplaceCarWindow",
+      "task_name_human": "Replace Car Window",
+      "goal": "Complete the task: Replace Car Window.",
+      "canonical_steps": [
+        {
+          "action_id": 41,
+          "action": "remove surface of the door",
+          "step_idx": 1
+        },
+        {
+          "action_id": 42,
+          "action": "remove old glass from window lift",
+          "step_idx": 2
+        },
+        {
+          "action_id": 43,
+          "action": "glue on window frame",
+          "step_idx": 3
+        },
+        {
+          "action_id": 44,
+          "action": "install new glass on window lift",
+          "step_idx": 4
+        },
+        {
+          "action_id": 45,
+          "action": "install the door",
+          "step_idx": 5
+        }
+      ]
+    },
+    "58": {
+      "task_id": "58",
+      "recipe_type": 58,
+      "task_name": "ReplaceBatteryOnKeyToCar",
+      "task_name_human": "Replace Battery On Key To Car",
+      "goal": "Complete the task: Replace Battery On Key To Car.",
+      "canonical_steps": [
+        {
+          "action_id": 120,
+          "action": "open the car key cover",
+          "step_idx": 1
+        },
+        {
+          "action_id": 121,
+          "action": "take out the car key battery",
+          "step_idx": 2
+        },
+        {
+          "action_id": 122,
+          "action": "put in the battery",
+          "step_idx": 3
+        },
+        {
+          "action_id": 123,
+          "action": "close the car key cover",
+          "step_idx": 4
+        }
+      ]
+    },
+    "59": {
+      "task_id": "59",
+      "recipe_type": 59,
+      "task_name": "ReplaceBatteryOnTVControl",
+      "task_name_human": "Replace Battery On TV Control",
+      "goal": "Complete the task: Replace Battery On TV Control.",
+      "canonical_steps": [
+        {
+          "action_id": 692,
+          "action": "open cover",
+          "step_idx": 1
+        },
+        {
+          "action_id": 693,
+          "action": "remove battery",
+          "step_idx": 2
+        },
+        {
+          "action_id": 694,
+          "action": "put battery in",
+          "step_idx": 3
+        },
+        {
+          "action_id": 695,
+          "action": "close cover",
+          "step_idx": 4
+        }
+      ]
+    },
+    "60": {
+      "task_id": "60",
+      "recipe_type": 60,
+      "task_name": "UseNetiPot",
+      "task_name_human": "Use Neti Pot",
+      "goal": "Complete the task: Use Neti Pot.",
+      "canonical_steps": [
+        {
+          "action_id": 598,
+          "action": "add a small amount of salt to Neti Pot",
+          "step_idx": 1
+        },
+        {
+          "action_id": 599,
+          "action": "add water to Neti Pot",
+          "step_idx": 2
+        },
+        {
+          "action_id": 600,
+          "action": "shake and stir",
+          "step_idx": 3
+        },
+        {
+          "action_id": 601,
+          "action": "fill a nostril with saline and do the same to the other nostril",
+          "step_idx": 4
+        },
+        {
+          "action_id": 602,
+          "action": "wipe nose",
+          "step_idx": 5
+        }
+      ]
+    },
+    "61": {
+      "task_id": "61",
+      "recipe_type": 61,
+      "task_name": "UseEpinephrineAuto-injector",
+      "task_name_human": "Use Epinephrine Auto-injector",
+      "goal": "Complete the task: Use Epinephrine Auto-injector.",
+      "canonical_steps": [
+        {
+          "action_id": 673,
+          "action": "unplug protection head",
+          "step_idx": 1
+        },
+        {
+          "action_id": 674,
+          "action": "plunge into thigh",
+          "step_idx": 2
+        },
+        {
+          "action_id": 675,
+          "action": "pull out after a period of time",
+          "step_idx": 3
+        }
+      ]
+    },
+    "62": {
+      "task_id": "62",
+      "recipe_type": 62,
+      "task_name": "UseTripleBeamBalance",
+      "task_name_human": "Use Triple Beam Balance",
+      "goal": "Complete the task: Use Triple Beam Balance.",
+      "canonical_steps": [
+        {
+          "action_id": 425,
+          "action": "adjust the balance to the horizontal position",
+          "step_idx": 1
+        },
+        {
+          "action_id": 426,
+          "action": "correct the balance zero",
+          "step_idx": 2
+        },
+        {
+          "action_id": 427,
+          "action": "put the sample to be measured on the balance",
+          "step_idx": 3
+        },
+        {
+          "action_id": 428,
+          "action": "put the weight until the balance is balanced",
+          "step_idx": 4
+        }
+      ]
+    },
+    "63": {
+      "task_id": "63",
+      "recipe_type": 63,
+      "task_name": "UseVolumetricPipette",
+      "task_name_human": "Use Volumetric Pipette",
+      "goal": "Complete the task: Use Volumetric Pipette.",
+      "canonical_steps": [
+        {
+          "action_id": 83,
+          "action": "absorb liquid with dropper",
+          "step_idx": 1
+        },
+        {
+          "action_id": 84,
+          "action": "calibrate the liquid",
+          "step_idx": 2
+        },
+        {
+          "action_id": 85,
+          "action": "release liquid",
+          "step_idx": 3
+        }
+      ]
+    },
+    "64": {
+      "task_id": "64",
+      "recipe_type": 64,
+      "task_name": "WrapZongzi",
+      "task_name_human": "Wrap Zongzi",
+      "goal": "Complete the task: Wrap Zongzi.",
+      "canonical_steps": [
+        {
+          "action_id": 497,
+          "action": "cone the leaves",
+          "step_idx": 1
+        },
+        {
+          "action_id": 498,
+          "action": "add ingredients into cone",
+          "step_idx": 2
+        },
+        {
+          "action_id": 499,
+          "action": "fold the leaves",
+          "step_idx": 3
+        },
+        {
+          "action_id": 500,
+          "action": "tie the zongzi tightly",
+          "step_idx": 4
+        }
+      ]
+    },
+    "65": {
+      "task_id": "65",
+      "recipe_type": 65,
+      "task_name": "InstallAirConditioner",
+      "task_name_human": "Install Air Conditioner",
+      "goal": "Complete the task: Install Air Conditioner.",
+      "canonical_steps": [
+        {
+          "action_id": 628,
+          "action": "install sponge strip",
+          "step_idx": 1
+        },
+        {
+          "action_id": 629,
+          "action": "install window panel",
+          "step_idx": 2
+        },
+        {
+          "action_id": 630,
+          "action": "fix window board",
+          "step_idx": 3
+        },
+        {
+          "action_id": 631,
+          "action": "connect air conditioners and windows",
+          "step_idx": 4
+        }
+      ]
+    },
+    "66": {
+      "task_id": "66",
+      "recipe_type": 66,
+      "task_name": "InstallBicycleRack",
+      "task_name_human": "Install Bicycle Rack",
+      "goal": "Complete the task: Install Bicycle Rack.",
+      "canonical_steps": [
+        {
+          "action_id": 336,
+          "action": "mount the bracket to the back of the car",
+          "step_idx": 1
+        },
+        {
+          "action_id": 337,
+          "action": "fix and fasten the upper and lower ropes to car",
+          "step_idx": 2
+        },
+        {
+          "action_id": 338,
+          "action": "place the bicycle on the bracket",
+          "step_idx": 3
+        },
+        {
+          "action_id": 339,
+          "action": "fasten the strap",
+          "step_idx": 4
+        }
+      ]
+    },
+    "67": {
+      "task_id": "67",
+      "recipe_type": 67,
+      "task_name": "InstallCeilingFan",
+      "task_name_human": "Install Ceiling Fan",
+      "goal": "Complete the task: Install Ceiling Fan.",
+      "canonical_steps": [
+        {
+          "action_id": 353,
+          "action": "close switch",
+          "step_idx": 1
+        },
+        {
+          "action_id": 354,
+          "action": "remove old lamp fixed cover",
+          "step_idx": 2
+        },
+        {
+          "action_id": 355,
+          "action": "remove old lamp fixed support",
+          "step_idx": 3
+        },
+        {
+          "action_id": 356,
+          "action": "install fan bracket",
+          "step_idx": 4
+        },
+        {
+          "action_id": 357,
+          "action": "install fan tray",
+          "step_idx": 5
+        },
+        {
+          "action_id": 358,
+          "action": "install fan frame",
+          "step_idx": 6
+        },
+        {
+          "action_id": 359,
+          "action": "install fans and lights",
+          "step_idx": 7
+        }
+      ]
+    },
+    "68": {
+      "task_id": "68",
+      "recipe_type": 68,
+      "task_name": "InstallCeramicTile",
+      "task_name_human": "Install Ceramic Tile",
+      "goal": "Complete the task: Install Ceramic Tile.",
+      "canonical_steps": [
+        {
+          "action_id": 161,
+          "action": "check ground and layout planning",
+          "step_idx": 1
+        },
+        {
+          "action_id": 162,
+          "action": "prepare adhesive",
+          "step_idx": 2
+        },
+        {
+          "action_id": 163,
+          "action": "wipe adhesive and bedding layer",
+          "step_idx": 3
+        },
+        {
+          "action_id": 164,
+          "action": "cut tiles",
+          "step_idx": 4
+        },
+        {
+          "action_id": 165,
+          "action": "tile the wall",
+          "step_idx": 5
+        },
+        {
+          "action_id": 166,
+          "action": "fill the gap",
+          "step_idx": 6
+        }
+      ]
+    },
+    "69": {
+      "task_id": "69",
+      "recipe_type": 69,
+      "task_name": "PasteScreenProtectorOnPad",
+      "task_name_human": "Paste Screen Protector On Pad",
+      "goal": "Complete the task: Paste Screen Protector On Pad.",
+      "canonical_steps": [
+        {
+          "action_id": 331,
+          "action": "place label",
+          "step_idx": 1
+        },
+        {
+          "action_id": 332,
+          "action": "wipe screen",
+          "step_idx": 2
+        },
+        {
+          "action_id": 333,
+          "action": "paste protector on the screen",
+          "step_idx": 3
+        },
+        {
+          "action_id": 334,
+          "action": "wipe screen again",
+          "step_idx": 4
+        },
+        {
+          "action_id": 335,
+          "action": "remove the label",
+          "step_idx": 5
+        }
+      ]
+    },
+    "70": {
+      "task_id": "70",
+      "recipe_type": 70,
+      "task_name": "InstallLicensePlateFrame",
+      "task_name_human": "Install License Plate Frame",
+      "goal": "Complete the task: Install License Plate Frame.",
+      "canonical_steps": [
+        {
+          "action_id": 737,
+          "action": "place license plate",
+          "step_idx": 1
+        },
+        {
+          "action_id": 738,
+          "action": "place license plate cover",
+          "step_idx": 2
+        },
+        {
+          "action_id": 739,
+          "action": "screw and fix the cover",
+          "step_idx": 3
+        }
+      ]
+    },
+    "71": {
+      "task_id": "71",
+      "recipe_type": 71,
+      "task_name": "InstallShowerHead",
+      "task_name_human": "Install Shower Head",
+      "goal": "Complete the task: Install Shower Head.",
+      "canonical_steps": [
+        {
+          "action_id": 663,
+          "action": "replace the old shower head",
+          "step_idx": 1
+        },
+        {
+          "action_id": 664,
+          "action": "wrap the pipe band",
+          "step_idx": 2
+        },
+        {
+          "action_id": 665,
+          "action": "install the new shower head",
+          "step_idx": 3
+        }
+      ]
+    },
+    "72": {
+      "task_id": "72",
+      "recipe_type": 72,
+      "task_name": "InstallClosestool",
+      "task_name_human": "Install Closestool",
+      "goal": "Complete the task: Install Closestool.",
+      "canonical_steps": [
+        {
+          "action_id": 410,
+          "action": "close the sluice and empty and disconnect the water pipe",
+          "step_idx": 1
+        },
+        {
+          "action_id": 411,
+          "action": "take down the closestool",
+          "step_idx": 2
+        },
+        {
+          "action_id": 412,
+          "action": "remove the old wax ring and clean",
+          "step_idx": 3
+        },
+        {
+          "action_id": 413,
+          "action": "install the new wax ring",
+          "step_idx": 4
+        },
+        {
+          "action_id": 414,
+          "action": "install the closestool again",
+          "step_idx": 5
+        },
+        {
+          "action_id": 415,
+          "action": "connect the water pipe",
+          "step_idx": 6
+        }
+      ]
+    },
+    "73": {
+      "task_id": "73",
+      "recipe_type": 73,
+      "task_name": "InstallWoodFlooring",
+      "task_name_human": "Install Wood Flooring",
+      "goal": "Complete the task: Install Wood Flooring.",
+      "canonical_steps": [
+        {
+          "action_id": 96,
+          "action": "prepare the ground floor",
+          "step_idx": 1
+        },
+        {
+          "action_id": 97,
+          "action": "cut the raw boards",
+          "step_idx": 2
+        },
+        {
+          "action_id": 98,
+          "action": "fit on the boards",
+          "step_idx": 3
+        },
+        {
+          "action_id": 99,
+          "action": "knock in the nails",
+          "step_idx": 4
+        },
+        {
+          "action_id": 100,
+          "action": "apply some glue on the borads",
+          "step_idx": 5
+        }
+      ]
+    },
+    "74": {
+      "task_id": "74",
+      "recipe_type": 74,
+      "task_name": "InstallCurtain",
+      "task_name_human": "Install Curtain",
+      "goal": "Complete the task: Install Curtain.",
+      "canonical_steps": [
+        {
+          "action_id": 760,
+          "action": "drill in the wall",
+          "step_idx": 1
+        },
+        {
+          "action_id": 761,
+          "action": "install two shelves",
+          "step_idx": 2
+        },
+        {
+          "action_id": 762,
+          "action": "place crossbar on shelves",
+          "step_idx": 3
+        },
+        {
+          "action_id": 763,
+          "action": "hang up curtains",
+          "step_idx": 4
+        }
+      ]
+    },
+    "75": {
+      "task_id": "75",
+      "recipe_type": 75,
+      "task_name": "IronClothes",
+      "task_name_human": "Iron Clothes",
+      "goal": "Complete the task: Iron Clothes.",
+      "canonical_steps": [
+        {
+          "action_id": 170,
+          "action": "get an iron prepared",
+          "step_idx": 1
+        },
+        {
+          "action_id": 171,
+          "action": "make the clothes wet",
+          "step_idx": 2
+        },
+        {
+          "action_id": 172,
+          "action": "flip the clothes repeatly",
+          "step_idx": 3
+        },
+        {
+          "action_id": 173,
+          "action": "put the clothes neatly on a ironing table",
+          "step_idx": 4
+        },
+        {
+          "action_id": 174,
+          "action": "iron the cloths with the iron",
+          "step_idx": 5
+        },
+        {
+          "action_id": 175,
+          "action": "hang the ironed clothes",
+          "step_idx": 6
+        }
+      ]
+    },
+    "76": {
+      "task_id": "76",
+      "recipe_type": 76,
+      "task_name": "PractiseKarate",
+      "task_name_human": "Practise Karate",
+      "goal": "Complete the task: Practise Karate.",
+      "canonical_steps": [
+        {
+          "action_id": 494,
+          "action": "march into the area and salute",
+          "step_idx": 1
+        },
+        {
+          "action_id": 495,
+          "action": "begin to practise karate",
+          "step_idx": 2
+        },
+        {
+          "action_id": 496,
+          "action": "exit from the area and salute",
+          "step_idx": 3
+        }
+      ]
+    },
+    "77": {
+      "task_id": "77",
+      "recipe_type": 77,
+      "task_name": "LubricateALock",
+      "task_name_human": "Lubricate A Lock",
+      "goal": "Complete the task: Lubricate A Lock.",
+      "canonical_steps": [
+        {
+          "action_id": 398,
+          "action": "apply the lubricant on the lock",
+          "step_idx": 1
+        },
+        {
+          "action_id": 399,
+          "action": "wipe off the redundant lubricant",
+          "step_idx": 2
+        },
+        {
+          "action_id": 400,
+          "action": "insert the key repeatly",
+          "step_idx": 3
+        }
+      ]
+    },
+    "78": {
+      "task_id": "78",
+      "recipe_type": 78,
+      "task_name": "MakePaperDice",
+      "task_name_human": "Make Paper Dice",
+      "goal": "Complete the task: Make Paper Dice.",
+      "canonical_steps": [
+        {
+          "action_id": 348,
+          "action": "fold or bent paper",
+          "step_idx": 1
+        },
+        {
+          "action_id": 349,
+          "action": "put paper together",
+          "step_idx": 2
+        },
+        {
+          "action_id": 350,
+          "action": "cut paper",
+          "step_idx": 3
+        },
+        {
+          "action_id": 351,
+          "action": "paint on the paper",
+          "step_idx": 4
+        },
+        {
+          "action_id": 352,
+          "action": "measure and mark",
+          "step_idx": 5
+        }
+      ]
+    },
+    "79": {
+      "task_id": "79",
+      "recipe_type": 79,
+      "task_name": "MakeBurger",
+      "task_name_human": "Make Burger",
+      "goal": "Complete the task: Make Burger.",
+      "canonical_steps": [
+        {
+          "action_id": 22,
+          "action": "knead the meat",
+          "step_idx": 1
+        },
+        {
+          "action_id": 23,
+          "action": "fry meat",
+          "step_idx": 2
+        },
+        {
+          "action_id": 24,
+          "action": "combine meat and bread to make burger",
+          "step_idx": 3
+        }
+      ]
+    },
+    "80": {
+      "task_id": "80",
+      "recipe_type": 80,
+      "task_name": "MakeCandle",
+      "task_name_human": "Make Candle",
+      "goal": "Complete the task: Make Candle.",
+      "canonical_steps": [
+        {
+          "action_id": 320,
+          "action": "put the candle wick into a vessel",
+          "step_idx": 1
+        },
+        {
+          "action_id": 321,
+          "action": "fix the candle wick",
+          "step_idx": 2
+        },
+        {
+          "action_id": 322,
+          "action": "melt the wax with water",
+          "step_idx": 3
+        },
+        {
+          "action_id": 323,
+          "action": "pour the wax into the vessel",
+          "step_idx": 4
+        },
+        {
+          "action_id": 324,
+          "action": "wait for the candle until concretion",
+          "step_idx": 5
+        }
+      ]
+    },
+    "81": {
+      "task_id": "81",
+      "recipe_type": 81,
+      "task_name": "MakeChineseLantern",
+      "task_name_human": "Make Chinese Lantern",
+      "goal": "Complete the task: Make Chinese Lantern.",
+      "canonical_steps": [
+        {
+          "action_id": 51,
+          "action": "fold or bent the paper",
+          "step_idx": 1
+        },
+        {
+          "action_id": 52,
+          "action": "nail down or stick together",
+          "step_idx": 2
+        },
+        {
+          "action_id": 53,
+          "action": "cut the raw materials",
+          "step_idx": 3
+        },
+        {
+          "action_id": 54,
+          "action": "draw pictures on the materials",
+          "step_idx": 4
+        },
+        {
+          "action_id": 55,
+          "action": "thread and make knots",
+          "step_idx": 5
+        },
+        {
+          "action_id": 56,
+          "action": "put the candle in the lantern",
+          "step_idx": 6
+        },
+        {
+          "action_id": 57,
+          "action": "measure and label the lantern",
+          "step_idx": 7
+        }
+      ]
+    },
+    "82": {
+      "task_id": "82",
+      "recipe_type": 82,
+      "task_name": "MakeCocktail",
+      "task_name_human": "Make Cocktail",
+      "goal": "Complete the task: Make Cocktail.",
+      "canonical_steps": [
+        {
+          "action_id": 751,
+          "action": "pour into the ingredients",
+          "step_idx": 1
+        },
+        {
+          "action_id": 752,
+          "action": "stir the mixture",
+          "step_idx": 2
+        },
+        {
+          "action_id": 753,
+          "action": "shake the mixture",
+          "step_idx": 3
+        },
+        {
+          "action_id": 754,
+          "action": "pour in after mix it",
+          "step_idx": 4
+        },
+        {
+          "action_id": 755,
+          "action": "decorate with fruit",
+          "step_idx": 5
+        }
+      ]
+    },
+    "83": {
+      "task_id": "83",
+      "recipe_type": 83,
+      "task_name": "MakeFrenchFries",
+      "task_name_human": "Make French Fries",
+      "goal": "Complete the task: Make French Fries.",
+      "canonical_steps": [
+        {
+          "action_id": 203,
+          "action": "cut potato into strips",
+          "step_idx": 1
+        },
+        {
+          "action_id": 204,
+          "action": "soak them in water",
+          "step_idx": 2
+        },
+        {
+          "action_id": 205,
+          "action": "dry strips",
+          "step_idx": 3
+        },
+        {
+          "action_id": 206,
+          "action": "put in the oil to fry",
+          "step_idx": 4
+        }
+      ]
+    },
+    "84": {
+      "task_id": "84",
+      "recipe_type": 84,
+      "task_name": "MakeHomemadeIceCream",
+      "task_name_human": "Make Homemade Ice Cream",
+      "goal": "Complete the task: Make Homemade Ice Cream.",
+      "canonical_steps": [
+        {
+          "action_id": 680,
+          "action": "pour the ingredients into the bowl",
+          "step_idx": 1
+        },
+        {
+          "action_id": 681,
+          "action": "stir the mixture",
+          "step_idx": 2
+        },
+        {
+          "action_id": 682,
+          "action": "package and freeze",
+          "step_idx": 3
+        },
+        {
+          "action_id": 683,
+          "action": "decorate the ice cream",
+          "step_idx": 4
+        }
+      ]
+    },
+    "85": {
+      "task_id": "85",
+      "recipe_type": 85,
+      "task_name": "MakeLambKebab",
+      "task_name_human": "Make Lamb Kebab",
+      "goal": "Complete the task: Make Lamb Kebab.",
+      "canonical_steps": [
+        {
+          "action_id": 1,
+          "action": "prepare seasonings and side dishes",
+          "step_idx": 1
+        },
+        {
+          "action_id": 2,
+          "action": "prepare meat",
+          "step_idx": 2
+        },
+        {
+          "action_id": 3,
+          "action": "mix and pickle",
+          "step_idx": 3
+        },
+        {
+          "action_id": 4,
+          "action": "string together",
+          "step_idx": 4
+        },
+        {
+          "action_id": 5,
+          "action": "roast ingredients",
+          "step_idx": 5
+        },
+        {
+          "action_id": 6,
+          "action": "brush sauce or sprinkle seasoning",
+          "step_idx": 6
+        }
+      ]
+    },
+    "86": {
+      "task_id": "86",
+      "recipe_type": 86,
+      "task_name": "MakeMatchaTea",
+      "task_name_human": "Make Matcha Tea",
+      "goal": "Complete the task: Make Matcha Tea.",
+      "canonical_steps": [
+        {
+          "action_id": 61,
+          "action": "prepare tea pots and tea bowls",
+          "step_idx": 1
+        },
+        {
+          "action_id": 62,
+          "action": "add tea powder",
+          "step_idx": 2
+        },
+        {
+          "action_id": 63,
+          "action": "brew tea and stir",
+          "step_idx": 3
+        },
+        {
+          "action_id": 64,
+          "action": "add milk",
+          "step_idx": 4
+        }
+      ]
+    },
+    "87": {
+      "task_id": "87",
+      "recipe_type": 87,
+      "task_name": "MakeOrangeJuice",
+      "task_name_human": "Make Orange Juice",
+      "goal": "Complete the task: Make Orange Juice.",
+      "canonical_steps": [
+        {
+          "action_id": 764,
+          "action": "cut oranges",
+          "step_idx": 1
+        },
+        {
+          "action_id": 765,
+          "action": "juice the oranges",
+          "step_idx": 2
+        },
+        {
+          "action_id": 766,
+          "action": "pour the orange juice into the cup",
+          "step_idx": 3
+        }
+      ]
+    },
+    "88": {
+      "task_id": "88",
+      "recipe_type": 88,
+      "task_name": "MakePickles",
+      "task_name_human": "Make Pickles",
+      "goal": "Complete the task: Make Pickles.",
+      "canonical_steps": [
+        {
+          "action_id": 484,
+          "action": "put the ingredients into the can",
+          "step_idx": 1
+        },
+        {
+          "action_id": 485,
+          "action": "pour the soup in",
+          "step_idx": 2
+        },
+        {
+          "action_id": 486,
+          "action": "close cans",
+          "step_idx": 3
+        }
+      ]
+    },
+    "89": {
+      "task_id": "89",
+      "recipe_type": 89,
+      "task_name": "MakePizza",
+      "task_name_human": "Make Pizza",
+      "goal": "Complete the task: Make Pizza.",
+      "canonical_steps": [
+        {
+          "action_id": 37,
+          "action": "knead the dough",
+          "step_idx": 1
+        },
+        {
+          "action_id": 38,
+          "action": "unroll the dough",
+          "step_idx": 2
+        },
+        {
+          "action_id": 39,
+          "action": "add seasoning",
+          "step_idx": 3
+        },
+        {
+          "action_id": 40,
+          "action": "bake pizza",
+          "step_idx": 4
+        }
+      ]
+    },
+    "90": {
+      "task_id": "90",
+      "recipe_type": 90,
+      "task_name": "MakeRJ45Cable",
+      "task_name_human": "Make RJ45 Cable",
+      "goal": "Complete the task: Make RJ45 Cable.",
+      "canonical_steps": [
+        {
+          "action_id": 655,
+          "action": "strip the insulation",
+          "step_idx": 1
+        },
+        {
+          "action_id": 656,
+          "action": "arrange the seperated wire",
+          "step_idx": 2
+        },
+        {
+          "action_id": 657,
+          "action": "cut a certain length",
+          "step_idx": 3
+        },
+        {
+          "action_id": 658,
+          "action": "insert it into the crystal head",
+          "step_idx": 4
+        },
+        {
+          "action_id": 659,
+          "action": "fixe it with a crimping pliers",
+          "step_idx": 5
+        }
+      ]
+    },
+    "91": {
+      "task_id": "91",
+      "recipe_type": 91,
+      "task_name": "MakeSalad",
+      "task_name_human": "Make Salad",
+      "goal": "Complete the task: Make Salad.",
+      "canonical_steps": [
+        {
+          "action_id": 264,
+          "action": "cut ingredients",
+          "step_idx": 1
+        },
+        {
+          "action_id": 265,
+          "action": "put the ingredients into the bowl",
+          "step_idx": 2
+        },
+        {
+          "action_id": 266,
+          "action": "stir the ingredients",
+          "step_idx": 3
+        }
+      ]
+    },
+    "92": {
+      "task_id": "92",
+      "recipe_type": 92,
+      "task_name": "MakeSalmon",
+      "task_name_human": "Make Salmon",
+      "goal": "Complete the task: Make Salmon.",
+      "canonical_steps": [
+        {
+          "action_id": 25,
+          "action": "add seasoning on the salmon",
+          "step_idx": 1
+        },
+        {
+          "action_id": 26,
+          "action": "fry salmon",
+          "step_idx": 2
+        },
+        {
+          "action_id": 27,
+          "action": "add seasoning",
+          "step_idx": 3
+        },
+        {
+          "action_id": 28,
+          "action": "load the dish",
+          "step_idx": 4
+        },
+        {
+          "action_id": 29,
+          "action": "add decoration",
+          "step_idx": 5
+        }
+      ]
+    },
+    "93": {
+      "task_id": "93",
+      "recipe_type": 93,
+      "task_name": "MakeSandwich",
+      "task_name_human": "Make Sandwich",
+      "goal": "Complete the task: Make Sandwich.",
+      "canonical_steps": [
+        {
+          "action_id": 522,
+          "action": "prepare the filler",
+          "step_idx": 1
+        },
+        {
+          "action_id": 523,
+          "action": "cut the bread",
+          "step_idx": 2
+        },
+        {
+          "action_id": 524,
+          "action": "put the filler on the bread slice",
+          "step_idx": 3
+        },
+        {
+          "action_id": 525,
+          "action": "fry or grill",
+          "step_idx": 4
+        },
+        {
+          "action_id": 526,
+          "action": "cut into small pieces",
+          "step_idx": 5
+        }
+      ]
+    },
+    "94": {
+      "task_id": "94",
+      "recipe_type": 94,
+      "task_name": "MakeSoap",
+      "task_name_human": "Make Soap",
+      "goal": "Complete the task: Make Soap.",
+      "canonical_steps": [
+        {
+          "action_id": 384,
+          "action": "melt the soap block",
+          "step_idx": 1
+        },
+        {
+          "action_id": 385,
+          "action": "prepare a vacant vessel",
+          "step_idx": 2
+        },
+        {
+          "action_id": 386,
+          "action": "put the melted soap block into the vessel",
+          "step_idx": 3
+        },
+        {
+          "action_id": 387,
+          "action": "take out after freezing",
+          "step_idx": 4
+        }
+      ]
+    },
+    "95": {
+      "task_id": "95",
+      "recipe_type": 95,
+      "task_name": "MakeStrawberrySmoothie",
+      "task_name_human": "Make Strawberry Smoothie",
+      "goal": "Complete the task: Make Strawberry Smoothie.",
+      "canonical_steps": [
+        {
+          "action_id": 101,
+          "action": "add ice cubes",
+          "step_idx": 1
+        },
+        {
+          "action_id": 102,
+          "action": "put strawberries and other fruits into the juicer",
+          "step_idx": 2
+        },
+        {
+          "action_id": 103,
+          "action": "put yogurt, honey and other ingredients into the juicer",
+          "step_idx": 3
+        },
+        {
+          "action_id": 104,
+          "action": "shake and juice",
+          "step_idx": 4
+        }
+      ]
+    },
+    "96": {
+      "task_id": "96",
+      "recipe_type": 96,
+      "task_name": "MakeSugarCoatedHaws",
+      "task_name_human": "Make Sugar Coated Haws",
+      "goal": "Complete the task: Make Sugar Coated Haws.",
+      "canonical_steps": [
+        {
+          "action_id": 191,
+          "action": "string the fruit together",
+          "step_idx": 1
+        },
+        {
+          "action_id": 192,
+          "action": "melt the sugar",
+          "step_idx": 2
+        },
+        {
+          "action_id": 193,
+          "action": "soak sugar gourd in sugar",
+          "step_idx": 3
+        }
+      ]
+    },
+    "97": {
+      "task_id": "97",
+      "recipe_type": 97,
+      "task_name": "MakeWirelessEarbuds",
+      "task_name_human": "Make Wireless Earbuds",
+      "goal": "Complete the task: Make Wireless Earbuds.",
+      "canonical_steps": [
+        {
+          "action_id": 615,
+          "action": "cut the headphone cable",
+          "step_idx": 1
+        },
+        {
+          "action_id": 616,
+          "action": "process the copper wire inside the earphone cable",
+          "step_idx": 2
+        },
+        {
+          "action_id": 617,
+          "action": "solder the headset cable to the Bluetooth module",
+          "step_idx": 3
+        },
+        {
+          "action_id": 618,
+          "action": "wrap in foil paper",
+          "step_idx": 4
+        },
+        {
+          "action_id": 619,
+          "action": "wrap in copper wire",
+          "step_idx": 5
+        }
+      ]
+    },
+    "98": {
+      "task_id": "98",
+      "recipe_type": 98,
+      "task_name": "MakeBed",
+      "task_name_human": "Make Bed",
+      "goal": "Complete the task: Make Bed.",
+      "canonical_steps": [
+        {
+          "action_id": 124,
+          "action": "put the sheet on the bed",
+          "step_idx": 1
+        },
+        {
+          "action_id": 125,
+          "action": "insert the quilt into the quilt cover",
+          "step_idx": 2
+        },
+        {
+          "action_id": 126,
+          "action": "put the quilt on the bed",
+          "step_idx": 3
+        },
+        {
+          "action_id": 127,
+          "action": "insert the pillow into the pillow cover",
+          "step_idx": 4
+        },
+        {
+          "action_id": 128,
+          "action": "put the pillow on the bed",
+          "step_idx": 5
+        }
+      ]
+    },
+    "99": {
+      "task_id": "99",
+      "recipe_type": 99,
+      "task_name": "MakeCoffee",
+      "task_name_human": "Make Coffee",
+      "goal": "Complete the task: Make Coffee.",
+      "canonical_steps": [
+        {
+          "action_id": 186,
+          "action": "boil water or coffee",
+          "step_idx": 1
+        },
+        {
+          "action_id": 187,
+          "action": "grind the coffee beans",
+          "step_idx": 2
+        },
+        {
+          "action_id": 188,
+          "action": "filtrate the coffee beans",
+          "step_idx": 3
+        },
+        {
+          "action_id": 189,
+          "action": "brew the coffee beans",
+          "step_idx": 4
+        },
+        {
+          "action_id": 190,
+          "action": "add some ingredients in the coffee",
+          "step_idx": 5
+        }
+      ]
+    },
+    "100": {
+      "task_id": "100",
+      "recipe_type": 100,
+      "task_name": "MakeTea",
+      "task_name_human": "Make Tea",
+      "goal": "Complete the task: Make Tea.",
+      "canonical_steps": [
+        {
+          "action_id": 307,
+          "action": "heat the teapot and wash the cup",
+          "step_idx": 1
+        },
+        {
+          "action_id": 308,
+          "action": "prepare and boil water",
+          "step_idx": 2
+        },
+        {
+          "action_id": 309,
+          "action": "prepare and add the tea",
+          "step_idx": 3
+        },
+        {
+          "action_id": 310,
+          "action": "add some water to the tea",
+          "step_idx": 4
+        },
+        {
+          "action_id": 311,
+          "action": "add some ingredients to the tea",
+          "step_idx": 5
+        },
+        {
+          "action_id": 312,
+          "action": "pour the tea into the vessel",
+          "step_idx": 6
+        }
+      ]
+    },
+    "101": {
+      "task_id": "101",
+      "recipe_type": 101,
+      "task_name": "ChangeMobilePhoneBattery",
+      "task_name_human": "Change Mobile Phone Battery",
+      "goal": "Complete the task: Change Mobile Phone Battery.",
+      "canonical_steps": [
+        {
+          "action_id": 743,
+          "action": "heat the back cover of the phone",
+          "step_idx": 1
+        },
+        {
+          "action_id": 744,
+          "action": "pick up the back cover of the phone with the cymbal",
+          "step_idx": 2
+        },
+        {
+          "action_id": 745,
+          "action": "remove the components of the fixed battery",
+          "step_idx": 3
+        },
+        {
+          "action_id": 746,
+          "action": "remove the tape of the fixed battery",
+          "step_idx": 4
+        },
+        {
+          "action_id": 747,
+          "action": "take down the old battery",
+          "step_idx": 5
+        },
+        {
+          "action_id": 748,
+          "action": "put on new tape",
+          "step_idx": 6
+        },
+        {
+          "action_id": 749,
+          "action": "load a new battery",
+          "step_idx": 7
+        },
+        {
+          "action_id": 750,
+          "action": "restore the fixed battery components and the back cover",
+          "step_idx": 8
+        }
+      ]
+    },
+    "102": {
+      "task_id": "102",
+      "recipe_type": 102,
+      "task_name": "ReplaceMobileScreenProtector",
+      "task_name_human": "Replace Mobile Screen Protector",
+      "goal": "Complete the task: Replace Mobile Screen Protector.",
+      "canonical_steps": [
+        {
+          "action_id": 756,
+          "action": "remove the original protector",
+          "step_idx": 1
+        },
+        {
+          "action_id": 757,
+          "action": "wipe the screen",
+          "step_idx": 2
+        },
+        {
+          "action_id": 758,
+          "action": "line up the protector and the cellphone",
+          "step_idx": 3
+        },
+        {
+          "action_id": 759,
+          "action": "paste protector on the screen",
+          "step_idx": 4
+        }
+      ]
+    },
+    "103": {
+      "task_id": "103",
+      "recipe_type": 103,
+      "task_name": "AttendNBASkillsChallenge",
+      "task_name_human": "Attend NBA Skills Challenge",
+      "goal": "Complete the task: Attend NBA Skills Challenge.",
+      "canonical_steps": [
+        {
+          "action_id": 148,
+          "action": "do the first layup",
+          "step_idx": 1
+        },
+        {
+          "action_id": 149,
+          "action": "dribble in the field",
+          "step_idx": 2
+        },
+        {
+          "action_id": 150,
+          "action": "pass the basketball into the hole at the first time",
+          "step_idx": 3
+        },
+        {
+          "action_id": 151,
+          "action": "shoot towards the basket",
+          "step_idx": 4
+        },
+        {
+          "action_id": 152,
+          "action": "pass the basketball into the hole at the second time",
+          "step_idx": 5
+        },
+        {
+          "action_id": 153,
+          "action": "dribble and lay up",
+          "step_idx": 6
+        }
+      ]
+    },
+    "104": {
+      "task_id": "104",
+      "recipe_type": 104,
+      "task_name": "OpenALockWithPaperclips",
+      "task_name_human": "Open A Lock With Paperclips",
+      "goal": "Complete the task: Open A Lock With Paperclips.",
+      "canonical_steps": [
+        {
+          "action_id": 89,
+          "action": "bent the paperclips by hands",
+          "step_idx": 1
+        },
+        {
+          "action_id": 90,
+          "action": "squeeze the paperclips by hands",
+          "step_idx": 2
+        },
+        {
+          "action_id": 91,
+          "action": "insert the paperclips into the lock hole",
+          "step_idx": 3
+        },
+        {
+          "action_id": 92,
+          "action": "twist the paperclips by hands",
+          "step_idx": 4
+        }
+      ]
+    },
+    "105": {
+      "task_id": "105",
+      "recipe_type": 105,
+      "task_name": "OpenChampagneBottle",
+      "task_name_human": "Open Champagne Bottle",
+      "goal": "Complete the task: Open Champagne Bottle.",
+      "canonical_steps": [
+        {
+          "action_id": 179,
+          "action": "tear out the foil",
+          "step_idx": 1
+        },
+        {
+          "action_id": 180,
+          "action": "turn the suspension link",
+          "step_idx": 2
+        },
+        {
+          "action_id": 181,
+          "action": "open the bottle carefully",
+          "step_idx": 3
+        }
+      ]
+    },
+    "106": {
+      "task_id": "106",
+      "recipe_type": 106,
+      "task_name": "OperateFireExtinguisher",
+      "task_name_human": "Operate Fire Extinguisher",
+      "goal": "Complete the task: Operate Fire Extinguisher.",
+      "canonical_steps": [
+        {
+          "action_id": 740,
+          "action": "pull out the insurance ring",
+          "step_idx": 1
+        },
+        {
+          "action_id": 741,
+          "action": "spray experimentally to check",
+          "step_idx": 2
+        },
+        {
+          "action_id": 742,
+          "action": "spray towards the fire",
+          "step_idx": 3
+        }
+      ]
+    },
+    "107": {
+      "task_id": "107",
+      "recipe_type": 107,
+      "task_name": "PackSleepingBag",
+      "task_name_human": "Pack Sleeping Bag",
+      "goal": "Complete the task: Pack Sleeping Bag.",
+      "canonical_steps": [
+        {
+          "action_id": 297,
+          "action": "pack the sleeping bag",
+          "step_idx": 1
+        },
+        {
+          "action_id": 298,
+          "action": "tie the bag tightly",
+          "step_idx": 2
+        }
+      ]
+    },
+    "108": {
+      "task_id": "108",
+      "recipe_type": 108,
+      "task_name": "PerformPaperToMoneyTrick",
+      "task_name_human": "Perform Paper To Money Trick",
+      "goal": "Complete the task: Perform Paper To Money Trick.",
+      "canonical_steps": [
+        {
+          "action_id": 535,
+          "action": "show the blank paper",
+          "step_idx": 1
+        },
+        {
+          "action_id": 536,
+          "action": "fold or fire the blank paper",
+          "step_idx": 2
+        },
+        {
+          "action_id": 537,
+          "action": "show the money to the audience",
+          "step_idx": 3
+        }
+      ]
+    },
+    "109": {
+      "task_id": "109",
+      "recipe_type": 109,
+      "task_name": "MakePaperWindMill",
+      "task_name_human": "Make Paper Wind Mill",
+      "goal": "Complete the task: Make Paper Wind Mill.",
+      "canonical_steps": [
+        {
+          "action_id": 239,
+          "action": "fold the edges of the paper",
+          "step_idx": 1
+        },
+        {
+          "action_id": 240,
+          "action": "cut along the edges",
+          "step_idx": 2
+        },
+        {
+          "action_id": 241,
+          "action": "fold the squares inward and fix them",
+          "step_idx": 3
+        },
+        {
+          "action_id": 242,
+          "action": "fix the wind mill on the bracket",
+          "step_idx": 4
+        }
+      ]
+    },
+    "110": {
+      "task_id": "110",
+      "recipe_type": 110,
+      "task_name": "ParkParallel",
+      "task_name_human": "Park Parallel",
+      "goal": "Complete the task: Park Parallel.",
+      "canonical_steps": [
+        {
+          "action_id": 689,
+          "action": "drive the car forward",
+          "step_idx": 1
+        },
+        {
+          "action_id": 690,
+          "action": "drive the car backward",
+          "step_idx": 2
+        },
+        {
+          "action_id": 691,
+          "action": "adjust front and back position",
+          "step_idx": 3
+        }
+      ]
+    },
+    "111": {
+      "task_id": "111",
+      "recipe_type": 111,
+      "task_name": "GiveAnIntramuscularInjection",
+      "task_name_human": "Give An Intramuscular Injection",
+      "goal": "Complete the task: Give An Intramuscular Injection.",
+      "canonical_steps": [
+        {
+          "action_id": 624,
+          "action": "fill the injection head",
+          "step_idx": 1
+        },
+        {
+          "action_id": 625,
+          "action": "disinfect the injecting place",
+          "step_idx": 2
+        },
+        {
+          "action_id": 626,
+          "action": "inject to the muscular",
+          "step_idx": 3
+        },
+        {
+          "action_id": 627,
+          "action": "pull out the needle and press",
+          "step_idx": 4
+        }
+      ]
+    },
+    "112": {
+      "task_id": "112",
+      "recipe_type": 112,
+      "task_name": "PerformCPR",
+      "task_name_human": "Perform CPR",
+      "goal": "Complete the task: Perform CPR.",
+      "canonical_steps": [
+        {
+          "action_id": 448,
+          "action": "call emergency number",
+          "step_idx": 1
+        },
+        {
+          "action_id": 449,
+          "action": "check the breath of the patient",
+          "step_idx": 2
+        },
+        {
+          "action_id": 450,
+          "action": "check the foreign matter in the mouse",
+          "step_idx": 3
+        },
+        {
+          "action_id": 451,
+          "action": "do artificial breathing to the patient",
+          "step_idx": 4
+        },
+        {
+          "action_id": 452,
+          "action": "check the pulse of the patient",
+          "step_idx": 5
+        },
+        {
+          "action_id": 453,
+          "action": "press the chest of the patient",
+          "step_idx": 6
+        }
+      ]
+    },
+    "113": {
+      "task_id": "113",
+      "recipe_type": 113,
+      "task_name": "PitchATent",
+      "task_name_human": "Pitch A Tent",
+      "goal": "Complete the task: Pitch A Tent.",
+      "canonical_steps": [
+        {
+          "action_id": 142,
+          "action": "clean up the ground",
+          "step_idx": 1
+        },
+        {
+          "action_id": 143,
+          "action": "lay the cushion evenly",
+          "step_idx": 2
+        },
+        {
+          "action_id": 144,
+          "action": "set up the brackets",
+          "step_idx": 3
+        },
+        {
+          "action_id": 145,
+          "action": "set up the platfond",
+          "step_idx": 4
+        },
+        {
+          "action_id": 146,
+          "action": "fix the ground nail",
+          "step_idx": 5
+        },
+        {
+          "action_id": 147,
+          "action": "put the waterproof cover",
+          "step_idx": 6
+        }
+      ]
+    },
+    "114": {
+      "task_id": "114",
+      "recipe_type": 114,
+      "task_name": "PlantTree",
+      "task_name_human": "Plant Tree",
+      "goal": "Complete the task: Plant Tree.",
+      "canonical_steps": [
+        {
+          "action_id": 221,
+          "action": "dig a pit with proper size",
+          "step_idx": 1
+        },
+        {
+          "action_id": 222,
+          "action": "fill the tree into the pit",
+          "step_idx": 2
+        },
+        {
+          "action_id": 223,
+          "action": "fill the pit with some soil",
+          "step_idx": 3
+        },
+        {
+          "action_id": 224,
+          "action": "pour water to the tree",
+          "step_idx": 4
+        }
+      ]
+    },
+    "115": {
+      "task_id": "115",
+      "recipe_type": 115,
+      "task_name": "PlayFrisbeeWithADog",
+      "task_name_human": "Play Frisbee With A Dog",
+      "goal": "Complete the task: Play Frisbee With A Dog.",
+      "canonical_steps": [
+        {
+          "action_id": 176,
+          "action": "chase for the frisbee",
+          "step_idx": 1
+        },
+        {
+          "action_id": 177,
+          "action": "catch the frisbee with mouse",
+          "step_idx": 2
+        },
+        {
+          "action_id": 178,
+          "action": "bring the frisbee back",
+          "step_idx": 3
+        }
+      ]
+    },
+    "116": {
+      "task_id": "116",
+      "recipe_type": 116,
+      "task_name": "PractisePoleVault",
+      "task_name_human": "Practise Pole Vault",
+      "goal": "Complete the task: Practise Pole Vault.",
+      "canonical_steps": [
+        {
+          "action_id": 373,
+          "action": "begin to run up",
+          "step_idx": 1
+        },
+        {
+          "action_id": 374,
+          "action": "begin to jump up",
+          "step_idx": 2
+        },
+        {
+          "action_id": 375,
+          "action": "fall to the ground",
+          "step_idx": 3
+        }
+      ]
+    },
+    "117": {
+      "task_id": "117",
+      "recipe_type": 117,
+      "task_name": "PrepareCanvas",
+      "task_name_human": "Prepare Canvas",
+      "goal": "Complete the task: Prepare Canvas.",
+      "canonical_steps": [
+        {
+          "action_id": 243,
+          "action": "pour the gesso to the canvas",
+          "step_idx": 1
+        },
+        {
+          "action_id": 244,
+          "action": "brush the gesso evenly",
+          "step_idx": 2
+        }
+      ]
+    },
+    "118": {
+      "task_id": "118",
+      "recipe_type": 118,
+      "task_name": "PrepareStandardSolution",
+      "task_name_human": "Prepare Standard Solution",
+      "goal": "Complete the task: Prepare Standard Solution.",
+      "canonical_steps": [
+        {
+          "action_id": 289,
+          "action": "weigh up the solute",
+          "step_idx": 1
+        },
+        {
+          "action_id": 290,
+          "action": "transfer and dissolve the solute",
+          "step_idx": 2
+        },
+        {
+          "action_id": 291,
+          "action": "add water into the volumetric flask to the tick line",
+          "step_idx": 3
+        },
+        {
+          "action_id": 292,
+          "action": "transfer the solution and label",
+          "step_idx": 4
+        }
+      ]
+    },
+    "119": {
+      "task_id": "119",
+      "recipe_type": 119,
+      "task_name": "PrepareSumiInk",
+      "task_name_human": "Prepare Sumi Ink",
+      "goal": "Complete the task: Prepare Sumi Ink.",
+      "canonical_steps": [
+        {
+          "action_id": 735,
+          "action": "add some water to the vessel",
+          "step_idx": 1
+        },
+        {
+          "action_id": 736,
+          "action": "grind roundly and evenly",
+          "step_idx": 2
+        }
+      ]
+    },
+    "120": {
+      "task_id": "120",
+      "recipe_type": 120,
+      "task_name": "PumpUpBicycleTire",
+      "task_name_human": "Pump Up Bicycle Tire",
+      "goal": "Complete the task: Pump Up Bicycle Tire.",
+      "canonical_steps": [
+        {
+          "action_id": 245,
+          "action": "screw off the valve cap and open the valve",
+          "step_idx": 1
+        },
+        {
+          "action_id": 246,
+          "action": "install the air nozzle",
+          "step_idx": 2
+        },
+        {
+          "action_id": 247,
+          "action": "pump up to the tire",
+          "step_idx": 3
+        },
+        {
+          "action_id": 248,
+          "action": "remove the air nozzle",
+          "step_idx": 4
+        },
+        {
+          "action_id": 249,
+          "action": "tighten the valve and screw on the valve cap",
+          "step_idx": 5
+        }
+      ]
+    },
+    "121": {
+      "task_id": "121",
+      "recipe_type": 121,
+      "task_name": "PutOnQuiltCover",
+      "task_name_human": "Put On Quilt Cover",
+      "goal": "Complete the task: Put On Quilt Cover.",
+      "canonical_steps": [
+        {
+          "action_id": 137,
+          "action": "turn over the quilt cover",
+          "step_idx": 1
+        },
+        {
+          "action_id": 138,
+          "action": "put nicely and align the quilt and the cover",
+          "step_idx": 2
+        },
+        {
+          "action_id": 139,
+          "action": "roll the quilt cover and the quilt together",
+          "step_idx": 3
+        },
+        {
+          "action_id": 140,
+          "action": "take out the quilt cover from another side",
+          "step_idx": 4
+        },
+        {
+          "action_id": 141,
+          "action": "put and arrange nicely",
+          "step_idx": 5
+        }
+      ]
+    },
+    "122": {
+      "task_id": "122",
+      "recipe_type": 122,
+      "task_name": "PutOnHairExtensions",
+      "task_name_human": "Put On Hair Extensions",
+      "goal": "Complete the task: Put On Hair Extensions.",
+      "canonical_steps": [
+        {
+          "action_id": 325,
+          "action": "pull up the hair to reserve place for the hair extensions",
+          "step_idx": 1
+        },
+        {
+          "action_id": 326,
+          "action": "put on the hair extensions",
+          "step_idx": 2
+        },
+        {
+          "action_id": 327,
+          "action": "put down the hair and comb",
+          "step_idx": 3
+        }
+      ]
+    },
+    "123": {
+      "task_id": "123",
+      "recipe_type": 123,
+      "task_name": "RefillFountainPen",
+      "task_name_human": "Refill Fountain Pen",
+      "goal": "Complete the task: Refill Fountain Pen.",
+      "canonical_steps": [
+        {
+          "action_id": 732,
+          "action": "take off the shell",
+          "step_idx": 1
+        },
+        {
+          "action_id": 733,
+          "action": "absorb some ink slowly",
+          "step_idx": 2
+        },
+        {
+          "action_id": 734,
+          "action": "clean the fountain pen with napkin",
+          "step_idx": 3
+        }
+      ]
+    },
+    "124": {
+      "task_id": "124",
+      "recipe_type": 124,
+      "task_name": "RefillALighter",
+      "task_name_human": "Refill A Lighter",
+      "goal": "Complete the task: Refill A Lighter.",
+      "canonical_steps": [
+        {
+          "action_id": 481,
+          "action": "press the fuel nozzle",
+          "step_idx": 1
+        },
+        {
+          "action_id": 482,
+          "action": "pump up the fuel",
+          "step_idx": 2
+        },
+        {
+          "action_id": 483,
+          "action": "lighten the lighter to check",
+          "step_idx": 3
+        }
+      ]
+    },
+    "125": {
+      "task_id": "125",
+      "recipe_type": 125,
+      "task_name": "RefillAStapler",
+      "task_name_human": "Refill A Stapler",
+      "goal": "Complete the task: Refill A Stapler.",
+      "canonical_steps": [
+        {
+          "action_id": 648,
+          "action": "pull open the stapler",
+          "step_idx": 1
+        },
+        {
+          "action_id": 649,
+          "action": "insert the stapler pins",
+          "step_idx": 2
+        },
+        {
+          "action_id": 650,
+          "action": "close up the stapler",
+          "step_idx": 3
+        }
+      ]
+    },
+    "126": {
+      "task_id": "126",
+      "recipe_type": 126,
+      "task_name": "RefillCartridge",
+      "task_name_human": "Refill Cartridge",
+      "goal": "Complete the task: Refill Cartridge.",
+      "canonical_steps": [
+        {
+          "action_id": 86,
+          "action": "take out the label",
+          "step_idx": 1
+        },
+        {
+          "action_id": 87,
+          "action": "inject the ink to the cartridge",
+          "step_idx": 2
+        },
+        {
+          "action_id": 88,
+          "action": "stick on the label",
+          "step_idx": 3
+        }
+      ]
+    },
+    "127": {
+      "task_id": "127",
+      "recipe_type": 127,
+      "task_name": "RemoveScratchesFromWindshield",
+      "task_name_human": "Remove Scratches From Windshield",
+      "goal": "Complete the task: Remove Scratches From Windshield.",
+      "canonical_steps": [
+        {
+          "action_id": 491,
+          "action": "spray the cleaning agent on the car window",
+          "step_idx": 1
+        },
+        {
+          "action_id": 492,
+          "action": "apply the cleaning agent with towel evenly",
+          "step_idx": 2
+        },
+        {
+          "action_id": 493,
+          "action": "wipe off the cleaning agent",
+          "step_idx": 3
+        }
+      ]
+    },
+    "128": {
+      "task_id": "128",
+      "recipe_type": 128,
+      "task_name": "ReplaceABulb",
+      "task_name_human": "Replace A Bulb",
+      "goal": "Complete the task: Replace A Bulb.",
+      "canonical_steps": [
+        {
+          "action_id": 75,
+          "action": "remove the light shell/housing/support",
+          "step_idx": 1
+        },
+        {
+          "action_id": 76,
+          "action": "take out the old bulb",
+          "step_idx": 2
+        },
+        {
+          "action_id": 77,
+          "action": "install the new bulb",
+          "step_idx": 3
+        },
+        {
+          "action_id": 78,
+          "action": "install the light shell/housing/support",
+          "step_idx": 4
+        }
+      ]
+    },
+    "129": {
+      "task_id": "129",
+      "recipe_type": 129,
+      "task_name": "ReplaceAWiperHead",
+      "task_name_human": "Replace A Wiper Head",
+      "goal": "Complete the task: Replace A Wiper Head.",
+      "canonical_steps": [
+        {
+          "action_id": 573,
+          "action": "take out the wiper",
+          "step_idx": 1
+        },
+        {
+          "action_id": 574,
+          "action": "take out the old rubber sleeve from the wiper head",
+          "step_idx": 2
+        },
+        {
+          "action_id": 575,
+          "action": "take out the blade from the old rubber sleeve",
+          "step_idx": 3
+        },
+        {
+          "action_id": 576,
+          "action": "put the balde into the new rubber sleeve",
+          "step_idx": 4
+        },
+        {
+          "action_id": 577,
+          "action": "put the new rubber sleeve into the wiper head",
+          "step_idx": 5
+        },
+        {
+          "action_id": 578,
+          "action": "install the wiper back",
+          "step_idx": 6
+        }
+      ]
+    },
+    "130": {
+      "task_id": "130",
+      "recipe_type": 130,
+      "task_name": "ReplaceBladeOfASaw",
+      "task_name_human": "Replace Blade Of A Saw",
+      "goal": "Complete the task: Replace Blade Of A Saw.",
+      "canonical_steps": [
+        {
+          "action_id": 720,
+          "action": "turn off the balde screw",
+          "step_idx": 1
+        },
+        {
+          "action_id": 721,
+          "action": "take out the blade",
+          "step_idx": 2
+        },
+        {
+          "action_id": 722,
+          "action": "install the new blade",
+          "step_idx": 3
+        },
+        {
+          "action_id": 723,
+          "action": "tighten the blade screw",
+          "step_idx": 4
+        }
+      ]
+    },
+    "131": {
+      "task_id": "131",
+      "recipe_type": 131,
+      "task_name": "ReplaceCDDriveWithSSD",
+      "task_name_human": "Replace CD Drive With SSD",
+      "goal": "Complete the task: Replace CD Drive With SSD.",
+      "canonical_steps": [
+        {
+          "action_id": 212,
+          "action": "take out the laptop CD drive",
+          "step_idx": 1
+        },
+        {
+          "action_id": 213,
+          "action": "screw off the screws and sheetmetals and baffles on the both sides of the CD drive",
+          "step_idx": 2
+        },
+        {
+          "action_id": 214,
+          "action": "install the SSD onto the hard disk tray",
+          "step_idx": 3
+        },
+        {
+          "action_id": 215,
+          "action": "install the screws and sheetmetals and baffles onto the hard disk tray",
+          "step_idx": 4
+        },
+        {
+          "action_id": 216,
+          "action": "insert the hard disk tray into the position of the CD drive",
+          "step_idx": 5
+        }
+      ]
+    },
+    "132": {
+      "task_id": "132",
+      "recipe_type": 132,
+      "task_name": "ReplaceCarFuse",
+      "task_name_human": "Replace Car Fuse",
+      "goal": "Complete the task: Replace Car Fuse.",
+      "canonical_steps": [
+        {
+          "action_id": 465,
+          "action": "open up the cover",
+          "step_idx": 1
+        },
+        {
+          "action_id": 466,
+          "action": "take out the fuse",
+          "step_idx": 2
+        },
+        {
+          "action_id": 467,
+          "action": "fit on the fuse",
+          "step_idx": 3
+        },
+        {
+          "action_id": 468,
+          "action": "close up the cover",
+          "step_idx": 4
+        }
+      ]
+    },
+    "133": {
+      "task_id": "133",
+      "recipe_type": 133,
+      "task_name": "ReplaceDoorKnob",
+      "task_name_human": "Replace Door Knob",
+      "goal": "Complete the task: Replace Door Knob.",
+      "canonical_steps": [
+        {
+          "action_id": 416,
+          "action": "remove the door knob",
+          "step_idx": 1
+        },
+        {
+          "action_id": 417,
+          "action": "remove the bolt and pin board",
+          "step_idx": 2
+        },
+        {
+          "action_id": 418,
+          "action": "install the new pin board",
+          "step_idx": 3
+        },
+        {
+          "action_id": 419,
+          "action": "install the new bolt",
+          "step_idx": 4
+        },
+        {
+          "action_id": 420,
+          "action": "install the new door knob",
+          "step_idx": 5
+        }
+      ]
+    },
+    "134": {
+      "task_id": "134",
+      "recipe_type": 134,
+      "task_name": "ReplaceDrumhead",
+      "task_name_human": "Replace Drumhead",
+      "goal": "Complete the task: Replace Drumhead.",
+      "canonical_steps": [
+        {
+          "action_id": 620,
+          "action": "screw off the screws",
+          "step_idx": 1
+        },
+        {
+          "action_id": 621,
+          "action": "remove the drumhead",
+          "step_idx": 2
+        },
+        {
+          "action_id": 622,
+          "action": "replace with the new drumhead",
+          "step_idx": 3
+        },
+        {
+          "action_id": 623,
+          "action": "screw on the screws",
+          "step_idx": 4
+        }
+      ]
+    },
+    "135": {
+      "task_id": "135",
+      "recipe_type": 135,
+      "task_name": "ReplaceElectricalOutlet",
+      "task_name_human": "Replace Electrical Outlet",
+      "goal": "Complete the task: Replace Electrical Outlet.",
+      "canonical_steps": [
+        {
+          "action_id": 770,
+          "action": "switch off the power",
+          "step_idx": 1
+        },
+        {
+          "action_id": 771,
+          "action": "screw off the screws used to fix the switch",
+          "step_idx": 2
+        },
+        {
+          "action_id": 772,
+          "action": "use electricity meter to check the power supply",
+          "step_idx": 3
+        },
+        {
+          "action_id": 773,
+          "action": "use screwdriver or electirc screwdriver to release the wire in the wall from the switch",
+          "step_idx": 4
+        },
+        {
+          "action_id": 774,
+          "action": "use screwdriver or electirc screwdriver to screw the wire in the wall into the screw of the new switch",
+          "step_idx": 5
+        },
+        {
+          "action_id": 775,
+          "action": "reset the switch and screw on the screws used to fix the switch",
+          "step_idx": 6
+        }
+      ]
+    },
+    "136": {
+      "task_id": "136",
+      "recipe_type": 136,
+      "task_name": "ReplaceFaucet",
+      "task_name_human": "Replace Faucet",
+      "goal": "Complete the task: Replace Faucet.",
+      "canonical_steps": [
+        {
+          "action_id": 632,
+          "action": "close the sluice and empty and disconnect the water pipe",
+          "step_idx": 1
+        },
+        {
+          "action_id": 633,
+          "action": "remove the old faucet",
+          "step_idx": 2
+        },
+        {
+          "action_id": 634,
+          "action": "install the new faucet",
+          "step_idx": 3
+        },
+        {
+          "action_id": 635,
+          "action": "connect the water pipe",
+          "step_idx": 4
+        },
+        {
+          "action_id": 636,
+          "action": "open the sluice and test the new faucet",
+          "step_idx": 5
+        }
+      ]
+    },
+    "137": {
+      "task_id": "137",
+      "recipe_type": 137,
+      "task_name": "ReplaceFilterForAirPurifier",
+      "task_name_human": "Replace Filter For Air Purifier",
+      "goal": "Complete the task: Replace Filter For Air Purifier.",
+      "canonical_steps": [
+        {
+          "action_id": 392,
+          "action": "take out the shell",
+          "step_idx": 1
+        },
+        {
+          "action_id": 393,
+          "action": "take out the filter",
+          "step_idx": 2
+        },
+        {
+          "action_id": 394,
+          "action": "clean up the filter",
+          "step_idx": 3
+        },
+        {
+          "action_id": 395,
+          "action": "fit on the filter",
+          "step_idx": 4
+        },
+        {
+          "action_id": 396,
+          "action": "fit on the shell",
+          "step_idx": 5
+        },
+        {
+          "action_id": 397,
+          "action": "press the resetting button",
+          "step_idx": 6
+        }
+      ]
+    },
+    "138": {
+      "task_id": "138",
+      "recipe_type": 138,
+      "task_name": "ReplaceLaptopScreen",
+      "task_name_human": "Replace Laptop Screen",
+      "goal": "Complete the task: Replace Laptop Screen.",
+      "canonical_steps": [
+        {
+          "action_id": 504,
+          "action": "take out the battery",
+          "step_idx": 1
+        },
+        {
+          "action_id": 505,
+          "action": "unscrew the screws used to fix the screen",
+          "step_idx": 2
+        },
+        {
+          "action_id": 506,
+          "action": "pull out the screen connector and remove the screen",
+          "step_idx": 3
+        },
+        {
+          "action_id": 507,
+          "action": "install the new screen",
+          "step_idx": 4
+        },
+        {
+          "action_id": 508,
+          "action": "reset and screw on the screws",
+          "step_idx": 5
+        }
+      ]
+    },
+    "139": {
+      "task_id": "139",
+      "recipe_type": 139,
+      "task_name": "ReplaceLightSocket",
+      "task_name_human": "Replace Light Socket",
+      "goal": "Complete the task: Replace Light Socket.",
+      "canonical_steps": [
+        {
+          "action_id": 376,
+          "action": "remove the light housing or shell and bulb",
+          "step_idx": 1
+        },
+        {
+          "action_id": 377,
+          "action": "remove the light socket and disconnect the wire",
+          "step_idx": 2
+        },
+        {
+          "action_id": 378,
+          "action": "connect the wire again",
+          "step_idx": 3
+        },
+        {
+          "action_id": 379,
+          "action": "install the light socket",
+          "step_idx": 4
+        },
+        {
+          "action_id": 380,
+          "action": "install the bulb and light housing or shell",
+          "step_idx": 5
+        }
+      ]
+    },
+    "140": {
+      "task_id": "140",
+      "recipe_type": 140,
+      "task_name": "ReplaceRefrigeratorWaterFilter",
+      "task_name_human": "Replace Refrigerator Water Filter",
+      "goal": "Complete the task: Replace Refrigerator Water Filter.",
+      "canonical_steps": [
+        {
+          "action_id": 696,
+          "action": "take out the old filter",
+          "step_idx": 1
+        },
+        {
+          "action_id": 697,
+          "action": "remove the cap of the new filter",
+          "step_idx": 2
+        },
+        {
+          "action_id": 698,
+          "action": "install the new filter",
+          "step_idx": 3
+        }
+      ]
+    },
+    "141": {
+      "task_id": "141",
+      "recipe_type": 141,
+      "task_name": "ReplaceSIMCard",
+      "task_name_human": "Replace SIM Card",
+      "goal": "Complete the task: Replace SIM Card.",
+      "canonical_steps": [
+        {
+          "action_id": 532,
+          "action": "use the needle to open the SIM card slot",
+          "step_idx": 1
+        },
+        {
+          "action_id": 533,
+          "action": "put the SIM card into the SIM card slot",
+          "step_idx": 2
+        },
+        {
+          "action_id": 534,
+          "action": "press the SIM card slot back",
+          "step_idx": 3
+        }
+      ]
+    },
+    "142": {
+      "task_id": "142",
+      "recipe_type": 142,
+      "task_name": "ReplaceSewingMachineNeedle",
+      "task_name_human": "Replace Sewing Machine Needle",
+      "goal": "Complete the task: Replace Sewing Machine Needle.",
+      "canonical_steps": [
+        {
+          "action_id": 542,
+          "action": "unscrew the screw and take out the needle",
+          "step_idx": 1
+        },
+        {
+          "action_id": 543,
+          "action": "let the flat side of the new needle towards the jack and insert the new needle",
+          "step_idx": 2
+        },
+        {
+          "action_id": 544,
+          "action": "screw on the screw",
+          "step_idx": 3
+        }
+      ]
+    },
+    "143": {
+      "task_id": "143",
+      "recipe_type": 143,
+      "task_name": "ReplaceRearviewMirrorGlass",
+      "task_name_human": "Replace Rearview Mirror Glass",
+      "goal": "Complete the task: Replace Rearview Mirror Glass.",
+      "canonical_steps": [
+        {
+          "action_id": 7,
+          "action": "remove the old rearview mirror",
+          "step_idx": 1
+        },
+        {
+          "action_id": 8,
+          "action": "cut off the electric wire",
+          "step_idx": 2
+        },
+        {
+          "action_id": 9,
+          "action": "reconnect the electric wire",
+          "step_idx": 3
+        },
+        {
+          "action_id": 10,
+          "action": "reinstall the rearview mirror",
+          "step_idx": 4
+        }
+      ]
+    },
+    "144": {
+      "task_id": "144",
+      "recipe_type": 144,
+      "task_name": "ReplaceGraphicsCard",
+      "task_name_human": "Replace Graphics Card",
+      "goal": "Complete the task: Replace Graphics Card.",
+      "canonical_steps": [
+        {
+          "action_id": 182,
+          "action": "take out the shell",
+          "step_idx": 1
+        },
+        {
+          "action_id": 183,
+          "action": "remove the old graphics card",
+          "step_idx": 2
+        },
+        {
+          "action_id": 184,
+          "action": "install the new graphics card",
+          "step_idx": 3
+        },
+        {
+          "action_id": 185,
+          "action": "fit on the shell",
+          "step_idx": 4
+        }
+      ]
+    },
+    "145": {
+      "task_id": "145",
+      "recipe_type": 145,
+      "task_name": "ReplaceHardDisk",
+      "task_name_human": "Replace Hard Disk",
+      "goal": "Complete the task: Replace Hard Disk.",
+      "canonical_steps": [
+        {
+          "action_id": 589,
+          "action": "open the laptop rear cover",
+          "step_idx": 1
+        },
+        {
+          "action_id": 590,
+          "action": "remove the old hard disk",
+          "step_idx": 2
+        },
+        {
+          "action_id": 591,
+          "action": "install the new hard disk",
+          "step_idx": 3
+        },
+        {
+          "action_id": 592,
+          "action": "install the laptop rear cover",
+          "step_idx": 4
+        }
+      ]
+    },
+    "146": {
+      "task_id": "146",
+      "recipe_type": 146,
+      "task_name": "ReplaceMemoryChip",
+      "task_name_human": "Replace Memory Chip",
+      "goal": "Complete the task: Replace Memory Chip.",
+      "canonical_steps": [
+        {
+          "action_id": 369,
+          "action": "take out the shell",
+          "step_idx": 1
+        },
+        {
+          "action_id": 370,
+          "action": "remove the old memory chip",
+          "step_idx": 2
+        },
+        {
+          "action_id": 371,
+          "action": "install the new memory chip",
+          "step_idx": 3
+        },
+        {
+          "action_id": 372,
+          "action": "fit on the shell",
+          "step_idx": 4
+        }
+      ]
+    },
+    "147": {
+      "task_id": "147",
+      "recipe_type": 147,
+      "task_name": "ReplaceToiletSeat",
+      "task_name_human": "Replace Toilet Seat",
+      "goal": "Complete the task: Replace Toilet Seat.",
+      "canonical_steps": [
+        {
+          "action_id": 129,
+          "action": "take out the screws",
+          "step_idx": 1
+        },
+        {
+          "action_id": 130,
+          "action": "remove the old toilet seat",
+          "step_idx": 2
+        },
+        {
+          "action_id": 131,
+          "action": "install the new toilet seat",
+          "step_idx": 3
+        },
+        {
+          "action_id": 132,
+          "action": "screw on the screws",
+          "step_idx": 4
+        }
+      ]
+    },
+    "148": {
+      "task_id": "148",
+      "recipe_type": 148,
+      "task_name": "ResizeWatchBand",
+      "task_name_human": "Resize Watch Band",
+      "goal": "Complete the task: Resize Watch Band.",
+      "canonical_steps": [
+        {
+          "action_id": 250,
+          "action": "aim at the pin",
+          "step_idx": 1
+        },
+        {
+          "action_id": 251,
+          "action": "push the pin out",
+          "step_idx": 2
+        },
+        {
+          "action_id": 252,
+          "action": "aim at the pin",
+          "step_idx": 3
+        },
+        {
+          "action_id": 253,
+          "action": "push the pin out",
+          "step_idx": 4
+        },
+        {
+          "action_id": 254,
+          "action": "remove the old watch band and reconnect",
+          "step_idx": 5
+        },
+        {
+          "action_id": 255,
+          "action": "put the pin in",
+          "step_idx": 6
+        },
+        {
+          "action_id": 256,
+          "action": "push the pin in",
+          "step_idx": 7
+        }
+      ]
+    },
+    "149": {
+      "task_id": "149",
+      "recipe_type": 149,
+      "task_name": "RewrapBattery",
+      "task_name_human": "Rewrap Battery",
+      "goal": "Complete the task: Rewrap Battery.",
+      "canonical_steps": [
+        {
+          "action_id": 709,
+          "action": "remove the old wrapper",
+          "step_idx": 1
+        },
+        {
+          "action_id": 710,
+          "action": "wrap with the new wrapper",
+          "step_idx": 2
+        },
+        {
+          "action_id": 711,
+          "action": "install the insulated shim",
+          "step_idx": 3
+        },
+        {
+          "action_id": 712,
+          "action": "use the air pressure gun or hair drier to flatten the wrapper",
+          "step_idx": 4
+        }
+      ]
+    },
+    "150": {
+      "task_id": "150",
+      "recipe_type": 150,
+      "task_name": "RoastChestnut",
+      "task_name_human": "Roast Chestnut",
+      "goal": "Complete the task: Roast Chestnut.",
+      "canonical_steps": [
+        {
+          "action_id": 11,
+          "action": "cut a hole on the shell",
+          "step_idx": 1
+        },
+        {
+          "action_id": 12,
+          "action": "clean up and soak",
+          "step_idx": 2
+        },
+        {
+          "action_id": 13,
+          "action": "prepare and boil water",
+          "step_idx": 3
+        },
+        {
+          "action_id": 14,
+          "action": "fry or roast or braise",
+          "step_idx": 4
+        },
+        {
+          "action_id": 15,
+          "action": "take out the shell",
+          "step_idx": 5
+        }
+      ]
+    },
+    "151": {
+      "task_id": "151",
+      "recipe_type": 151,
+      "task_name": "SetUpAHamsterCage",
+      "task_name_human": "Set Up A Hamster Cage",
+      "goal": "Complete the task: Set Up A Hamster Cage.",
+      "canonical_steps": [
+        {
+          "action_id": 421,
+          "action": "clean the hamster box",
+          "step_idx": 1
+        },
+        {
+          "action_id": 422,
+          "action": "pave the box bottom with paper scraps",
+          "step_idx": 2
+        },
+        {
+          "action_id": 423,
+          "action": "set different kinds of hamster toys",
+          "step_idx": 3
+        },
+        {
+          "action_id": 424,
+          "action": "put the hamster into the hamster cage",
+          "step_idx": 4
+        }
+      ]
+    },
+    "152": {
+      "task_id": "152",
+      "recipe_type": 152,
+      "task_name": "UseSewingMachine",
+      "task_name_human": "Use Sewing Machine",
+      "goal": "Complete the task: Use Sewing Machine.",
+      "canonical_steps": [
+        {
+          "action_id": 93,
+          "action": "put the thread on the spool",
+          "step_idx": 1
+        },
+        {
+          "action_id": 94,
+          "action": "twine round the thread",
+          "step_idx": 2
+        },
+        {
+          "action_id": 95,
+          "action": "thread thorugh the needle",
+          "step_idx": 3
+        }
+      ]
+    },
+    "153": {
+      "task_id": "153",
+      "recipe_type": 153,
+      "task_name": "ShaveBeard",
+      "task_name_human": "Shave Beard",
+      "goal": "Complete the task: Shave Beard.",
+      "canonical_steps": [
+        {
+          "action_id": 699,
+          "action": "apply cleansing milk to the face",
+          "step_idx": 1
+        },
+        {
+          "action_id": 700,
+          "action": "shave roughly on the face",
+          "step_idx": 2
+        },
+        {
+          "action_id": 701,
+          "action": "apply shaving cream to the face",
+          "step_idx": 3
+        },
+        {
+          "action_id": 702,
+          "action": "shave carefully on the face",
+          "step_idx": 4
+        },
+        {
+          "action_id": 703,
+          "action": "wipe up the face",
+          "step_idx": 5
+        },
+        {
+          "action_id": 704,
+          "action": "do facial care carefully",
+          "step_idx": 6
+        }
+      ]
+    },
+    "154": {
+      "task_id": "154",
+      "recipe_type": 154,
+      "task_name": "PractiseSkiingAerials",
+      "task_name_human": "Practise Skiing Aerials",
+      "goal": "Complete the task: Practise Skiing Aerials.",
+      "canonical_steps": [
+        {
+          "action_id": 651,
+          "action": "ski down from the hill",
+          "step_idx": 1
+        },
+        {
+          "action_id": 652,
+          "action": "ski up from the hill",
+          "step_idx": 2
+        },
+        {
+          "action_id": 653,
+          "action": "rise to the sky",
+          "step_idx": 3
+        },
+        {
+          "action_id": 654,
+          "action": "fall to the ground",
+          "step_idx": 4
+        }
+      ]
+    },
+    "155": {
+      "task_id": "155",
+      "recipe_type": 155,
+      "task_name": "SmashGarlic",
+      "task_name_human": "Smash Garlic",
+      "goal": "Complete the task: Smash Garlic.",
+      "canonical_steps": [
+        {
+          "action_id": 365,
+          "action": "peel off the garlics",
+          "step_idx": 1
+        },
+        {
+          "action_id": 366,
+          "action": "cut up the garlics",
+          "step_idx": 2
+        },
+        {
+          "action_id": 367,
+          "action": "pour some salt to the garlics",
+          "step_idx": 3
+        },
+        {
+          "action_id": 368,
+          "action": "smash the garlics with the knife face",
+          "step_idx": 4
+        }
+      ]
+    },
+    "156": {
+      "task_id": "156",
+      "recipe_type": 156,
+      "task_name": "Sow",
+      "task_name_human": "Sow",
+      "goal": "Complete the task: Sow.",
+      "canonical_steps": [
+        {
+          "action_id": 579,
+          "action": "prepare the soil carefully",
+          "step_idx": 1
+        },
+        {
+          "action_id": 580,
+          "action": "apply a cover on the soil",
+          "step_idx": 2
+        },
+        {
+          "action_id": 581,
+          "action": "dig some holes on the soil",
+          "step_idx": 3
+        },
+        {
+          "action_id": 582,
+          "action": "sow on the soil",
+          "step_idx": 4
+        },
+        {
+          "action_id": 583,
+          "action": "cover with some soil",
+          "step_idx": 5
+        },
+        {
+          "action_id": 584,
+          "action": "water and fertilize the seeds",
+          "step_idx": 6
+        }
+      ]
+    },
+    "157": {
+      "task_id": "157",
+      "recipe_type": 157,
+      "task_name": "AssembleOfficeChair",
+      "task_name_human": "Assemble Office Chair",
+      "goal": "Complete the task: Assemble Office Chair.",
+      "canonical_steps": [
+        {
+          "action_id": 501,
+          "action": "install the wheels for the base",
+          "step_idx": 1
+        },
+        {
+          "action_id": 502,
+          "action": "assemble the cushion and the backrest",
+          "step_idx": 2
+        },
+        {
+          "action_id": 503,
+          "action": "connect the chair and the base",
+          "step_idx": 3
+        }
+      ]
+    },
+    "158": {
+      "task_id": "158",
+      "recipe_type": 158,
+      "task_name": "TieBoatToDock",
+      "task_name_human": "Tie Boat To Dock",
+      "goal": "Complete the task: Tie Boat To Dock.",
+      "canonical_steps": [
+        {
+          "action_id": 283,
+          "action": "circle the rope under the bolt",
+          "step_idx": 1
+        },
+        {
+          "action_id": 284,
+          "action": "cross the rope to wrap the bolt",
+          "step_idx": 2
+        },
+        {
+          "action_id": 285,
+          "action": "strain the rope tightly",
+          "step_idx": 3
+        }
+      ]
+    },
+    "159": {
+      "task_id": "159",
+      "recipe_type": 159,
+      "task_name": "Transplant",
+      "task_name_human": "Transplant",
+      "goal": "Complete the task: Transplant.",
+      "canonical_steps": [
+        {
+          "action_id": 388,
+          "action": "trim the plant carefully",
+          "step_idx": 1
+        },
+        {
+          "action_id": 389,
+          "action": "take out the plant",
+          "step_idx": 2
+        },
+        {
+          "action_id": 390,
+          "action": "put in the plant",
+          "step_idx": 3
+        },
+        {
+          "action_id": 391,
+          "action": "fill with some soil",
+          "step_idx": 4
+        }
+      ]
+    },
+    "160": {
+      "task_id": "160",
+      "recipe_type": 160,
+      "task_name": "PractiseTripleJump",
+      "task_name_human": "Practise Triple Jump",
+      "goal": "Complete the task: Practise Triple Jump.",
+      "canonical_steps": [
+        {
+          "action_id": 167,
+          "action": "begin to run up",
+          "step_idx": 1
+        },
+        {
+          "action_id": 168,
+          "action": "do the first two jumps",
+          "step_idx": 2
+        },
+        {
+          "action_id": 169,
+          "action": "do the third jump",
+          "step_idx": 3
+        }
+      ]
+    },
+    "161": {
+      "task_id": "161",
+      "recipe_type": 161,
+      "task_name": "ReplaceTyreValveStem",
+      "task_name_human": "Replace Tyre Valve Stem",
+      "goal": "Complete the task: Replace Tyre Valve Stem.",
+      "canonical_steps": [
+        {
+          "action_id": 566,
+          "action": "deflate the tyre first",
+          "step_idx": 1
+        },
+        {
+          "action_id": 567,
+          "action": "remove the air nozzle",
+          "step_idx": 2
+        },
+        {
+          "action_id": 568,
+          "action": "install the new air nozzle",
+          "step_idx": 3
+        },
+        {
+          "action_id": 569,
+          "action": "inflate the tyre after replacement",
+          "step_idx": 4
+        }
+      ]
+    },
+    "162": {
+      "task_id": "162",
+      "recipe_type": 162,
+      "task_name": "UnclogSinkWithBakingSoda",
+      "task_name_human": "Unclog Sink With Baking Soda",
+      "goal": "Complete the task: Unclog Sink With Baking Soda.",
+      "canonical_steps": [
+        {
+          "action_id": 487,
+          "action": "add baking soda to the sink hole",
+          "step_idx": 1
+        },
+        {
+          "action_id": 488,
+          "action": "add vinegar to the sink hole",
+          "step_idx": 2
+        },
+        {
+          "action_id": 489,
+          "action": "add hot water to the sink hole",
+          "step_idx": 3
+        },
+        {
+          "action_id": 490,
+          "action": "turn on the water tap to wash",
+          "step_idx": 4
+        }
+      ]
+    },
+    "163": {
+      "task_id": "163",
+      "recipe_type": 163,
+      "task_name": "UseVendingMachine",
+      "task_name_human": "Use Vending Machine",
+      "goal": "Complete the task: Use Vending Machine.",
+      "canonical_steps": [
+        {
+          "action_id": 519,
+          "action": "insert money into the vending machine",
+          "step_idx": 1
+        },
+        {
+          "action_id": 520,
+          "action": "press the corresponding button",
+          "step_idx": 2
+        },
+        {
+          "action_id": 521,
+          "action": "take out the goods",
+          "step_idx": 3
+        }
+      ]
+    },
+    "164": {
+      "task_id": "164",
+      "recipe_type": 164,
+      "task_name": "UseEarplugs",
+      "task_name_human": "Use Earplugs",
+      "goal": "Complete the task: Use Earplugs.",
+      "canonical_steps": [
+        {
+          "action_id": 660,
+          "action": "roll and rub the earplugs",
+          "step_idx": 1
+        },
+        {
+          "action_id": 661,
+          "action": "pull the ears outwards",
+          "step_idx": 2
+        },
+        {
+          "action_id": 662,
+          "action": "insert the earplugs into the ears",
+          "step_idx": 3
+        }
+      ]
+    },
+    "165": {
+      "task_id": "165",
+      "recipe_type": 165,
+      "task_name": "MakeSlimeWithGlue",
+      "task_name_human": "Make Slime With Glue",
+      "goal": "Complete the task: Make Slime With Glue.",
+      "canonical_steps": [
+        {
+          "action_id": 670,
+          "action": "add different kinds of ingredients",
+          "step_idx": 1
+        },
+        {
+          "action_id": 671,
+          "action": "mix the raw materials",
+          "step_idx": 2
+        },
+        {
+          "action_id": 672,
+          "action": "rub and drag the materials",
+          "step_idx": 3
+        }
+      ]
+    },
+    "166": {
+      "task_id": "166",
+      "recipe_type": 166,
+      "task_name": "RemoveBlackheadsWithGlue",
+      "task_name_human": "Remove Blackheads With Glue",
+      "goal": "Complete the task: Remove Blackheads With Glue.",
+      "canonical_steps": [
+        {
+          "action_id": 229,
+          "action": "pour some glue to the face",
+          "step_idx": 1
+        },
+        {
+          "action_id": 230,
+          "action": "wipe the glue to a layer",
+          "step_idx": 2
+        },
+        {
+          "action_id": 231,
+          "action": "reveal the glue from the face",
+          "step_idx": 3
+        }
+      ]
+    },
+    "167": {
+      "task_id": "167",
+      "recipe_type": 167,
+      "task_name": "UseJack",
+      "task_name_human": "Use Jack",
+      "goal": "Complete the task: Use Jack.",
+      "canonical_steps": [
+        {
+          "action_id": 110,
+          "action": "raise the jack up",
+          "step_idx": 1
+        },
+        {
+          "action_id": 111,
+          "action": "set the underprop",
+          "step_idx": 2
+        },
+        {
+          "action_id": 112,
+          "action": "remove the underprop",
+          "step_idx": 3
+        },
+        {
+          "action_id": 113,
+          "action": "let the jack down",
+          "step_idx": 4
+        }
+      ]
+    },
+    "168": {
+      "task_id": "168",
+      "recipe_type": 168,
+      "task_name": "UseRiceCookerToCookRice",
+      "task_name_human": "Use Rice Cooker To Cook Rice",
+      "goal": "Complete the task: Use Rice Cooker To Cook Rice.",
+      "canonical_steps": [
+        {
+          "action_id": 217,
+          "action": "take out some rice",
+          "step_idx": 1
+        },
+        {
+          "action_id": 218,
+          "action": "soak and wash the rice",
+          "step_idx": 2
+        },
+        {
+          "action_id": 219,
+          "action": "put the washed rice into the rice cooker",
+          "step_idx": 3
+        },
+        {
+          "action_id": 220,
+          "action": "cook the rice by rice cooker",
+          "step_idx": 4
+        }
+      ]
+    },
+    "169": {
+      "task_id": "169",
+      "recipe_type": 169,
+      "task_name": "UseSoyMilkMaker",
+      "task_name_human": "Use Soy Milk Maker",
+      "goal": "Complete the task: Use Soy Milk Maker.",
+      "canonical_steps": [
+        {
+          "action_id": 198,
+          "action": "pour some soy beans",
+          "step_idx": 1
+        },
+        {
+          "action_id": 199,
+          "action": "pour some water to the soy milk maker",
+          "step_idx": 2
+        },
+        {
+          "action_id": 200,
+          "action": "run the soy milk maker",
+          "step_idx": 3
+        },
+        {
+          "action_id": 201,
+          "action": "filtrate with a filter",
+          "step_idx": 4
+        },
+        {
+          "action_id": 202,
+          "action": "pour into a glass",
+          "step_idx": 5
+        }
+      ]
+    },
+    "170": {
+      "task_id": "170",
+      "recipe_type": 170,
+      "task_name": "UseTappingGun",
+      "task_name_human": "Use Tapping Gun",
+      "goal": "Complete the task: Use Tapping Gun.",
+      "canonical_steps": [
+        {
+          "action_id": 429,
+          "action": "insert the gun head",
+          "step_idx": 1
+        },
+        {
+          "action_id": 430,
+          "action": "remove the protecting cover of the gun head",
+          "step_idx": 2
+        },
+        {
+          "action_id": 431,
+          "action": "insert the glue needle",
+          "step_idx": 3
+        },
+        {
+          "action_id": 432,
+          "action": "hold the gun end and let the gun head aim at the tag brand",
+          "step_idx": 4
+        },
+        {
+          "action_id": 433,
+          "action": "trigger and take out the needle head",
+          "step_idx": 5
+        }
+      ]
+    },
+    "171": {
+      "task_id": "171",
+      "recipe_type": 171,
+      "task_name": "UseToaster",
+      "task_name_human": "Use Toaster",
+      "goal": "Complete the task: Use Toaster.",
+      "canonical_steps": [
+        {
+          "action_id": 267,
+          "action": "put a slice of bread in",
+          "step_idx": 1
+        },
+        {
+          "action_id": 268,
+          "action": "run the toaster and adjust",
+          "step_idx": 2
+        },
+        {
+          "action_id": 269,
+          "action": "take out the slice of bread",
+          "step_idx": 3
+        }
+      ]
+    },
+    "172": {
+      "task_id": "172",
+      "recipe_type": 172,
+      "task_name": "PerformVanishingGlassTrick",
+      "task_name_human": "Perform Vanishing Glass Trick",
+      "goal": "Complete the task: Perform Vanishing Glass Trick.",
+      "canonical_steps": [
+        {
+          "action_id": 767,
+          "action": "show the glass to the audience",
+          "step_idx": 1
+        },
+        {
+          "action_id": 768,
+          "action": "block out the glass",
+          "step_idx": 2
+        },
+        {
+          "action_id": 769,
+          "action": "show the vanished glass",
+          "step_idx": 3
+        }
+      ]
+    },
+    "173": {
+      "task_id": "173",
+      "recipe_type": 173,
+      "task_name": "UseVolumetricFlask",
+      "task_name_human": "Use Volumetric Flask",
+      "goal": "Complete the task: Use Volumetric Flask.",
+      "canonical_steps": [
+        {
+          "action_id": 279,
+          "action": "pour the solution to the volumetric flask",
+          "step_idx": 1
+        },
+        {
+          "action_id": 280,
+          "action": "fill the solution to the mark",
+          "step_idx": 2
+        },
+        {
+          "action_id": 281,
+          "action": "seal the volumetric flask",
+          "step_idx": 3
+        },
+        {
+          "action_id": 282,
+          "action": "invert the volumetric flask",
+          "step_idx": 4
+        }
+      ]
+    },
+    "174": {
+      "task_id": "174",
+      "recipe_type": 174,
+      "task_name": "WashDog",
+      "task_name_human": "Wash Dog",
+      "goal": "Complete the task: Wash Dog.",
+      "canonical_steps": [
+        {
+          "action_id": 730,
+          "action": "use the body wash",
+          "step_idx": 1
+        },
+        {
+          "action_id": 731,
+          "action": "wash the body wash away",
+          "step_idx": 2
+        }
+      ]
+    },
+    "175": {
+      "task_id": "175",
+      "recipe_type": 175,
+      "task_name": "WashHair",
+      "task_name_human": "Wash Hair",
+      "goal": "Complete the task: Wash Hair.",
+      "canonical_steps": [
+        {
+          "action_id": 509,
+          "action": "wet and wash the hair",
+          "step_idx": 1
+        },
+        {
+          "action_id": 510,
+          "action": "apply the shampoo or hair conditioner",
+          "step_idx": 2
+        },
+        {
+          "action_id": 511,
+          "action": "scratch the hair carefully",
+          "step_idx": 3
+        },
+        {
+          "action_id": 512,
+          "action": "make the hair dry",
+          "step_idx": 4
+        },
+        {
+          "action_id": 513,
+          "action": "comb the hair with a comb",
+          "step_idx": 5
+        },
+        {
+          "action_id": 514,
+          "action": "wrap the hair by hands",
+          "step_idx": 6
+        },
+        {
+          "action_id": 515,
+          "action": "pin the hair with some hairpins",
+          "step_idx": 7
+        }
+      ]
+    },
+    "176": {
+      "task_id": "176",
+      "recipe_type": 176,
+      "task_name": "WearContactLenses",
+      "task_name_human": "Wear Contact Lenses",
+      "goal": "Complete the task: Wear Contact Lenses.",
+      "canonical_steps": [
+        {
+          "action_id": 570,
+          "action": "wet and wash hands",
+          "step_idx": 1
+        },
+        {
+          "action_id": 571,
+          "action": "add some cleaner to clean and wet the lenses and take out the lenses",
+          "step_idx": 2
+        },
+        {
+          "action_id": 572,
+          "action": "wear the  contact lenses",
+          "step_idx": 3
+        }
+      ]
+    },
+    "177": {
+      "task_id": "177",
+      "recipe_type": 177,
+      "task_name": "WearShinGuards",
+      "task_name_human": "Wear Shin Guards",
+      "goal": "Complete the task: Wear Shin Guards.",
+      "canonical_steps": [
+        {
+          "action_id": 286,
+          "action": "put on the shin guard sleeves or football socks",
+          "step_idx": 1
+        },
+        {
+          "action_id": 287,
+          "action": "insert or put on the shin guard",
+          "step_idx": 2
+        },
+        {
+          "action_id": 288,
+          "action": "wrap on the tape",
+          "step_idx": 3
+        }
+      ]
+    },
+    "178": {
+      "task_id": "178",
+      "recipe_type": 178,
+      "task_name": "PractiseWeightLift",
+      "task_name_human": "Practise Weight Lift",
+      "goal": "Complete the task: Practise Weight Lift.",
+      "canonical_steps": [
+        {
+          "action_id": 454,
+          "action": "squat and hold the barbell",
+          "step_idx": 1
+        },
+        {
+          "action_id": 455,
+          "action": "pull the barbell to the chin",
+          "step_idx": 2
+        },
+        {
+          "action_id": 456,
+          "action": "lift the barbell from the chin over the head",
+          "step_idx": 3
+        },
+        {
+          "action_id": 457,
+          "action": "stand up with straight legs",
+          "step_idx": 4
+        },
+        {
+          "action_id": 458,
+          "action": "lift the barbell directly over the head",
+          "step_idx": 5
+        },
+        {
+          "action_id": 459,
+          "action": "put down the barbell",
+          "step_idx": 6
+        }
+      ]
+    },
+    "179": {
+      "task_id": "179",
+      "recipe_type": 179,
+      "task_name": "WrapGiftBox",
+      "task_name_human": "Wrap Gift Box",
+      "goal": "Complete the task: Wrap Gift Box.",
+      "canonical_steps": [
+        {
+          "action_id": 30,
+          "action": "measure the size of the packing paper",
+          "step_idx": 1
+        },
+        {
+          "action_id": 31,
+          "action": "cut the packing paper",
+          "step_idx": 2
+        },
+        {
+          "action_id": 32,
+          "action": "stick with the tape and wrap",
+          "step_idx": 3
+        },
+        {
+          "action_id": 33,
+          "action": "decorate the wrapped gift",
+          "step_idx": 4
+        }
+      ]
+    }
+  },
+  "step_id_to_action": {
+    "65": "clean inner wall of container",
+    "66": "place a piece of paper on weighing pan",
+    "67": "zeroing set",
+    "68": "place weighing sample on weighing pan and read",
+    "460": "clean the window surface",
+    "461": "tear off the front of the sticker",
+    "462": "put the sticker on the window",
+    "463": "press the sticker",
+    "464": "tear off the other side of the sticker",
+    "559": "place the bed board",
+    "560": "place the board on each side",
+    "561": "place board at the bottom",
+    "562": "install legs on the bed",
+    "563": "put all bed boxes together",
+    "564": "install head of the bed",
+    "565": "place mattress on the bed",
+    "434": "install the sofa back",
+    "435": "install armrest on sofa",
+    "436": "install stand of the seat",
+    "437": "place cushion and backrest",
+    "438": "install legs of sofa",
+    "439": "put on sofa cover",
+    "440": "put every parts mentioned together",
+    "612": "assemble the frame",
+    "613": "install horizontal boards",
+    "614": "install vertical boards",
+    "270": "install the motherboard",
+    "271": "install the fan",
+    "272": "install peripherals inside the case",
+    "273": "plug cable and wire",
+    "274": "install peripherals outside the case",
+    "58": "cover injury with bandage",
+    "59": "wind legs with bandage",
+    "60": "cut the bandage",
+    "114": "check the old chain",
+    "115": "cut the old chain",
+    "116": "take old chain away",
+    "117": "install the new chain",
+    "118": "ajust the chain length",
+    "119": "link the new chain",
+    "676": "tie the tourniquet",
+    "677": "disinfect",
+    "678": "collect blood",
+    "679": "pull out the needle and press with cotton",
+    "154": "knead the raw sugar",
+    "155": "blow the raw sugar",
+    "156": "paint on sugar",
+    "548": "add seasoning to the boiling water",
+    "549": "pour the noodles into the water and stir",
+    "550": "take a little bit noodles and taste it",
+    "551": "pour the cooked noodles",
+    "713": "clean the surface",
+    "714": "apply polishing paste on the surface",
+    "715": "polish with polisher",
+    "716": "clean the scratch",
+    "684": "open the fuel tank cap",
+    "685": "insert oil gun in the car",
+    "686": "operate the control panel",
+    "687": "pullthe  oil gun out",
+    "688": "close the fuel tank cap",
+    "259": "unscrew the screw",
+    "260": "jack up the car",
+    "261": "remove the tire",
+    "262": "put on the tire",
+    "263": "tighten screws",
+    "724": "clean the pumpkin",
+    "725": "remove pumpkin pedicle",
+    "726": "clean up the interior of thepumpkin",
+    "727": "draw an outline",
+    "728": "carve along the outline",
+    "729": "place light into pumpkin",
+    "79": "check the type of the back cover",
+    "80": "open the back cover",
+    "81": "replace the battery",
+    "82": "install the back cover and waterproof ring",
+    "232": "unload the wheel",
+    "233": "remove the inner tube",
+    "234": "remove the tire",
+    "235": "load the tire",
+    "236": "load the inner tube",
+    "237": "pump up the tire",
+    "238": "load the wheel",
+    "275": "cut off and remove the old string",
+    "276": "fix the new string on the lower part of the guitar",
+    "277": "fix the new string on the head of the guitar",
+    "278": "adjust the tightness of the new string",
+    "608": "open the front door or cover of the printer",
+    "609": "take out the toner cartridge",
+    "610": "insert a new toner cartridge",
+    "611": "close the front door or cover of the printer",
+    "538": "power off",
+    "539": "pick up the button",
+    "540": "clean the inside of the button",
+    "541": "wipe the keyboard",
+    "207": "pour salt and rust removal liquid",
+    "208": "rub back and forth with potatoes or rust remover",
+    "209": "rinse the pot",
+    "210": "add some oil to the pot",
+    "211": "heat the pot",
+    "593": "remove the hamster from the hamster cage",
+    "594": "remove the toy and paper bed from the hamster cage",
+    "595": "clean toys and hamster cages",
+    "596": "move the toy and paper bed into the hamster cage",
+    "597": "put the hamster back into the hamster cage",
+    "105": "cut the head",
+    "106": "remove the intestines and blood vessels",
+    "107": "scratch scales",
+    "108": "cut off the tail and fin",
+    "109": "remove the gill",
+    "705": "remove the head",
+    "706": "remove the shrimp shell",
+    "707": "remove the tail",
+    "708": "remove the vein",
+    "299": "apply detergent to the intertior of the toilet",
+    "300": "scrub the toilet interior",
+    "301": "flush and wash the interior",
+    "302": "apply detergent to the external side",
+    "303": "wipe the external side",
+    "46": "make the detergent",
+    "47": "apply detergent to bathtub",
+    "48": "dip detergent with rag",
+    "49": "scrub the bathtub",
+    "50": "clean bathtub with water",
+    "527": "make the detergent",
+    "528": "dip detergent with rag or apply detergent",
+    "529": "clean the floor",
+    "530": "wash the floor",
+    "531": "polish the floor",
+    "641": "sweep the floor",
+    "642": "use vacuum cleaner to clean",
+    "643": "wet the mop",
+    "644": "make the  detergent",
+    "645": "apply detergent",
+    "646": "mop the floor",
+    "647": "wash the floor",
+    "16": "pour the egg into the bowl",
+    "17": "stir the egg",
+    "18": "pour the egg into the pot",
+    "19": "fry eggs",
+    "20": "put seasoning in the egg",
+    "21": "pour the egg onto the plate",
+    "257": "push curling",
+    "258": "brush ice floor",
+    "340": "cut the wide side",
+    "341": "remove the core",
+    "342": "cut into strips and pieces",
+    "343": "cut the flesh",
+    "344": "peel",
+    "225": "show the whole rope again",
+    "226": "knot the rope",
+    "227": "cut the rope",
+    "228": "show the whole rope again",
+    "603": "cut off the edge",
+    "604": "peel",
+    "605": "cut in half",
+    "606": "dig out the seeds with spoon",
+    "607": "slice the pulp",
+    "637": "cut both ends and remove fruit seeds",
+    "638": "remove the peel",
+    "639": "slice the pulp",
+    "640": "cut in half",
+    "360": "add detergent and make bubble",
+    "361": "wipe the dish",
+    "362": "rinse the dish",
+    "363": "put dish in dishwasher",
+    "364": "take dish out",
+    "345": "line up for admission",
+    "346": "expand the flag",
+    "347": "raise the national flag",
+    "69": "remove old rubber and glue",
+    "70": "glue on the back of the rubber",
+    "71": "glue on the paddle",
+    "72": "put rubber on paddle",
+    "73": "cut the rubber",
+    "74": "attach tape to the edge of the paddle",
+    "328": "cut branches",
+    "329": "connect branches",
+    "330": "wind the junction to fasten the connection",
+    "776": "pre-swing",
+    "777": "rotate body and accelerate the hammer",
+    "778": "throw the hammer out",
+    "469": "measure and mark the wall",
+    "470": "crop the wallpaper",
+    "471": "apply glue to the wall and wallpaper",
+    "472": "paste and level the wallpaper",
+    "473": "cut out a hole",
+    "474": "loosen the outer cover of a switch or socket",
+    "475": "stuff the wallpaper into the loose outer cover",
+    "476": "tighten the outer cover of the switch or socket",
+    "477": "clean the wall",
+    "478": "wipe or polish the wall",
+    "479": "make the glue",
+    "480": "dip the glue",
+    "717": "place gasket at injury",
+    "718": "wind bandage around head",
+    "719": "knot at the end of the bandage",
+    "585": "hold electrode with a welding tong",
+    "586": "wear a eye protection helmet",
+    "587": "weld along the weld line",
+    "588": "clean weld line with a hammer",
+    "516": "apply detergent to leather",
+    "517": "wipe the detergent",
+    "518": "clean the surface",
+    "441": "draw black patterns",
+    "442": "transfer pattern to board or tarpaulin",
+    "443": "scrape tarpaulin without ink",
+    "444": "cut the tarpaulin",
+    "445": "mark the area that needs to be inked",
+    "446": "ink the marked area",
+    "447": "transfer print",
+    "407": "draw lines to mark the hole",
+    "408": "find the position of the hole",
+    "409": "drill with an electric drill",
+    "34": "apply toothpaste or other cleaning agent to scratch",
+    "35": "wipe the scratch with cloth",
+    "36": "wipe the toothpaste",
+    "313": "pull out a lock lever at bottom of gun",
+    "314": "unscrew gun head",
+    "315": "take out old grease container",
+    "316": "put in a new grease container",
+    "317": "open the lid of new container",
+    "318": "screw gun head back",
+    "319": "try to press gun head, spray residual old grease",
+    "304": "prepare the frame",
+    "305": "prepare flower",
+    "306": "stick or bind flower to the frame",
+    "666": "put flower in book",
+    "667": "press book or heat flower",
+    "668": "take out dry flowers",
+    "669": "use dried flower to place pattern and fix it",
+    "157": "add raw materials",
+    "158": "mix raw materials",
+    "159": "put materials into mold",
+    "160": "take out chocolate",
+    "293": "pour raw materials",
+    "294": "mix raw materials",
+    "295": "shape cookie",
+    "296": "bake cookies",
+    "194": "add raw materials",
+    "195": "mix raw materials",
+    "196": "pour bean paste into plate",
+    "197": "invert seasoning",
+    "381": "process (crop, fold) paper",
+    "382": "paste paper into base of paper basket",
+    "383": "stick handle to paper basket",
+    "552": "pour raw materials",
+    "553": "stir raw materials",
+    "554": "knead together",
+    "555": "flatten the dough",
+    "556": "cut into strips",
+    "557": "press the strips in the middle with a board",
+    "558": "fry the dough",
+    "401": "remove inner tube",
+    "402": "look for leaks",
+    "403": "use sandpaper/metal to polish rubber near leak",
+    "404": "apply glue",
+    "405": "paste patch",
+    "406": "put inner tube back",
+    "545": "remove cap",
+    "546": "put lead into the pen",
+    "547": "buckle the cap",
+    "133": "apply cleaning agent",
+    "134": "use a hair dryer to blow hot wall",
+    "135": "wipe wall with detergent",
+    "136": "clean wall with a clean cloth",
+    "41": "remove surface of the door",
+    "42": "remove old glass from window lift",
+    "43": "glue on window frame",
+    "44": "install new glass on window lift",
+    "45": "install the door",
+    "120": "open the car key cover",
+    "121": "take out the car key battery",
+    "122": "put in the battery",
+    "123": "close the car key cover",
+    "692": "open cover",
+    "693": "remove battery",
+    "694": "put battery in",
+    "695": "close cover",
+    "598": "add a small amount of salt to Neti Pot",
+    "599": "add water to Neti Pot",
+    "600": "shake and stir",
+    "601": "fill a nostril with saline and do the same to the other nostril",
+    "602": "wipe nose",
+    "673": "unplug protection head",
+    "674": "plunge into thigh",
+    "675": "pull out after a period of time",
+    "425": "adjust the balance to the horizontal position",
+    "426": "correct the balance zero",
+    "427": "put the sample to be measured on the balance",
+    "428": "put the weight until the balance is balanced",
+    "83": "absorb liquid with dropper",
+    "84": "calibrate the liquid",
+    "85": "release liquid",
+    "497": "cone the leaves",
+    "498": "add ingredients into cone",
+    "499": "fold the leaves",
+    "500": "tie the zongzi tightly",
+    "628": "install sponge strip",
+    "629": "install window panel",
+    "630": "fix window board",
+    "631": "connect air conditioners and windows",
+    "336": "mount the bracket to the back of the car",
+    "337": "fix and fasten the upper and lower ropes to car",
+    "338": "place the bicycle on the bracket",
+    "339": "fasten the strap",
+    "353": "close switch",
+    "354": "remove old lamp fixed cover",
+    "355": "remove old lamp fixed support",
+    "356": "install fan bracket",
+    "357": "install fan tray",
+    "358": "install fan frame",
+    "359": "install fans and lights",
+    "161": "check ground and layout planning",
+    "162": "prepare adhesive",
+    "163": "wipe adhesive and bedding layer",
+    "164": "cut tiles",
+    "165": "tile the wall",
+    "166": "fill the gap",
+    "331": "place label",
+    "332": "wipe screen",
+    "333": "paste protector on the screen",
+    "334": "wipe screen again",
+    "335": "remove the label",
+    "737": "place license plate",
+    "738": "place license plate cover",
+    "739": "screw and fix the cover",
+    "663": "replace the old shower head",
+    "664": "wrap the pipe band",
+    "665": "install the new shower head",
+    "410": "close the sluice and empty and disconnect the water pipe",
+    "411": "take down the closestool",
+    "412": "remove the old wax ring and clean",
+    "413": "install the new wax ring",
+    "414": "install the closestool again",
+    "415": "connect the water pipe",
+    "96": "prepare the ground floor",
+    "97": "cut the raw boards",
+    "98": "fit on the boards",
+    "99": "knock in the nails",
+    "100": "apply some glue on the borads",
+    "760": "drill in the wall",
+    "761": "install two shelves",
+    "762": "place crossbar on shelves",
+    "763": "hang up curtains",
+    "170": "get an iron prepared",
+    "171": "make the clothes wet",
+    "172": "flip the clothes repeatly",
+    "173": "put the clothes neatly on a ironing table",
+    "174": "iron the cloths with the iron",
+    "175": "hang the ironed clothes",
+    "494": "march into the area and salute",
+    "495": "begin to practise karate",
+    "496": "exit from the area and salute",
+    "398": "apply the lubricant on the lock",
+    "399": "wipe off the redundant lubricant",
+    "400": "insert the key repeatly",
+    "348": "fold or bent paper",
+    "349": "put paper together",
+    "350": "cut paper",
+    "351": "paint on the paper",
+    "352": "measure and mark",
+    "22": "knead the meat",
+    "23": "fry meat",
+    "24": "combine meat and bread to make burger",
+    "320": "put the candle wick into a vessel",
+    "321": "fix the candle wick",
+    "322": "melt the wax with water",
+    "323": "pour the wax into the vessel",
+    "324": "wait for the candle until concretion",
+    "51": "fold or bent the paper",
+    "52": "nail down or stick together",
+    "53": "cut the raw materials",
+    "54": "draw pictures on the materials",
+    "55": "thread and make knots",
+    "56": "put the candle in the lantern",
+    "57": "measure and label the lantern",
+    "751": "pour into the ingredients",
+    "752": "stir the mixture",
+    "753": "shake the mixture",
+    "754": "pour in after mix it",
+    "755": "decorate with fruit",
+    "203": "cut potato into strips",
+    "204": "soak them in water",
+    "205": "dry strips",
+    "206": "put in the oil to fry",
+    "680": "pour the ingredients into the bowl",
+    "681": "stir the mixture",
+    "682": "package and freeze",
+    "683": "decorate the ice cream",
+    "1": "prepare seasonings and side dishes",
+    "2": "prepare meat",
+    "3": "mix and pickle",
+    "4": "string together",
+    "5": "roast ingredients",
+    "6": "brush sauce or sprinkle seasoning",
+    "61": "prepare tea pots and tea bowls",
+    "62": "add tea powder",
+    "63": "brew tea and stir",
+    "64": "add milk",
+    "764": "cut oranges",
+    "765": "juice the oranges",
+    "766": "pour the orange juice into the cup",
+    "484": "put the ingredients into the can",
+    "485": "pour the soup in",
+    "486": "close cans",
+    "37": "knead the dough",
+    "38": "unroll the dough",
+    "39": "add seasoning",
+    "40": "bake pizza",
+    "655": "strip the insulation",
+    "656": "arrange the seperated wire",
+    "657": "cut a certain length",
+    "658": "insert it into the crystal head",
+    "659": "fixe it with a crimping pliers",
+    "264": "cut ingredients",
+    "265": "put the ingredients into the bowl",
+    "266": "stir the ingredients",
+    "25": "add seasoning on the salmon",
+    "26": "fry salmon",
+    "27": "add seasoning",
+    "28": "load the dish",
+    "29": "add decoration",
+    "522": "prepare the filler",
+    "523": "cut the bread",
+    "524": "put the filler on the bread slice",
+    "525": "fry or grill",
+    "526": "cut into small pieces",
+    "384": "melt the soap block",
+    "385": "prepare a vacant vessel",
+    "386": "put the melted soap block into the vessel",
+    "387": "take out after freezing",
+    "101": "add ice cubes",
+    "102": "put strawberries and other fruits into the juicer",
+    "103": "put yogurt, honey and other ingredients into the juicer",
+    "104": "shake and juice",
+    "191": "string the fruit together",
+    "192": "melt the sugar",
+    "193": "soak sugar gourd in sugar",
+    "615": "cut the headphone cable",
+    "616": "process the copper wire inside the earphone cable",
+    "617": "solder the headset cable to the Bluetooth module",
+    "618": "wrap in foil paper",
+    "619": "wrap in copper wire",
+    "124": "put the sheet on the bed",
+    "125": "insert the quilt into the quilt cover",
+    "126": "put the quilt on the bed",
+    "127": "insert the pillow into the pillow cover",
+    "128": "put the pillow on the bed",
+    "186": "boil water or coffee",
+    "187": "grind the coffee beans",
+    "188": "filtrate the coffee beans",
+    "189": "brew the coffee beans",
+    "190": "add some ingredients in the coffee",
+    "307": "heat the teapot and wash the cup",
+    "308": "prepare and boil water",
+    "309": "prepare and add the tea",
+    "310": "add some water to the tea",
+    "311": "add some ingredients to the tea",
+    "312": "pour the tea into the vessel",
+    "743": "heat the back cover of the phone",
+    "744": "pick up the back cover of the phone with the cymbal",
+    "745": "remove the components of the fixed battery",
+    "746": "remove the tape of the fixed battery",
+    "747": "take down the old battery",
+    "748": "put on new tape",
+    "749": "load a new battery",
+    "750": "restore the fixed battery components and the back cover",
+    "756": "remove the original protector",
+    "757": "wipe the screen",
+    "758": "line up the protector and the cellphone",
+    "759": "paste protector on the screen",
+    "148": "do the first layup",
+    "149": "dribble in the field",
+    "150": "pass the basketball into the hole at the first time",
+    "151": "shoot towards the basket",
+    "152": "pass the basketball into the hole at the second time",
+    "153": "dribble and lay up",
+    "89": "bent the paperclips by hands",
+    "90": "squeeze the paperclips by hands",
+    "91": "insert the paperclips into the lock hole",
+    "92": "twist the paperclips by hands",
+    "179": "tear out the foil",
+    "180": "turn the suspension link",
+    "181": "open the bottle carefully",
+    "740": "pull out the insurance ring",
+    "741": "spray experimentally to check",
+    "742": "spray towards the fire",
+    "297": "pack the sleeping bag",
+    "298": "tie the bag tightly",
+    "535": "show the blank paper",
+    "536": "fold or fire the blank paper",
+    "537": "show the money to the audience",
+    "239": "fold the edges of the paper",
+    "240": "cut along the edges",
+    "241": "fold the squares inward and fix them",
+    "242": "fix the wind mill on the bracket",
+    "689": "drive the car forward",
+    "690": "drive the car backward",
+    "691": "adjust front and back position",
+    "624": "fill the injection head",
+    "625": "disinfect the injecting place",
+    "626": "inject to the muscular",
+    "627": "pull out the needle and press",
+    "448": "call emergency number",
+    "449": "check the breath of the patient",
+    "450": "check the foreign matter in the mouse",
+    "451": "do artificial breathing to the patient",
+    "452": "check the pulse of the patient",
+    "453": "press the chest of the patient",
+    "142": "clean up the ground",
+    "143": "lay the cushion evenly",
+    "144": "set up the brackets",
+    "145": "set up the platfond",
+    "146": "fix the ground nail",
+    "147": "put the waterproof cover",
+    "221": "dig a pit with proper size",
+    "222": "fill the tree into the pit",
+    "223": "fill the pit with some soil",
+    "224": "pour water to the tree",
+    "176": "chase for the frisbee",
+    "177": "catch the frisbee with mouse",
+    "178": "bring the frisbee back",
+    "373": "begin to run up",
+    "374": "begin to jump up",
+    "375": "fall to the ground",
+    "243": "pour the gesso to the canvas",
+    "244": "brush the gesso evenly",
+    "289": "weigh up the solute",
+    "290": "transfer and dissolve the solute",
+    "291": "add water into the volumetric flask to the tick line",
+    "292": "transfer the solution and label",
+    "735": "add some water to the vessel",
+    "736": "grind roundly and evenly",
+    "245": "screw off the valve cap and open the valve",
+    "246": "install the air nozzle",
+    "247": "pump up to the tire",
+    "248": "remove the air nozzle",
+    "249": "tighten the valve and screw on the valve cap",
+    "137": "turn over the quilt cover",
+    "138": "put nicely and align the quilt and the cover",
+    "139": "roll the quilt cover and the quilt together",
+    "140": "take out the quilt cover from another side",
+    "141": "put and arrange nicely",
+    "325": "pull up the hair to reserve place for the hair extensions",
+    "326": "put on the hair extensions",
+    "327": "put down the hair and comb",
+    "732": "take off the shell",
+    "733": "absorb some ink slowly",
+    "734": "clean the fountain pen with napkin",
+    "481": "press the fuel nozzle",
+    "482": "pump up the fuel",
+    "483": "lighten the lighter to check",
+    "648": "pull open the stapler",
+    "649": "insert the stapler pins",
+    "650": "close up the stapler",
+    "86": "take out the label",
+    "87": "inject the ink to the cartridge",
+    "88": "stick on the label",
+    "491": "spray the cleaning agent on the car window",
+    "492": "apply the cleaning agent with towel evenly",
+    "493": "wipe off the cleaning agent",
+    "75": "remove the light shell/housing/support",
+    "76": "take out the old bulb",
+    "77": "install the new bulb",
+    "78": "install the light shell/housing/support",
+    "573": "take out the wiper",
+    "574": "take out the old rubber sleeve from the wiper head",
+    "575": "take out the blade from the old rubber sleeve",
+    "576": "put the balde into the new rubber sleeve",
+    "577": "put the new rubber sleeve into the wiper head",
+    "578": "install the wiper back",
+    "720": "turn off the balde screw",
+    "721": "take out the blade",
+    "722": "install the new blade",
+    "723": "tighten the blade screw",
+    "212": "take out the laptop CD drive",
+    "213": "screw off the screws and sheetmetals and baffles on the both sides of the CD drive",
+    "214": "install the SSD onto the hard disk tray",
+    "215": "install the screws and sheetmetals and baffles onto the hard disk tray",
+    "216": "insert the hard disk tray into the position of the CD drive",
+    "465": "open up the cover",
+    "466": "take out the fuse",
+    "467": "fit on the fuse",
+    "468": "close up the cover",
+    "416": "remove the door knob",
+    "417": "remove the bolt and pin board",
+    "418": "install the new pin board",
+    "419": "install the new bolt",
+    "420": "install the new door knob",
+    "620": "screw off the screws",
+    "621": "remove the drumhead",
+    "622": "replace with the new drumhead",
+    "623": "screw on the screws",
+    "770": "switch off the power",
+    "771": "screw off the screws used to fix the switch",
+    "772": "use electricity meter to check the power supply",
+    "773": "use screwdriver or electirc screwdriver to release the wire in the wall from the switch",
+    "774": "use screwdriver or electirc screwdriver to screw the wire in the wall into the screw of the new switch",
+    "775": "reset the switch and screw on the screws used to fix the switch",
+    "632": "close the sluice and empty and disconnect the water pipe",
+    "633": "remove the old faucet",
+    "634": "install the new faucet",
+    "635": "connect the water pipe",
+    "636": "open the sluice and test the new faucet",
+    "392": "take out the shell",
+    "393": "take out the filter",
+    "394": "clean up the filter",
+    "395": "fit on the filter",
+    "396": "fit on the shell",
+    "397": "press the resetting button",
+    "504": "take out the battery",
+    "505": "unscrew the screws used to fix the screen",
+    "506": "pull out the screen connector and remove the screen",
+    "507": "install the new screen",
+    "508": "reset and screw on the screws",
+    "376": "remove the light housing or shell and bulb",
+    "377": "remove the light socket and disconnect the wire",
+    "378": "connect the wire again",
+    "379": "install the light socket",
+    "380": "install the bulb and light housing or shell",
+    "696": "take out the old filter",
+    "697": "remove the cap of the new filter",
+    "698": "install the new filter",
+    "532": "use the needle to open the SIM card slot",
+    "533": "put the SIM card into the SIM card slot",
+    "534": "press the SIM card slot back",
+    "542": "unscrew the screw and take out the needle",
+    "543": "let the flat side of the new needle towards the jack and insert the new needle",
+    "544": "screw on the screw",
+    "7": "remove the old rearview mirror",
+    "8": "cut off the electric wire",
+    "9": "reconnect the electric wire",
+    "10": "reinstall the rearview mirror",
+    "182": "take out the shell",
+    "183": "remove the old graphics card",
+    "184": "install the new graphics card",
+    "185": "fit on the shell",
+    "589": "open the laptop rear cover",
+    "590": "remove the old hard disk",
+    "591": "install the new hard disk",
+    "592": "install the laptop rear cover",
+    "369": "take out the shell",
+    "370": "remove the old memory chip",
+    "371": "install the new memory chip",
+    "372": "fit on the shell",
+    "129": "take out the screws",
+    "130": "remove the old toilet seat",
+    "131": "install the new toilet seat",
+    "132": "screw on the screws",
+    "250": "aim at the pin",
+    "251": "push the pin out",
+    "252": "aim at the pin",
+    "253": "push the pin out",
+    "254": "remove the old watch band and reconnect",
+    "255": "put the pin in",
+    "256": "push the pin in",
+    "709": "remove the old wrapper",
+    "710": "wrap with the new wrapper",
+    "711": "install the insulated shim",
+    "712": "use the air pressure gun or hair drier to flatten the wrapper",
+    "11": "cut a hole on the shell",
+    "12": "clean up and soak",
+    "13": "prepare and boil water",
+    "14": "fry or roast or braise",
+    "15": "take out the shell",
+    "421": "clean the hamster box",
+    "422": "pave the box bottom with paper scraps",
+    "423": "set different kinds of hamster toys",
+    "424": "put the hamster into the hamster cage",
+    "93": "put the thread on the spool",
+    "94": "twine round the thread",
+    "95": "thread thorugh the needle",
+    "699": "apply cleansing milk to the face",
+    "700": "shave roughly on the face",
+    "701": "apply shaving cream to the face",
+    "702": "shave carefully on the face",
+    "703": "wipe up the face",
+    "704": "do facial care carefully",
+    "651": "ski down from the hill",
+    "652": "ski up from the hill",
+    "653": "rise to the sky",
+    "654": "fall to the ground",
+    "365": "peel off the garlics",
+    "366": "cut up the garlics",
+    "367": "pour some salt to the garlics",
+    "368": "smash the garlics with the knife face",
+    "579": "prepare the soil carefully",
+    "580": "apply a cover on the soil",
+    "581": "dig some holes on the soil",
+    "582": "sow on the soil",
+    "583": "cover with some soil",
+    "584": "water and fertilize the seeds",
+    "501": "install the wheels for the base",
+    "502": "assemble the cushion and the backrest",
+    "503": "connect the chair and the base",
+    "283": "circle the rope under the bolt",
+    "284": "cross the rope to wrap the bolt",
+    "285": "strain the rope tightly",
+    "388": "trim the plant carefully",
+    "389": "take out the plant",
+    "390": "put in the plant",
+    "391": "fill with some soil",
+    "167": "begin to run up",
+    "168": "do the first two jumps",
+    "169": "do the third jump",
+    "566": "deflate the tyre first",
+    "567": "remove the air nozzle",
+    "568": "install the new air nozzle",
+    "569": "inflate the tyre after replacement",
+    "487": "add baking soda to the sink hole",
+    "488": "add vinegar to the sink hole",
+    "489": "add hot water to the sink hole",
+    "490": "turn on the water tap to wash",
+    "519": "insert money into the vending machine",
+    "520": "press the corresponding button",
+    "521": "take out the goods",
+    "660": "roll and rub the earplugs",
+    "661": "pull the ears outwards",
+    "662": "insert the earplugs into the ears",
+    "670": "add different kinds of ingredients",
+    "671": "mix the raw materials",
+    "672": "rub and drag the materials",
+    "229": "pour some glue to the face",
+    "230": "wipe the glue to a layer",
+    "231": "reveal the glue from the face",
+    "110": "raise the jack up",
+    "111": "set the underprop",
+    "112": "remove the underprop",
+    "113": "let the jack down",
+    "217": "take out some rice",
+    "218": "soak and wash the rice",
+    "219": "put the washed rice into the rice cooker",
+    "220": "cook the rice by rice cooker",
+    "198": "pour some soy beans",
+    "199": "pour some water to the soy milk maker",
+    "200": "run the soy milk maker",
+    "201": "filtrate with a filter",
+    "202": "pour into a glass",
+    "429": "insert the gun head",
+    "430": "remove the protecting cover of the gun head",
+    "431": "insert the glue needle",
+    "432": "hold the gun end and let the gun head aim at the tag brand",
+    "433": "trigger and take out the needle head",
+    "267": "put a slice of bread in",
+    "268": "run the toaster and adjust",
+    "269": "take out the slice of bread",
+    "767": "show the glass to the audience",
+    "768": "block out the glass",
+    "769": "show the vanished glass",
+    "279": "pour the solution to the volumetric flask",
+    "280": "fill the solution to the mark",
+    "281": "seal the volumetric flask",
+    "282": "invert the volumetric flask",
+    "730": "use the body wash",
+    "731": "wash the body wash away",
+    "509": "wet and wash the hair",
+    "510": "apply the shampoo or hair conditioner",
+    "511": "scratch the hair carefully",
+    "512": "make the hair dry",
+    "513": "comb the hair with a comb",
+    "514": "wrap the hair by hands",
+    "515": "pin the hair with some hairpins",
+    "570": "wet and wash hands",
+    "571": "add some cleaner to clean and wet the lenses and take out the lenses",
+    "572": "wear the  contact lenses",
+    "286": "put on the shin guard sleeves or football socks",
+    "287": "insert or put on the shin guard",
+    "288": "wrap on the tape",
+    "454": "squat and hold the barbell",
+    "455": "pull the barbell to the chin",
+    "456": "lift the barbell from the chin over the head",
+    "457": "stand up with straight legs",
+    "458": "lift the barbell directly over the head",
+    "459": "put down the barbell",
+    "30": "measure the size of the packing paper",
+    "31": "cut the packing paper",
+    "32": "stick with the tape and wrap",
+    "33": "decorate the wrapped gift"
+  }
+}

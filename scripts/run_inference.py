@@ -114,6 +114,7 @@ import argparse
 import json
 import os
 import sys
+import importlib.util
 from pathlib import Path
 
 import torch
@@ -289,6 +290,29 @@ def load_goal_model(model_path: str, device):
     model = T5ForConditionalGeneration.from_pretrained(model_path)
     model.to(device).eval()
     return model, tokenizer
+
+
+def load_goal_latent_model(model_path: str, device):
+    """Load learned goal-latent model used for energy scoring."""
+    from transformers import AutoTokenizer
+
+    spec = importlib.util.spec_from_file_location(
+        "train_goal_latent_model",
+        os.path.join(os.path.dirname(__file__), "train_goal_latent_model.py"),
+    )
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+
+    ckpt = torch.load(model_path, map_location=device, weights_only=False)
+    model = mod.GoalLatentModel(
+        encoder_name=ckpt["encoder_name"],
+        latent_dim=ckpt["latent_dim"],
+        hidden_dim=ckpt.get("hidden_dim", 384),
+    )
+    model.load_state_dict(ckpt["model_state_dict"])
+    model.to(device).eval()
+    tokenizer = AutoTokenizer.from_pretrained(ckpt["encoder_name"])
+    return model, tokenizer, mod.format_trajectory_for_energy
 
 
 # ─────────────────────────────────────────────────────────────────
@@ -480,6 +504,40 @@ def compute_energy(latent_dir: str, task_id: str, video_id: str,
     return torch.norm(z_pred - z_goal, p=2).item() ** 2
 
 
+def compute_learned_energy(
+    goal_latent_model,
+    goal_latent_tokenizer,
+    format_traj_fn,
+    goal: str,
+    full_steps: list,
+    device,
+    max_goal_len: int = 64,
+    max_traj_len: int = 384,
+) -> float:
+    """Compute learned energy E=||z_traj(goal,steps)-z_goal(goal)||^2."""
+    goal_enc = goal_latent_tokenizer(
+        [goal],
+        max_length=max_goal_len,
+        truncation=True,
+        return_tensors="pt",
+    ).to(device)
+    traj_text = format_traj_fn(goal, full_steps)
+    traj_enc = goal_latent_tokenizer(
+        [traj_text],
+        max_length=max_traj_len,
+        truncation=True,
+        return_tensors="pt",
+    ).to(device)
+    with torch.no_grad():
+        z_goal = goal_latent_model.encode_goal(
+            goal_enc.input_ids, goal_enc.attention_mask
+        )[0]
+        z_traj = goal_latent_model.encode_traj(
+            traj_enc.input_ids, traj_enc.attention_mask
+        )[0]
+    return torch.norm(z_traj - z_goal, p=2).item() ** 2
+
+
 # ─────────────────────────────────────────────────────────────────
 # Generation
 # ─────────────────────────────────────────────────────────────────
@@ -564,6 +622,13 @@ def run_system2(args, device):
     critic_model, critic_tokenizer, format_traj_fn = load_critic(
         args.critic_model, device, args.critic_type, args.llm_base_critic
     )
+    goal_latent_model = None
+    goal_latent_tokenizer = None
+    goal_latent_format = None
+    if args.goal_latent_model:
+        goal_latent_model, goal_latent_tokenizer, goal_latent_format = load_goal_latent_model(
+            args.goal_latent_model, device
+        )
 
     prompt = build_system1_prompt(
         goal=args.goal,
@@ -616,11 +681,28 @@ def run_system2(args, device):
 
     # Score with energy (optional)
     energy_scores = [0.0] * len(plans)
-    use_energy = (
-        args.latent_dir and os.path.isdir(args.latent_dir or "")
+    use_learned_energy = goal_latent_model is not None
+    use_lookup_energy = (
+        (not use_learned_energy)
+        and args.latent_dir and os.path.isdir(args.latent_dir or "")
         and args.task_id and args.video_id
     )
-    if use_energy:
+    if use_learned_energy:
+        print(f"Computing learned energy (α={args.alpha}, β={args.beta})...")
+        for i, plan in enumerate(plans):
+            if not plan["valid"]:
+                energy_scores[i] = float("inf")
+                continue
+            full_steps = prefix_steps + plan["steps"]
+            energy_scores[i] = compute_learned_energy(
+                goal_latent_model,
+                goal_latent_tokenizer,
+                goal_latent_format,
+                args.goal,
+                full_steps,
+                device,
+            )
+    elif use_lookup_energy:
         print(f"Computing V-JEPA energy (α={args.alpha}, β={args.beta})...")
         for i, plan in enumerate(plans):
             if not plan["valid"]:
@@ -769,6 +851,10 @@ Examples:
     # V-JEPA energy (system2 only, optional)
     parser.add_argument("--latent_dir", default=None,
                         help="V-JEPA latent directory (enables energy scoring)")
+    parser.add_argument("--goal_latent_model", default=None,
+                        help="Path to learned goal-latent checkpoint (.pt). "
+                             "If provided, uses learned energy from "
+                             "goal + action/state-change trajectory.")
     parser.add_argument("--task_id", default=None,
                         help="CrossTask task ID (needed for energy scoring)")
     parser.add_argument("--video_id", default=None,
