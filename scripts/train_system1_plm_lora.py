@@ -659,6 +659,9 @@ def load_model_and_tokenizer(args):
         lora_alpha=args.lora_alpha,
         lora_dropout=args.lora_dropout,
         target_modules=DEFAULT_TARGET_MODULES,
+        # PerceptionLM reloads with a missing standalone lm_head, so we must
+        # persist the trained output head alongside the LoRA adapters.
+        modules_to_save=["lm_head"],
         bias="none",
         task_type="CAUSAL_LM",
         # Use DoRA for better quality unless QLoRA (where it can be unstable)
