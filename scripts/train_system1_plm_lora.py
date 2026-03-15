@@ -635,6 +635,14 @@ def load_model_and_tokenizer(args):
         )
         print(f"  Loaded as AutoModelForCausalLM (fallback)")
 
+    # Ensure output head is correctly tied to token embeddings when required.
+    if hasattr(model, "tie_weights"):
+        try:
+            model.tie_weights()
+            print("  Tied input/output embeddings")
+        except Exception as e:
+            print(f"  Warning: could not tie weights ({e})")
+
     # --- Freeze vision encoder (we don't use vision) ---
     if hasattr(model, "model") and hasattr(model.model, "vision_tower"):
         for param in model.model.vision_tower.parameters():

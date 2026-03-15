@@ -120,6 +120,9 @@ from pathlib import Path
 
 import torch
 
+# Must match scripts/train_system1_plm_lora.py
+CAUSAL_PROMPT_SUFFIX = "\n\nAssistant:"
+
 # ─────────────────────────────────────────────────────────────────
 # Prompt construction
 # ─────────────────────────────────────────────────────────────────
@@ -260,19 +263,28 @@ def load_system1(model_path: str, device, model_type: str = "t5",
             base_model_name = "facebook/Perception-LM-1B"
         print(f"Loading System-1 (PLM+LoRA): base={base_model_name}, adapter={model_path}")
 
-        tokenizer = AutoTokenizer.from_pretrained(base_model_name, use_fast=True)
+        # Prefer adapter tokenizer if saved during training.
+        tok_source = model_path if os.path.isdir(model_path) else base_model_name
+        tokenizer = AutoTokenizer.from_pretrained(tok_source, use_fast=True)
         if tokenizer.pad_token is None:
             tokenizer.pad_token = tokenizer.eos_token
 
         try:
             from transformers import AutoModelForImageTextToText
             base = AutoModelForImageTextToText.from_pretrained(
-                base_model_name, torch_dtype=torch.bfloat16, trust_remote_code=True
+                base_model_name, dtype=torch.bfloat16, trust_remote_code=True
             )
         except Exception:
             base = AutoModelForCausalLM.from_pretrained(
-                base_model_name, torch_dtype=torch.bfloat16, trust_remote_code=True
+                base_model_name, dtype=torch.bfloat16, trust_remote_code=True
             )
+
+        if hasattr(base, "tie_weights"):
+            try:
+                base.tie_weights()
+                print("  Tied input/output embeddings")
+            except Exception as e:
+                print(f"  Warning: could not tie weights ({e})")
 
         model = PeftModel.from_pretrained(base, model_path)
         model.to(device).eval()
@@ -614,6 +626,9 @@ def generate_plan(model, tokenizer, prompt: str, device,
                   top_p: float = 0.9,
                   max_new_tokens: int = 256) -> str:
     """Generate a single plan from a prompt."""
+    if gen_mode == "causal" and not prompt.rstrip().endswith("Assistant:"):
+        prompt = prompt + CAUSAL_PROMPT_SUFFIX
+
     enc = tokenizer(
         prompt, max_length=512, truncation=True, return_tensors="pt"
     ).to(device)
