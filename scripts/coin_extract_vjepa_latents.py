@@ -151,7 +151,9 @@ def resolve_dtype(device: str, dtype_name: str) -> torch.dtype:
 
 def normalize_youtube_url(url: str) -> str:
     if "/embed/" in url:
-        return url.replace("/embed/", "/watch?v/")
+        prefix, video_id = url.split("/embed/", 1)
+        video_id = video_id.split("?", 1)[0].strip("/")
+        return f"{prefix}/watch?v={video_id}"
     return url
 
 
