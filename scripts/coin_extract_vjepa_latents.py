@@ -15,7 +15,8 @@ the repository:
         meta.json
 
 Each ``segment_XXX.pt`` stores a pooled latent vector for one annotated COIN
-segment. A ``meta.json`` file keeps the segment mapping and extraction config.
+segment. The final segment is also saved as ``goal.pt``. A ``meta.json`` file
+keeps the segment mapping and extraction config.
 
 By default the script downloads videos from ``COIN.json`` with ``yt-dlp``. If
 you already have the videos locally, point ``--videos_dir`` at a directory
@@ -279,7 +280,7 @@ class VJEPAExtractor:
         self.model.eval()
         self.processor = AutoVideoProcessor.from_pretrained(model_name, cache_dir=cache_dir)
 
-    def encode_segment(self, video: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
+    def encode_segment(self, video: torch.Tensor) -> torch.Tensor:
         inputs = self.processor(video, return_tensors="pt")
         pixel_values = inputs["pixel_values_videos"].to(self.device)
         if self.device == "cuda":
@@ -305,14 +306,13 @@ class VJEPAExtractor:
                     pooled = tokens.mean(dim=1)
 
         pooled = pooled.detach().cpu().squeeze(0).float()
-        token_features = tokens.detach().cpu().squeeze(0).float()
 
         del inputs, pixel_values, tokens
         if self.device == "cuda":
             torch.cuda.empty_cache()
         gc.collect()
 
-        return pooled, token_features
+        return pooled
 
 
 def ensure_decord():
@@ -328,7 +328,11 @@ def ensure_decord():
 def should_skip_video(video_dir: Path, skip_existing: bool) -> bool:
     if not skip_existing:
         return False
-    return (video_dir / "meta.json").exists()
+    if not (video_dir / "meta.json").exists():
+        return False
+    if not (video_dir / "goal.pt").exists():
+        return False
+    return any(video_dir.glob("segment_*.pt"))
 
 
 def build_meta(
@@ -349,6 +353,8 @@ def build_meta(
         "model_name": model_name,
         "frames_per_segment": frames_per_segment,
         "num_segments": len(segments),
+        "goal_segment_index": len(segments) - 1 if segments else None,
+        "goal_file": "goal.pt" if segments else None,
         "segments": segments,
     }
 
@@ -367,9 +373,6 @@ def process_video(
     save_bundle: bool,
 ) -> Tuple[bool, str]:
     VideoReader = ensure_decord()
-
-    task_dir = output_dir / task_id / video_id
-    task_dir.mkdir(parents=True, exist_ok=True)
 
     local_path = resolve_local_video(videos_dir, video_id, video_extensions)
     tmp_path: Optional[Path] = None
@@ -393,6 +396,9 @@ def process_video(
             tmp_path.unlink()
         return False, "video_read_failed"
 
+    task_dir = output_dir / task_id / video_id
+    task_dir.mkdir(parents=True, exist_ok=True)
+
     segments_meta: List[dict] = []
     pooled_segments: List[torch.Tensor] = []
 
@@ -405,10 +411,10 @@ def process_video(
                 float(end_sec),
                 num_frames=frames_per_segment,
             )
-            pooled, token_features = extractor.encode_segment(video)
+            pooled = extractor.encode_segment(video)
 
             segment_path = task_dir / f"segment_{seg_idx:03d}.pt"
-            torch.save(token_features, segment_path)
+            torch.save(pooled, segment_path)
             pooled_segments.append(pooled)
 
             segments_meta.append(
@@ -418,10 +424,13 @@ def process_video(
                     "step_label": ann["label"],
                     "start_sec": float(start_sec),
                     "end_sec": float(end_sec),
-                    "latent_shape": list(token_features.shape),
+                    "latent_shape": list(pooled.shape),
                     "latent_file": segment_path.name,
                 }
             )
+
+        goal_latent = pooled_segments[-1]
+        torch.save(goal_latent, task_dir / "goal.pt")
 
         meta = build_meta(
             task_id=task_id,
@@ -489,7 +498,7 @@ def main() -> None:
     print(f"DType:  {dtype}")
     print(f"Model:  {args.model_name}")
     print(f"Videos: {len(selected)} selected")
-    print(f"Output: {output_dir}")
+    print(f"Output: {output_dir.resolve()}")
 
     extractor = VJEPAExtractor(
         model_name=args.model_name,
