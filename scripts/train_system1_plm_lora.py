@@ -728,7 +728,7 @@ def evaluate(model, dataloader, device, latent_head=None,
                 ]  # (N_steps, H)
                 z_text = latent_head(h_steps)
                 z_video = nn.functional.normalize(
-                    latent_vjepa.to(device).float(), dim=-1
+                    latent_vjepa.to(device, dtype=z_text.dtype), dim=-1
                 )
                 l_latent = info_nce_loss(z_text, z_video, temperature)
                 total_latent_loss += l_latent.item()
@@ -839,7 +839,7 @@ def train(args):
         latent_head = LatentProjectionHead(
             llm_hidden_dim=hidden_dim,
             vjepa_dim=args.vjepa_dim,
-        ).to(device)
+        ).to(device, dtype=torch.bfloat16)
         head_params = sum(p.numel() for p in latent_head.parameters())
         print(f"\n  Latent Projection Head:")
         print(f"    LLM hidden dim:  {hidden_dim}")
@@ -997,7 +997,7 @@ def train(args):
 
                 # Normalize V-JEPA latents
                 z_video = nn.functional.normalize(
-                    latent_vjepa.to(device).float(), dim=-1
+                    latent_vjepa.to(device, dtype=z_text.dtype), dim=-1
                 )  # (N_steps, D_vjepa)
 
                 # Symmetric InfoNCE
