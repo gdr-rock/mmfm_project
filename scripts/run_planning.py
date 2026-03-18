@@ -286,14 +286,15 @@ def generate_k_plans(
     prompt_len = enc.input_ids.shape[1]
 
     plans = []
+    do_sample = temperature > 0
     for _ in range(K):
         with torch.no_grad():
             gen_ids = model.generate(
                 **enc,
                 max_new_tokens=max_target_len,
-                do_sample=True,
-                temperature=temperature,
-                top_p=top_p,
+                do_sample=do_sample,
+                temperature=temperature if do_sample else None,
+                top_p=top_p if do_sample else None,
                 num_beams=1,
             )
 
@@ -549,94 +550,101 @@ def run_planning(args):
     results = []
     t0 = time.time()
 
-    for i, sample in enumerate(test_samples):
-        input_text = sample["input_text"]
-        gold_output = sample["output_text"]
-        meta = sample.get("meta", {})
-
-        # Extract goal and prefix from input_text
-        goal = ""
-        prefix_steps = []
-        for line in input_text.split("\n"):
-            if line.startswith("Goal:"):
-                goal = line[len("Goal:"):].strip()
-            elif line.strip() and line.strip()[0].isdigit() and ")" in line:
-                # Parse "  1) action | state_change"
-                step_text = line.strip().split(")", 1)[1].strip()
-                prefix_steps.append(step_text)
-
-        # Generate K plans
-        plans = generate_k_plans(
-            s1_model, s1_tokenizer, input_text,
-            K=args.K, temperature=args.temperature, top_p=args.top_p,
-            max_target_len=256, device=device,
-            gen_mode=s1_gen_mode,
-        )
-
-        # Score with critic
-        critic_scores = score_plans_critic(
-            critic_model, critic_tokenizer, format_traj_fn,
-            goal, prefix_steps, plans, device,
-        )
-
-        # Score with energy (if available)
-        energy_scores = [0.0] * len(plans)
-        if use_learned_energy:
-            energy_scores = score_plans_learned_energy(
-                goal_latent_model,
-                goal_latent_tokenizer,
-                goal_latent_format,
-                goal,
-                prefix_steps,
-                plans,
-                device,
-            )
-        elif use_latent_lookup_energy:
-            energy_scores = score_plans_energy(
-                args.latent_dir,
-                meta.get("video_id", ""),
-                meta.get("task_id", ""),
-                plans,
-            )
-
-        # Combined score
-        combined_scores = [
-            args.alpha * c + args.beta * e
-            for c, e in zip(critic_scores, energy_scores)
-        ]
-
-        # Select best plan (lowest score)
-        best_idx = int(np.argmin(combined_scores))
-
-        result = {
-            "sample_idx": i,
-            "meta": meta,
-            "goal": goal,
-            "gold_output": gold_output,
-            "K": args.K,
-            "best_plan_idx": best_idx,
-            "best_plan": plans[best_idx],
-            "best_score": combined_scores[best_idx],
-            "all_plans": [
-                {
-                    "plan": p,
-                    "critic_score": cs,
-                    "energy_score": es,
-                    "combined_score": comb,
-                }
-                for p, cs, es, comb in zip(plans, critic_scores, energy_scores, combined_scores)
-            ],
-        }
-        results.append(result)
-
-        if (i + 1) % 50 == 0:
-            elapsed = time.time() - t0
-            print(f"  [{i+1}/{len(test_samples)}] {elapsed:.0f}s")
-
-    # Write results
+    # Stream results to disk so long COIN runs preserve partial progress.
     with open(out_path, "w") as f:
-        for r in results:
-            f.write(json.dumps(r, ensure_ascii=False) + "\n")
+        for i, sample in enumerate(test_samples):
+            input_text = sample["input_text"]
+            gold_output = sample["output_text"]
+            meta = sample.get("meta", {})
+
+            # Extract goal and prefix from input_text
+            goal = ""
+            prefix_steps = []
+            for line in input_text.split("\n"):
+                if line.startswith("Goal:"):
+                    goal = line[len("Goal:"):].strip()
+                elif line.strip() and line.strip()[0].isdigit() and ")" in line:
+                    # Parse "  1) action | state_change"
+                    step_text = line.strip().split(")", 1)[1].strip()
+                    prefix_steps.append(step_text)
+
+            # Generate K plans
+            plans = generate_k_plans(
+                s1_model, s1_tokenizer, input_text,
+                K=args.K, temperature=args.temperature, top_p=args.top_p,
+                max_target_len=256, device=device,
+                gen_mode=s1_gen_mode,
+            )
+
+            # Score with critic
+            critic_scores = score_plans_critic(
+                critic_model, critic_tokenizer, format_traj_fn,
+                goal, prefix_steps, plans, device,
+            )
+
+            # Score with energy (if available)
+            energy_scores = [0.0] * len(plans)
+            if use_learned_energy:
+                energy_scores = score_plans_learned_energy(
+                    goal_latent_model,
+                    goal_latent_tokenizer,
+                    goal_latent_format,
+                    goal,
+                    prefix_steps,
+                    plans,
+                    device,
+                )
+            elif use_latent_lookup_energy:
+                energy_scores = score_plans_energy(
+                    args.latent_dir,
+                    meta.get("video_id", ""),
+                    meta.get("task_id", ""),
+                    plans,
+                )
+
+            # Combined score
+            combined_scores = [
+                args.alpha * c + args.beta * e
+                for c, e in zip(critic_scores, energy_scores)
+            ]
+
+            # Select best plan (lowest score)
+            best_idx = int(np.argmin(combined_scores))
+
+            result = {
+                "sample_idx": i,
+                "meta": meta,
+                "goal": goal,
+                "gold_output": gold_output,
+                "K": args.K,
+                "best_plan_idx": best_idx,
+                "best_plan": plans[best_idx],
+                "best_score": combined_scores[best_idx],
+                "all_plans": [
+                    {
+                        "plan": p,
+                        "critic_score": cs,
+                        "energy_score": es,
+                        "combined_score": comb,
+                    }
+                    for p, cs, es, comb in zip(plans, critic_scores, energy_scores, combined_scores)
+                ],
+            }
+            results.append(result)
+            f.write(json.dumps(result, ensure_ascii=False) + "\n")
+            f.flush()
+
+            if (i + 1) % 25 == 0:
+                elapsed = time.time() - t0
+                done = i + 1
+                sec_per_sample = elapsed / done
+                eta_seconds = sec_per_sample * (len(test_samples) - done)
+                print(
+                    f"  [{done}/{len(test_samples)}] "
+                    f"elapsed={elapsed:.0f}s "
+                    f"({sec_per_sample:.2f}s/sample) "
+                    f"eta={eta_seconds/3600:.2f}h"
+                )
 
     elapsed = time.time() - t0
     n_valid = sum(1 for r in results if r["best_plan"]["valid"])
