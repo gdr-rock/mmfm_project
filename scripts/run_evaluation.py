@@ -125,23 +125,39 @@ def _load_system1_model(model_path, device, model_type="t5", base_model_name=Non
         if base_model_name is None:
             base_model_name = "facebook/Perception-LM-1B"
 
-        tokenizer = AutoTokenizer.from_pretrained(base_model_name, use_fast=True)
+        is_adapter = os.path.isdir(model_path) and os.path.exists(
+            os.path.join(model_path, "adapter_config.json")
+        )
+        tokenizer_source = model_path if os.path.isdir(model_path) else base_model_name
+        tokenizer = AutoTokenizer.from_pretrained(tokenizer_source, use_fast=True)
         if tokenizer.pad_token is None:
             tokenizer.pad_token = tokenizer.eos_token
             tokenizer.pad_token_id = tokenizer.eos_token_id
 
         # Try VLM class, fallback to causal LM
-        try:
-            from transformers import AutoModelForImageTextToText
-            base = AutoModelForImageTextToText.from_pretrained(
-                base_model_name, torch_dtype=torch.bfloat16, trust_remote_code=True,
-            )
-        except Exception:
-            base = AutoModelForCausalLM.from_pretrained(
-                base_model_name, torch_dtype=torch.bfloat16, trust_remote_code=True,
-            )
+        if is_adapter:
+            try:
+                from transformers import AutoModelForImageTextToText
+                base = AutoModelForImageTextToText.from_pretrained(
+                    base_model_name, torch_dtype=torch.bfloat16, trust_remote_code=True,
+                )
+            except Exception:
+                base = AutoModelForCausalLM.from_pretrained(
+                    base_model_name, torch_dtype=torch.bfloat16, trust_remote_code=True,
+                )
 
-        model = PeftModel.from_pretrained(base, model_path)
+            model = PeftModel.from_pretrained(base, model_path)
+        else:
+            try:
+                from transformers import AutoModelForImageTextToText
+                model = AutoModelForImageTextToText.from_pretrained(
+                    model_path, torch_dtype=torch.bfloat16, trust_remote_code=True,
+                )
+            except Exception:
+                model = AutoModelForCausalLM.from_pretrained(
+                    model_path, torch_dtype=torch.bfloat16, trust_remote_code=True,
+                )
+
         model.to(device)
         model.eval()
         return model, tokenizer, "causal"

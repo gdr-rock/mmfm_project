@@ -261,7 +261,14 @@ def load_system1(model_path: str, device, model_type: str = "t5",
 
         if base_model_name is None:
             base_model_name = "facebook/Perception-LM-1B"
-        print(f"Loading System-1 (PLM+LoRA): base={base_model_name}, adapter={model_path}")
+
+        is_adapter = os.path.isdir(model_path) and os.path.exists(
+            os.path.join(model_path, "adapter_config.json")
+        )
+        if is_adapter:
+            print(f"Loading System-1 (PLM+LoRA): base={base_model_name}, adapter={model_path}")
+        else:
+            print(f"Loading System-1 (PLM full checkpoint): {model_path}")
 
         # Prefer adapter tokenizer if saved during training.
         tok_source = model_path if os.path.isdir(model_path) else base_model_name
@@ -269,24 +276,36 @@ def load_system1(model_path: str, device, model_type: str = "t5",
         if tokenizer.pad_token is None:
             tokenizer.pad_token = tokenizer.eos_token
 
-        try:
-            from transformers import AutoModelForImageTextToText
-            base = AutoModelForImageTextToText.from_pretrained(
-                base_model_name, dtype=torch.bfloat16, trust_remote_code=True
-            )
-        except Exception:
-            base = AutoModelForCausalLM.from_pretrained(
-                base_model_name, dtype=torch.bfloat16, trust_remote_code=True
-            )
-
-        if hasattr(base, "tie_weights"):
+        if is_adapter:
             try:
-                base.tie_weights()
-                print("  Tied input/output embeddings")
-            except Exception as e:
-                print(f"  Warning: could not tie weights ({e})")
+                from transformers import AutoModelForImageTextToText
+                base = AutoModelForImageTextToText.from_pretrained(
+                    base_model_name, dtype=torch.bfloat16, trust_remote_code=True
+                )
+            except Exception:
+                base = AutoModelForCausalLM.from_pretrained(
+                    base_model_name, dtype=torch.bfloat16, trust_remote_code=True
+                )
 
-        model = PeftModel.from_pretrained(base, model_path)
+            if hasattr(base, "tie_weights"):
+                try:
+                    base.tie_weights()
+                    print("  Tied input/output embeddings")
+                except Exception as e:
+                    print(f"  Warning: could not tie weights ({e})")
+
+            model = PeftModel.from_pretrained(base, model_path)
+        else:
+            try:
+                from transformers import AutoModelForImageTextToText
+                model = AutoModelForImageTextToText.from_pretrained(
+                    model_path, dtype=torch.bfloat16, trust_remote_code=True
+                )
+            except Exception:
+                model = AutoModelForCausalLM.from_pretrained(
+                    model_path, dtype=torch.bfloat16, trust_remote_code=True
+                )
+
         model.to(device).eval()
         return model, tokenizer, "causal"
 
