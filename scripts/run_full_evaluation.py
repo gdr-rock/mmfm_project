@@ -333,6 +333,7 @@ def _best_plan_with_critic_goal(
 
 def evaluate_system_config(samples, cfg_name: str, cfg, args, device):
     rows = []
+    t0 = time.time()
 
     if cfg_name == "system1_no_jepa":
         s1_model, s1_tok, gen_mode = ri.load_system1(
@@ -450,8 +451,17 @@ def evaluate_system_config(samples, cfg_name: str, cfg, args, device):
             }
         )
 
-        if (idx + 1) % 25 == 0:
-            print(f"  [{cfg_name}] processed {idx+1}/{len(samples)} samples")
+        done = idx + 1
+        if done == 1 or done % 25 == 0:
+            elapsed = time.time() - t0
+            sec_per_sample = elapsed / done
+            eta_seconds = sec_per_sample * (len(samples) - done)
+            print(
+                f"  [{cfg_name}] processed {done}/{len(samples)} "
+                f"elapsed={elapsed:.0f}s "
+                f"({sec_per_sample:.2f}s/sample) "
+                f"eta={eta_seconds/3600:.2f}h"
+            )
 
     del s1_model, s1_tok
     if torch.cuda.is_available():

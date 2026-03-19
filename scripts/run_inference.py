@@ -652,6 +652,9 @@ def generate_plan(model, tokenizer, prompt: str, device,
         prompt, max_length=512, truncation=True, return_tensors="pt"
     ).to(device)
     prompt_len = enc.input_ids.shape[1]
+    pad_token_id = tokenizer.pad_token_id
+    if pad_token_id is None:
+        pad_token_id = tokenizer.eos_token_id
 
     do_sample = temperature > 0
     with torch.no_grad():
@@ -662,6 +665,7 @@ def generate_plan(model, tokenizer, prompt: str, device,
             temperature=temperature if do_sample else None,
             top_p=top_p if do_sample else None,
             num_beams=1,
+            pad_token_id=pad_token_id,
         )
 
     if gen_mode == "causal":
