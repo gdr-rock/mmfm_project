@@ -172,6 +172,9 @@ def parse_plan_json(text: str) -> list:
         except Exception:
             return s
 
+    def _is_end_step(action: str, state_change: str) -> bool:
+        return action.strip() == "<END>" and state_change.strip() == "<END>"
+
     def _steps_from_list(step_list):
         if not isinstance(step_list, list):
             return []
@@ -182,6 +185,8 @@ def parse_plan_json(text: str) -> list:
             action = s.get("action")
             state_change = s.get("state_change")
             if isinstance(action, str) and isinstance(state_change, str):
+                if _is_end_step(action, state_change):
+                    break
                 out.append(f"{action.strip()} | {state_change.strip()}")
         return out
 
@@ -230,10 +235,14 @@ def parse_plan_json(text: str) -> list:
     ]
     n = min(len(action_vals), len(state_vals))
     if n > 0:
-        return [
-            f"{action_vals[i].strip()} | {state_vals[i].strip()}"
-            for i in range(n)
-        ]
+        recovered = []
+        for i in range(n):
+            action = action_vals[i].strip()
+            state_change = state_vals[i].strip()
+            if _is_end_step(action, state_change):
+                break
+            recovered.append(f"{action} | {state_change}")
+        return recovered
 
     return []
 
@@ -242,10 +251,50 @@ def parse_plan_json(text: str) -> list:
 # Model loaders
 # ─────────────────────────────────────────────────────────────────
 
+def _resolve_existing_local_path(path_str: str):
+    """Resolve an existing local path against cwd or the repo root."""
+    if not path_str:
+        return path_str
+
+    raw = Path(os.path.expandvars(os.path.expanduser(path_str)))
+    repo_root = Path(__file__).resolve().parent.parent
+    candidates = [raw] if raw.is_absolute() else [Path.cwd() / raw, repo_root / raw]
+
+    for candidate in candidates:
+        if candidate.exists():
+            return str(candidate.resolve())
+        # System-1 PLM LoRA training writes best_adapter/, not best_model/.
+        if candidate.name == "best_model":
+            alt = candidate.with_name("best_adapter")
+            if alt.exists():
+                print(f"  Using adapter directory instead of missing checkpoint: {alt}")
+                return str(alt.resolve())
+
+    return path_str
+
+
+def _has_tokenizer_files(path_str: str) -> bool:
+    if not path_str or not os.path.isdir(path_str):
+        return False
+
+    tokenizer_files = (
+        "tokenizer.json",
+        "tokenizer_config.json",
+        "special_tokens_map.json",
+        "spiece.model",
+        "sentencepiece.bpe.model",
+        "vocab.json",
+        "merges.txt",
+    )
+    return any(os.path.exists(os.path.join(path_str, name)) for name in tokenizer_files)
+
+
 def load_system1(model_path: str, device, model_type: str = "t5",
                  base_model_name: str = None):
     """Load System-1 model. Returns (model, tokenizer, gen_mode)."""
     from transformers import AutoTokenizer
+
+    model_path = _resolve_existing_local_path(model_path)
 
     if model_type == "t5":
         from transformers import T5ForConditionalGeneration
@@ -270,8 +319,8 @@ def load_system1(model_path: str, device, model_type: str = "t5",
         else:
             print(f"Loading System-1 (PLM full checkpoint): {model_path}")
 
-        # Prefer adapter tokenizer if saved during training.
-        tok_source = model_path if os.path.isdir(model_path) else base_model_name
+        # Full checkpoints often omit tokenizer files; fall back to the base PLM tokenizer.
+        tok_source = model_path if _has_tokenizer_files(model_path) else base_model_name
         tokenizer = AutoTokenizer.from_pretrained(tok_source, use_fast=True)
         if tokenizer.pad_token is None:
             tokenizer.pad_token = tokenizer.eos_token

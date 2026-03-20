@@ -178,7 +178,7 @@ def step_to_state_change(step_text: str) -> str:
             return _VERB_TEMPLATES[verb](obj)
 
     # Fallback: generic passive voice
-    return f"The state changes: {step} is performed."
+    return f"{step.capitalize()} is now done." if step else "The step is now done."
 
 
 # ---------------------------------------------------------------------------

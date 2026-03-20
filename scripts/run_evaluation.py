@@ -97,7 +97,16 @@ def extract_step_strings(output_text: str) -> list:
     try:
         parsed = json.loads(output_text)
         steps = parsed.get("next_steps", [])
-        return [f"{s['action']} | {s['state_change']}" for s in steps]
+        out = []
+        for s in steps:
+            action = s.get("action")
+            state_change = s.get("state_change")
+            if not isinstance(action, str) or not isinstance(state_change, str):
+                continue
+            if action.strip() == "<END>" and state_change.strip() == "<END>":
+                break
+            out.append(f"{action} | {state_change}")
+        return out
     except (json.JSONDecodeError, KeyError, TypeError):
         return []
 

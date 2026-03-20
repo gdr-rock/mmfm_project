@@ -329,9 +329,15 @@ def generate_k_plans(
         try:
             parsed = json.loads(text)
             steps = parsed.get("next_steps", [])
-            step_strs = [
-                f"{s['action']} | {s['state_change']}" for s in steps
-            ]
+            step_strs = []
+            for s in steps:
+                action = s.get("action")
+                state_change = s.get("state_change")
+                if not isinstance(action, str) or not isinstance(state_change, str):
+                    continue
+                if action.strip() == "<END>" and state_change.strip() == "<END>":
+                    break
+                step_strs.append(f"{action} | {state_change}")
             plans.append({
                 "raw_text": text,
                 "steps": step_strs,
