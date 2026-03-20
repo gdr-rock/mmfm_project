@@ -375,6 +375,146 @@ python3 scripts/run_evaluation.py \
 - **mAcc** (Mean Accuracy) — step-level accuracy at each position
 - **mIoU** (Mean IoU) — set overlap between predicted and gold steps
 
+### 7b. Clean Full-Plan Evaluation (No Prefix)
+
+This is a separate evaluation mode for the question:
+
+- input = `goal + interpretation`, or `goal + initial frames`
+- model generates a **full plan**
+- critic and optional goal-latent model score each candidate plan
+- evaluation is done on the **full generated plan**, not next-`k` continuation
+
+Build the clean test files:
+
+```bash
+python3 scripts/build_coin_full_plan_test_data.py
+```
+
+This creates:
+
+- `data/coin/coin_full_plan_task_test.jsonl`
+  one row per COIN task, `goal + interpretation -> canonical full plan`
+- `data/coin/coin_full_plan_video_test.jsonl`
+  one row per COIN test video, `goal + interpretation/frames -> full observed plan`
+
+Run text-only full-plan evaluation on 5 rows:
+
+```bash
+python3 scripts/evaluate_full_plans_clean.py \
+    --test_data data/coin/coin_full_plan_task_test.jsonl \
+    --input_mode text \
+    --system1_model checkpoints/system1_plm_lora/best_adapter \
+    --system1_type plm \
+    --plm_base_model facebook/Perception-LM-1B \
+    --critic_model checkpoints/critic/best_model.pt \
+    --goal_latent_model checkpoints/goal_latent/best_model.pt \
+    --K 5 \
+    --plan_generation_mode rollout \
+    --rollout_chunk_size 3 \
+    --max_plan_steps 12 \
+    --temperature 0.8 \
+    --top_p 0.9 \
+    --max_samples 5 \
+    --output_dir outputs/full_plan_eval_clean
+```
+
+Run frame-based full-plan evaluation:
+
+```bash
+python3 scripts/evaluate_full_plans_clean.py \
+    --test_data data/coin/coin_full_plan_video_test.jsonl \
+    --input_mode frames \
+    --frames_root path/to/initial_frames \
+    --system1_model checkpoints/system1_plm_lora/best_adapter \
+    --system1_type plm \
+    --plm_base_model facebook/Perception-LM-1B \
+    --critic_model checkpoints/critic/best_model.pt \
+    --goal_latent_model checkpoints/goal_latent/best_model.pt \
+    --K 5 \
+    --plan_generation_mode rollout \
+    --rollout_chunk_size 3 \
+    --max_plan_steps 12 \
+    --temperature 0.8 \
+    --top_p 0.9 \
+    --max_samples 5 \
+    --output_dir outputs/full_plan_eval_frames
+```
+
+The evaluator saves:
+
+- `summary.json`
+- `summary.csv`
+- `per_sample.csv`
+- `per_sample.jsonl`
+- `summary_metrics.png`
+- `length_scatter.png`
+- `combined_score_hist.png`
+
+#### What The Printed Values Mean
+
+Example console output:
+
+```text
+[1/5] valid=5/5 exact=1.000 ord=1.000 iou=1.000
+```
+
+- `valid=5/5`
+  all `K=5` generated candidates were valid JSON plans
+- `exact=1.000`
+  the selected best plan matched the gold step list exactly after normalization
+- `ord=1.000`
+  the selected plan preserved the full gold ordering
+- `iou=1.000`
+  predicted and gold step sets were identical
+
+Summary fields:
+
+- `samples`
+  number of evaluated rows
+- `valid_json_rate`
+  fraction of samples where at least one valid plan was generated
+- `exact_match`
+  mean exact-match score across samples
+- `ordered_ratio`
+  mean longest-common-subsequence ratio against the gold plan
+- `step_iou`
+  mean set overlap between predicted and gold steps
+- `step_accuracy`
+  mean positional step accuracy
+- `avg_length_delta`
+  average `predicted_length - gold_length`
+- `avg_pred_len`
+  average predicted plan length
+- `avg_gold_len`
+  average gold plan length
+- `avg_critic_score`
+  mean critic cost of the selected plans; lower is better, negative values are fine
+- `avg_goal_score`
+  mean goal-latent energy of the selected plans; lower is better
+- `avg_combined_score`
+  mean reranking score used to select the best candidate; lower is better
+
+#### Interpreting Perfect Scores
+
+If you see:
+
+```text
+exact_match: 1.0
+ordered_ratio: 1.0
+step_iou: 1.0
+step_accuracy: 1.0
+```
+
+that means the evaluator selected a plan that exactly matches the gold plan for every evaluated sample.
+
+This is much easier to achieve on `coin_full_plan_task_test.jsonl` than on the original prefix-based evaluation because:
+
+- the task-level file uses clean canonical plans
+- the input includes a rule-based interpretation
+- there is no partial-prefix ambiguity
+
+For a more realistic test, prefer `coin_full_plan_video_test.jsonl`.
+
 ### 8. Standalone Inference (`run_inference.py`)
 
 ```bash
