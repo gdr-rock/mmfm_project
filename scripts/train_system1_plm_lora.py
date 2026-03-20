@@ -96,12 +96,13 @@ import json
 import os
 import random
 import time
+import math
 from pathlib import Path
 
 import numpy as np
 import torch
 import torch.nn as nn
-from torch.utils.data import DataLoader, Dataset
+from torch.utils.data import DataLoader, Dataset, Sampler
 
 # ---------------------------------------------------------------------------
 # Lazy imports — script starts fast, heavy imports on demand
@@ -284,8 +285,16 @@ class CausalLMDataset(Dataset):
         self.vjepa_dim = vjepa_dim
         self.samples = []
         self.has_latents = latent_dir is not None and os.path.isdir(latent_dir or "")
+        self.latent_indices = []
+        self.nonlatent_indices = []
+        self.latent_stats = {
+            "found": 0,
+            "missing_segment": 0,
+            "bad_dim": 0,
+            "bad_dtype": 0,
+            "non_finite": 0,
+        }
 
-        n_with_latents = 0
         n_total = 0
         with open(jsonl_path) as f:
             for line in f:
@@ -305,14 +314,26 @@ class CausalLMDataset(Dataset):
                     latents = self._load_step_latents(meta)
                     if latents is not None:
                         entry["vjepa_latents"] = latents  # list of (D,) tensors
-                        n_with_latents += 1
+                        self.latent_stats["found"] += 1
 
                 self.samples.append(entry)
+                if "vjepa_latents" in entry:
+                    self.latent_indices.append(len(self.samples) - 1)
+                else:
+                    self.nonlatent_indices.append(len(self.samples) - 1)
                 n_total += 1
 
         print(f"  Loaded {len(self.samples)} samples from {jsonl_path}")
         if self.has_latents:
-            print(f"  V-JEPA latents found for {n_with_latents}/{n_total} samples")
+            print(
+                f"  V-JEPA latents found for {self.latent_stats['found']}/{n_total} samples"
+            )
+            skipped = {
+                k: v for k, v in self.latent_stats.items() if k != "found" and v > 0
+            }
+            if skipped:
+                skipped_str = ", ".join(f"{k}={v}" for k, v in sorted(skipped.items()))
+                print(f"  Skipped latent rows: {skipped_str}")
 
     def _load_step_latents(self, meta: dict):
         """
@@ -339,16 +360,26 @@ class CausalLMDataset(Dataset):
                 f"segment_{seg_pos:03d}.pt"
             )
             if not os.path.exists(pt_path):
+                self.latent_stats["missing_segment"] += 1
                 return None  # Missing any segment → skip latent for this sample
 
             # Load and mean-pool: (T_tokens, D) → (D,)
             seg_latent = torch.load(pt_path, map_location="cpu")
+            if not torch.is_floating_point(seg_latent):
+                self.latent_stats["bad_dtype"] += 1
+                seg_latent = seg_latent.float()
             if seg_latent.dim() == 2:
                 seg_latent = seg_latent.mean(dim=0)  # (D,)
             elif seg_latent.dim() == 1:
                 pass  # Already pooled
             else:
                 seg_latent = seg_latent.reshape(-1, seg_latent.shape[-1]).mean(dim=0)
+            if seg_latent.shape[-1] != self.vjepa_dim:
+                self.latent_stats["bad_dim"] += 1
+                return None
+            if not torch.isfinite(seg_latent).all():
+                self.latent_stats["non_finite"] += 1
+                return None
             latents.append(seg_latent)
 
         return latents  # list of k tensors, each (D,)
@@ -464,6 +495,123 @@ class CausalLMDataset(Dataset):
                 positions.append(token_pos)
 
         return positions
+
+
+class OrderedIndexSampler(Sampler[int]):
+    """Sampler that yields a precomputed index order."""
+
+    def __init__(self, indices):
+        self.indices = list(indices)
+
+    def __iter__(self):
+        return iter(self.indices)
+
+    def __len__(self):
+        return len(self.indices)
+
+
+def _epoch_phase(epoch: int, epochs: int, curriculum_text_fraction: float) -> str:
+    if curriculum_text_fraction >= 1.0 or epochs <= 1:
+        return "text_uniform"
+    phase1_epochs = int(math.ceil(epochs * curriculum_text_fraction))
+    phase1_epochs = min(max(phase1_epochs, 0), epochs)
+    return "text_uniform" if epoch <= phase1_epochs else "latent_primary"
+
+
+def epoch_latent_weight(args, epoch: int) -> float:
+    phase = _epoch_phase(epoch, args.epochs, args.curriculum_text_fraction)
+    if phase == "latent_primary" and args.phase2_latent_weight is not None:
+        return args.phase2_latent_weight
+    return args.latent_weight
+
+
+def make_epoch_train_loader(dataset, batch_size: int, epoch: int, total_epochs: int,
+                            seed: int, curriculum_text_fraction: float,
+                            latent_primary_batch_ratio: float,
+                            collate_fn_impl, num_workers: int = 2,
+                            pin_memory: bool = True):
+    phase = _epoch_phase(epoch, total_epochs, curriculum_text_fraction)
+    total_batches = len(dataset) // batch_size
+    usable = total_batches * batch_size
+
+    if usable == 0:
+        sampler = OrderedIndexSampler([])
+        return DataLoader(
+            dataset,
+            batch_size=batch_size,
+            sampler=sampler,
+            shuffle=False,
+            collate_fn=collate_fn_impl,
+            num_workers=num_workers,
+            pin_memory=pin_memory,
+            drop_last=True,
+        ), {
+            "phase": phase,
+            "num_batches": 0,
+            "scheduled_samples": 0,
+            "scheduled_latent": 0,
+            "scheduled_nonlatent": 0,
+            "latent_fraction": 0.0,
+        }
+
+    rng = random.Random(seed + epoch)
+
+    if phase == "text_uniform" or not dataset.latent_indices or not dataset.nonlatent_indices:
+        all_indices = list(range(len(dataset)))
+        rng.shuffle(all_indices)
+        ordered_indices = all_indices[:usable]
+        latent_index_set = set(dataset.latent_indices)
+        scheduled_latent = sum(1 for idx in ordered_indices if idx in latent_index_set)
+    else:
+        latent_ratio = min(max(latent_primary_batch_ratio, 0.0), 1.0)
+        latent_per_batch = int(round(batch_size * latent_ratio))
+        latent_per_batch = min(max(latent_per_batch, 1), batch_size - 1)
+        nonlatent_per_batch = batch_size - latent_per_batch
+
+        latent_pool = list(dataset.latent_indices)
+        nonlatent_pool = list(dataset.nonlatent_indices)
+        ordered_indices = []
+        scheduled_latent = 0
+
+        def draw(pool, source, count):
+            picked = []
+            while len(picked) < count:
+                if not pool:
+                    pool.extend(source)
+                    rng.shuffle(pool)
+                picked.append(pool.pop())
+            return picked
+
+        rng.shuffle(latent_pool)
+        rng.shuffle(nonlatent_pool)
+        for _ in range(total_batches):
+            batch_indices = draw(latent_pool, dataset.latent_indices, latent_per_batch)
+            batch_indices.extend(draw(nonlatent_pool, dataset.nonlatent_indices, nonlatent_per_batch))
+            rng.shuffle(batch_indices)
+            ordered_indices.extend(batch_indices)
+            scheduled_latent += latent_per_batch
+
+    scheduled_nonlatent = len(ordered_indices) - scheduled_latent
+    sampler = OrderedIndexSampler(ordered_indices)
+    loader = DataLoader(
+        dataset,
+        batch_size=batch_size,
+        sampler=sampler,
+        shuffle=False,
+        collate_fn=collate_fn_impl,
+        num_workers=num_workers,
+        pin_memory=pin_memory,
+        drop_last=True,
+    )
+    stats = {
+        "phase": phase,
+        "num_batches": total_batches,
+        "scheduled_samples": len(ordered_indices),
+        "scheduled_latent": scheduled_latent,
+        "scheduled_nonlatent": scheduled_nonlatent,
+        "latent_fraction": scheduled_latent / max(len(ordered_indices), 1),
+    }
+    return loader, stats
 
 
 def collate_fn(batch, pad_token_id: int):
@@ -873,14 +1021,17 @@ def train(args):
     from functools import partial
     _collate = partial(collate_fn, pad_token_id=pad_id)
 
-    train_loader = DataLoader(
+    train_loader, train_schedule = make_epoch_train_loader(
         train_ds,
         batch_size=args.batch_size,
-        shuffle=True,
-        collate_fn=_collate,
-        num_workers=2,
+        epoch=1,
+        total_epochs=args.epochs,
+        seed=args.seed,
+        curriculum_text_fraction=args.curriculum_text_fraction,
+        latent_primary_batch_ratio=args.latent_primary_batch_ratio,
+        collate_fn_impl=_collate,
+        num_workers=args.num_workers,
         pin_memory=True,
-        drop_last=True,
     )
 
     val_loader = None
@@ -890,7 +1041,7 @@ def train(args):
             batch_size=args.batch_size,
             shuffle=False,
             collate_fn=_collate,
-            num_workers=2,
+            num_workers=args.num_workers,
             pin_memory=True,
         )
 
@@ -910,7 +1061,7 @@ def train(args):
 
     # Steps accounting for gradient accumulation
     effective_batch = args.batch_size * args.gradient_accumulation_steps
-    steps_per_epoch = len(train_loader) // args.gradient_accumulation_steps
+    steps_per_epoch = max(len(train_loader) // args.gradient_accumulation_steps, 1)
     total_steps = steps_per_epoch * args.epochs
     warmup_steps = int(0.06 * total_steps)
 
@@ -943,12 +1094,29 @@ def train(args):
     print(f"  Total steps:   {total_steps}")
     print(f"  Warmup:        {warmup_steps}")
     print(f"  Max seq len:   {args.max_seq_len}")
+    print(f"  Workers:       {args.num_workers}")
+    print(f"  Latent rows:   {len(train_ds.latent_indices)}/{len(train_ds.samples)}")
+    print(f"  Curriculum:    {args.curriculum_text_fraction:.0%} uniform / "
+          f"{max(0.0, 1.0 - args.curriculum_text_fraction):.0%} latent-primary")
     print(f"  Output:        {out_dir}")
     print(f"{'='*60}\n")
 
     global_step = 0
 
     for epoch in range(1, args.epochs + 1):
+        train_loader, train_schedule = make_epoch_train_loader(
+            train_ds,
+            batch_size=args.batch_size,
+            epoch=epoch,
+            total_epochs=args.epochs,
+            seed=args.seed,
+            curriculum_text_fraction=args.curriculum_text_fraction,
+            latent_primary_batch_ratio=args.latent_primary_batch_ratio,
+            collate_fn_impl=_collate,
+            num_workers=args.num_workers,
+            pin_memory=True,
+        )
+        current_latent_weight = epoch_latent_weight(args, epoch)
         model.train()
         if latent_head is not None:
             latent_head.train()
@@ -1008,7 +1176,7 @@ def train(args):
                 n_latent_steps += 1
 
             # Combined loss: L = L_text + α · L_latent
-            total_loss = text_loss + args.latent_weight * latent_loss
+            total_loss = text_loss + current_latent_weight * latent_loss
             scaled_loss = total_loss / args.gradient_accumulation_steps
             scaled_loss.backward()
 
@@ -1032,9 +1200,14 @@ def train(args):
         entry = {
             "epoch": epoch,
             "global_step": global_step,
+            "train_phase": train_schedule["phase"],
+            "scheduled_latent_fraction": round(train_schedule["latent_fraction"], 5),
+            "scheduled_latent_rows": train_schedule["scheduled_latent"],
+            "scheduled_nonlatent_rows": train_schedule["scheduled_nonlatent"],
+            "latent_weight": round(current_latent_weight, 5),
             "train_text_loss": round(avg_text_loss, 5),
             "train_latent_loss": round(avg_latent_loss, 5),
-            "train_loss": round(avg_text_loss + args.latent_weight * avg_latent_loss, 5),
+            "train_loss": round(avg_text_loss + current_latent_weight * avg_latent_loss, 5),
             "lr": optimizer.param_groups[0]["lr"],
             "time_sec": round(elapsed, 1),
         }
@@ -1044,7 +1217,7 @@ def train(args):
             val_metrics = evaluate(
                 model, val_loader, device,
                 latent_head=latent_head,
-                latent_weight=args.latent_weight,
+                latent_weight=current_latent_weight,
                 temperature=args.temperature,
             )
             entry.update({
@@ -1110,8 +1283,11 @@ def train(args):
 
         print(
             f"Epoch {epoch:3d}/{args.epochs}"
+            f"  phase={train_schedule['phase']}"
             f"  L_text={avg_text_loss:.4f}"
             f"{latent_str}"
+            f"  lat_w={current_latent_weight:.3f}"
+            f"  lat_rows={train_schedule['scheduled_latent_fraction']:.0%}"
             f"{val_str}{gen_str}"
             f"  lr={optimizer.param_groups[0]['lr']:.2e}"
             f"  [{elapsed:.0f}s]"
@@ -1200,6 +1376,17 @@ def main():
     parser.add_argument("--max_grad_norm", type=float, default=1.0)
     parser.add_argument("--max_seq_len", type=int, default=768,
                         help="Max sequence length (prompt + completion)")
+    parser.add_argument("--num_workers", type=int, default=2,
+                        help="DataLoader workers")
+    parser.add_argument("--curriculum_text_fraction", type=float, default=1.0,
+                        help="Fraction of epochs to keep uniform text-style "
+                             "sampling before switching to latent-primary batches")
+    parser.add_argument("--latent_primary_batch_ratio", type=float, default=0.75,
+                        help="In the latent-primary phase, fraction of each "
+                             "batch sampled from rows with valid V-JEPA latents")
+    parser.add_argument("--phase2_latent_weight", type=float, default=None,
+                        help="Optional latent weight to use only in the "
+                             "latent-primary phase")
 
     # Misc
     parser.add_argument("--seed", type=int, default=42)

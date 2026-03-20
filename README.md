@@ -515,6 +515,80 @@ This is much easier to achieve on `coin_full_plan_task_test.jsonl` than on the o
 
 For a more realistic test, prefer `coin_full_plan_video_test.jsonl`.
 
+### 7c. Task-Disjoint COIN + CrossTask System-1 Data (`data/coin_2`)
+
+The original COIN task-level file is useful, but it is still same-task evaluation.
+`data/coin_2` adds a harder setup:
+
+- COIN `test` is split by **task**, not by video
+- train mixes COIN with CrossTask for extra task/context coverage
+- train/val keep the useful **prefix** conditioning
+- test uses **goal-only** and **goal+interpretation** full-plan prompts
+- every target ends with `{"action":"<END>","state_change":"<END>"}` so the model can learn when to stop
+- the noisy fallback text `The state changes: ...` is removed from the new data
+
+Build it with:
+
+```bash
+python3 scripts/coin2_build_system1_dataset.py \
+    --output_dir data/coin_2
+```
+
+This creates:
+
+- `data/coin_2/coin2_system1_train.jsonl`
+- `data/coin_2/coin2_system1_val.jsonl`
+- `data/coin_2/coin2_system1_test_prompt_variants.jsonl`
+- `data/coin_2/coin2_system1_test_goal_only.jsonl`
+- `data/coin_2/coin2_system1_test_goal_plus_interpretation.jsonl`
+- `data/coin_2/coin2_task_split_manifest.csv`
+- `data/coin_2/coin2_dataset_report.json`
+
+Train System-1 on the new split:
+
+```bash
+python3 scripts/train_system1_plm_lora.py \
+    --train_data data/coin_2/coin2_system1_train.jsonl \
+    --val_data data/coin_2/coin2_system1_val.jsonl \
+    --output_dir checkpoints/system1_coin2_lora_grounded \
+    --model_name facebook/Perception-LM-1B \
+    --lora_r 16 \
+    --lora_alpha 32 \
+    --epochs 10 \
+    --batch_size 4 \
+    --gradient_accumulation_steps 8 \
+    --lr 1e-4 \
+    --max_seq_len 1024 \
+    --latent_dir /path/to/vjepa_latents \
+    --vjepa_dim 1408 \
+    --latent_weight 0.1 \
+    --curriculum_text_fraction 0.7 \
+    --latent_primary_batch_ratio 0.75 \
+    --phase2_latent_weight 0.2 \
+    --seed 42
+```
+
+The last three flags implement the simpler curriculum described above:
+
+- first `70%` of epochs use the normal shuffled training mix
+- final `30%` of epochs rebuild batches so they are latent-primary
+- latent tensors are validated before use: they are pooled to `(vjepa_dim,)`, cast to `float32`, and rows with missing segments, wrong width, or non-finite values are skipped for grounding
+
+Evaluate the held-out task split with direct full-plan generation:
+
+```bash
+python3 scripts/evaluate_full_plans_clean.py \
+    --test_data data/coin_2/coin2_system1_test_goal_only.jsonl \
+    --input_mode text \
+    --system1_model checkpoints/system1_coin2/best_model \
+    --critic_model checkpoints/critic/best_model.pt \
+    --goal_latent_model checkpoints/goal_latent/best_model.pt \
+    --plan_generation_mode direct \
+    --output_dir outputs/coin2_goal_only
+```
+
+Use `coin2_system1_test_goal_plus_interpretation.jsonl` for the interpretation-assisted variant.
+
 ### 8. Standalone Inference (`run_inference.py`)
 
 ```bash

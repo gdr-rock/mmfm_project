@@ -112,6 +112,8 @@ evaluate = helpers.evaluate
 generate_samples = helpers.generate_samples
 info_nce_loss = helpers.info_nce_loss
 _infer_hidden_dim = helpers._infer_hidden_dim
+make_epoch_train_loader = helpers.make_epoch_train_loader
+epoch_latent_weight = helpers.epoch_latent_weight
 
 
 def load_model_and_tokenizer(args):
@@ -299,14 +301,17 @@ def train(args):
 
     _collate = partial(collate_fn, pad_token_id=tokenizer.pad_token_id or 0)
 
-    train_loader = DataLoader(
+    train_loader, train_schedule = make_epoch_train_loader(
         train_ds,
         batch_size=args.batch_size,
-        shuffle=True,
-        collate_fn=_collate,
+        epoch=1,
+        total_epochs=args.epochs,
+        seed=args.seed,
+        curriculum_text_fraction=args.curriculum_text_fraction,
+        latent_primary_batch_ratio=args.latent_primary_batch_ratio,
+        collate_fn_impl=_collate,
         num_workers=args.num_workers,
         pin_memory=True,
-        drop_last=True,
     )
 
     val_loader = None
@@ -363,10 +368,27 @@ def train(args):
     print(f"  LR:             {args.lr}")
     print(f"  Warmup steps:   {warmup_steps}")
     print(f"  Max seq len:    {args.max_seq_len}")
+    print(f"  Workers:        {args.num_workers}")
+    print(f"  Latent rows:    {len(train_ds.latent_indices)}/{len(train_ds.samples)}")
+    print(f"  Curriculum:     {args.curriculum_text_fraction:.0%} uniform / "
+          f"{max(0.0, 1.0 - args.curriculum_text_fraction):.0%} latent-primary")
     print(f"  Output:         {out_dir}")
     print(f"{'='*60}\n")
 
     for epoch in range(1, args.epochs + 1):
+        train_loader, train_schedule = make_epoch_train_loader(
+            train_ds,
+            batch_size=args.batch_size,
+            epoch=epoch,
+            total_epochs=args.epochs,
+            seed=args.seed,
+            curriculum_text_fraction=args.curriculum_text_fraction,
+            latent_primary_batch_ratio=args.latent_primary_batch_ratio,
+            collate_fn_impl=_collate,
+            num_workers=args.num_workers,
+            pin_memory=True,
+        )
+        current_latent_weight = epoch_latent_weight(args, epoch)
         model.train()
         if latent_head is not None:
             latent_head.train()
@@ -408,7 +430,7 @@ def train(args):
                 epoch_latent_loss += latent_loss.item()
                 n_latent_steps += 1
 
-            total_loss = text_loss + args.latent_weight * latent_loss
+            total_loss = text_loss + current_latent_weight * latent_loss
             (total_loss / args.gradient_accumulation_steps).backward()
 
             epoch_text_loss += text_loss.item()
@@ -437,9 +459,14 @@ def train(args):
         entry = {
             "epoch": epoch,
             "global_step": global_step,
+            "train_phase": train_schedule["phase"],
+            "scheduled_latent_fraction": round(train_schedule["latent_fraction"], 5),
+            "scheduled_latent_rows": train_schedule["scheduled_latent"],
+            "scheduled_nonlatent_rows": train_schedule["scheduled_nonlatent"],
+            "latent_weight": round(current_latent_weight, 5),
             "train_text_loss": round(avg_text_loss, 5),
             "train_latent_loss": round(avg_latent_loss, 5),
-            "train_loss": round(avg_text_loss + args.latent_weight * avg_latent_loss, 5),
+            "train_loss": round(avg_text_loss + current_latent_weight * avg_latent_loss, 5),
             "lr": optimizer.param_groups[0]["lr"],
             "time_sec": round(elapsed, 1),
         }
@@ -450,7 +477,7 @@ def train(args):
                 val_loader,
                 device,
                 latent_head=latent_head,
-                latent_weight=args.latent_weight,
+                latent_weight=current_latent_weight,
                 temperature=args.temperature,
             )
             entry.update({
@@ -502,8 +529,11 @@ def train(args):
 
         print(
             f"Epoch {epoch:3d}/{args.epochs}"
+            f"  phase={train_schedule['phase']}"
             f"  L_text={avg_text_loss:.4f}"
             f"{latent_str}"
+            f"  lat_w={current_latent_weight:.3f}"
+            f"  lat_rows={train_schedule['scheduled_latent_fraction']:.0%}"
             f"{val_str}{gen_str}"
             f"  lr={optimizer.param_groups[0]['lr']:.2e}"
             f"  [{elapsed:.0f}s]"
@@ -575,6 +605,9 @@ def main():
     parser.add_argument("--max_grad_norm", type=float, default=1.0)
     parser.add_argument("--max_seq_len", type=int, default=768)
     parser.add_argument("--num_workers", type=int, default=2)
+    parser.add_argument("--curriculum_text_fraction", type=float, default=1.0)
+    parser.add_argument("--latent_primary_batch_ratio", type=float, default=0.75)
+    parser.add_argument("--phase2_latent_weight", type=float, default=None)
 
     parser.add_argument("--eval_gen_every", type=int, default=2)
     parser.add_argument("--eval_gen_samples", type=int, default=100)
