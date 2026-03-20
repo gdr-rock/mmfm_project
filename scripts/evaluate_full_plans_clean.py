@@ -13,7 +13,6 @@ from __future__ import annotations
 
 import argparse
 import csv
-import importlib.util
 import json
 import math
 import os
@@ -82,6 +81,25 @@ def build_full_plan_prompt(goal: str, interpretation: str = "") -> str:
     lines.append("")
     lines.append(
         'Generate the full plan to complete the task. Output JSON only: '
+        '{"next_steps": [{"action": "...", "state_change": "..."}, ...]}'
+    )
+    return "\n".join(lines)
+
+
+def build_rollout_prompt(goal: str, prefix_steps: list[str], k: int, interpretation: str = "") -> str:
+    lines = [f"Goal: {goal}"]
+    if interpretation:
+        lines.append(f"Interpretation: {interpretation}")
+    lines.append("")
+    lines.append("Progress so far:")
+    if prefix_steps:
+        for idx, step in enumerate(prefix_steps, start=1):
+            lines.append(f"  {idx}) {step}")
+    else:
+        lines.append("  (No steps observed yet.)")
+    lines.append("")
+    lines.append(
+        f'Predict the next {k} step(s). Output JSON only: '
         '{"next_steps": [{"action": "...", "state_change": "..."}, ...]}'
     )
     return "\n".join(lines)
@@ -434,6 +452,68 @@ def generate_plan(
     return tokenizer.decode(gen_ids[0], skip_special_tokens=True).strip()
 
 
+def rollout_full_plan(
+    model,
+    tokenizer,
+    goal: str,
+    interpretation: str,
+    device,
+    gen_mode: str,
+    temperature: float,
+    top_p: float,
+    max_new_tokens: int,
+    rollout_chunk_size: int,
+    max_plan_steps: int,
+) -> tuple[list[str], list[dict]]:
+    prefix_steps: list[str] = []
+    rollout_trace: list[dict] = []
+    stalled_rounds = 0
+
+    while len(prefix_steps) < max_plan_steps:
+        k = min(rollout_chunk_size, max_plan_steps - len(prefix_steps))
+        prompt = build_rollout_prompt(goal, prefix_steps, k, interpretation)
+        raw = generate_plan(
+            model,
+            tokenizer,
+            prompt,
+            device,
+            gen_mode,
+            temperature,
+            top_p,
+            max_new_tokens,
+        )
+        parsed = parse_plan_json(raw)
+
+        added_steps = 0
+        for step in parsed:
+            if len(prefix_steps) >= max_plan_steps:
+                break
+            if prefix_steps and normalize_step(step) == normalize_step(prefix_steps[-1]):
+                continue
+            prefix_steps.append(step)
+            added_steps += 1
+
+        rollout_trace.append(
+            {
+                "prompt": prompt,
+                "raw": raw,
+                "parsed_steps": parsed,
+                "added_steps": added_steps,
+                "plan_len_after_round": len(prefix_steps),
+            }
+        )
+
+        if added_steps == 0:
+            stalled_rounds += 1
+        else:
+            stalled_rounds = 0
+
+        if not parsed or stalled_rounds >= 2:
+            break
+
+    return prefix_steps, rollout_trace
+
+
 def generate_interpretation_from_frames(
     frames_path: str,
     device,
@@ -718,6 +798,9 @@ def main() -> None:
     parser.add_argument("--interp_prompt", default=DEFAULT_INTERP_PROMPT)
     parser.add_argument("--num_frames", type=int, default=8)
     parser.add_argument("--K", type=int, default=5)
+    parser.add_argument("--plan_generation_mode", choices=["rollout", "direct"], default="rollout")
+    parser.add_argument("--rollout_chunk_size", type=int, default=3)
+    parser.add_argument("--max_plan_steps", type=int, default=16)
     parser.add_argument("--temperature", type=float, default=0.0)
     parser.add_argument("--top_p", type=float, default=0.9)
     parser.add_argument("--max_new_tokens", type=int, default=256)
@@ -751,6 +834,8 @@ def main() -> None:
     data = load_jsonl(args.test_data, max_samples=args.max_samples)
     print(f"Loaded {len(data)} evaluation samples from {args.test_data}")
     print(f"Device: {device}")
+    if args.K > 1 and args.temperature <= 0:
+        print("WARNING: K > 1 with temperature=0 will usually produce identical candidates.")
 
     system1_model, system1_tokenizer, gen_mode = load_system1(
         args.system1_model, device, args.system1_type, args.plm_base_model
@@ -774,23 +859,45 @@ def main() -> None:
                 num_frames=args.num_frames,
                 prompt=args.interp_prompt,
             )
-
-        prompt = build_full_plan_prompt(goal, interpretation)
         gold_steps = sample["gold_steps"]
 
         plans = []
         for _ in range(args.K):
-            raw = generate_plan(
-                system1_model,
-                system1_tokenizer,
-                prompt,
-                device,
-                gen_mode,
-                args.temperature,
-                args.top_p,
-                args.max_new_tokens,
-            )
-            pred_steps = parse_plan_json(raw)
+            if args.plan_generation_mode == "rollout":
+                pred_steps, rollout_trace = rollout_full_plan(
+                    system1_model,
+                    system1_tokenizer,
+                    goal,
+                    interpretation,
+                    device,
+                    gen_mode,
+                    args.temperature,
+                    args.top_p,
+                    args.max_new_tokens,
+                    args.rollout_chunk_size,
+                    args.max_plan_steps,
+                )
+                raw = json.dumps(
+                    {
+                        "generation_mode": "rollout",
+                        "trace": rollout_trace,
+                    },
+                    ensure_ascii=False,
+                )
+            else:
+                prompt = build_full_plan_prompt(goal, interpretation)
+                raw = generate_plan(
+                    system1_model,
+                    system1_tokenizer,
+                    prompt,
+                    device,
+                    gen_mode,
+                    args.temperature,
+                    args.top_p,
+                    args.max_new_tokens,
+                )
+                pred_steps = parse_plan_json(raw)
+
             metrics = compute_full_plan_metrics(pred_steps, gold_steps)
 
             critic_score = 0.0
