@@ -390,4 +390,4 @@ def step_to_state_change(step_text: str) -> str:
             obj = step[len(verb):].strip()
             return _VERB_TEMPLATES[verb](obj)
 
-    return f"The state changes: {step} is performed."
+    return f"{_cap(step)} is now done." if step else "The step is now done."

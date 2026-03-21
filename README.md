@@ -572,7 +572,7 @@ The last three flags implement the simpler curriculum described above:
 
 - first `70%` of epochs use the normal shuffled training mix
 - final `30%` of epochs rebuild batches so they are latent-primary
-- latent tensors are validated before use: they are pooled to `(vjepa_dim,)`, cast to `float32`, and rows with missing segments, wrong width, or non-finite values are skipped for grounding
+- latent tensors are validated before use: they are pooled to `(vjepa_dim,)`, preserve their original floating dtype, and rows with missing segments, wrong width, or non-finite values are skipped for grounding
 
 Evaluate the held-out task split with direct full-plan generation:
 
@@ -588,6 +588,46 @@ python3 scripts/evaluate_full_plans_clean.py \
 ```
 
 Use `coin2_system1_test_goal_plus_interpretation.jsonl` for the interpretation-assisted variant.
+
+### 7d. Research Evaluation on `coin_2`
+
+For a cleaner research-style evaluation on the new held-out task split, use:
+
+- `scripts/evaluate_coin2_model.py` to evaluate one System-1 checkpoint across
+  `goal_only`, `goal_plus_interpretation`, and held-out prefix diagnostics using
+  the same candidate pool for greedy / critic / goal / critic+goal selection
+- `scripts/compare_coin2_evaluations.py` to compare multiple evaluation folders
+  and generate overall tables + plots
+
+Example: evaluate one model
+
+```bash
+python3 scripts/evaluate_coin2_model.py \
+    --system1_model checkpoints/system1_plm_coin2_lora_grounded/best_adapter \
+    --model_tag plm_coin2_grounded \
+    --critic_model checkpoints/critic_coin/best_model.pt \
+    --goal_latent_model checkpoints/goal_latent_coin/best_model.pt \
+    --K 5 \
+    --sampling_temperature 0.8 \
+    --output_dir outputs/coin_2
+```
+
+Example: compare several evaluated models
+
+```bash
+python3 scripts/compare_coin2_evaluations.py \
+    --input_root outputs/coin_2 \
+    --configs system1_greedy,system1_critic_goal \
+    --output_dir outputs/coin_2/comparison
+```
+
+The evaluation script writes:
+
+- `summary_overall.csv/json`: condition-level metrics with bootstrap confidence intervals
+- `summary_family.csv/json`: family-level aggregates (`goal_only`, `goal_plus_interpretation`, prefix diagnostics)
+- `per_sample.csv/jsonl`: one row per config and sample, including reranking gains vs greedy
+- `per_task_summary.csv/json`: per-task breakdowns
+- `plots/`: condition bars, prefix-length curves, gold-length accuracy plots, reranking gains, and per-task heatmaps
 
 ### 8. Standalone Inference (`run_inference.py`)
 
