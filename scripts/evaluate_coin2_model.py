@@ -1051,7 +1051,22 @@ def main() -> None:
     case_records = []
     flat_rows = []
 
+    # Check for existing checkpoint
+    checkpoint_per_case = out_dir / "per_case.jsonl"
+    checkpoint_per_sample = out_dir / "per_sample.jsonl"
+    
+    evaluated_case_ids = set()
+    if checkpoint_per_case.exists() and checkpoint_per_sample.exists():
+        print(f"Loading existing checkpoints from {out_dir}...")
+        case_records = load_jsonl(str(checkpoint_per_case))
+        flat_rows = load_jsonl(str(checkpoint_per_sample))
+        evaluated_case_ids = {r["case_id"] for r in case_records}
+        print(f"Resuming evaluation, found {len(evaluated_case_ids)} completed cases.")
+
     for idx, case in enumerate(cases, start=1):
+        if case.case_id in evaluated_case_ids:
+            continue
+
         candidates = generate_candidates_for_case(
             case,
             system1_model=system1_model,
@@ -1081,7 +1096,10 @@ def main() -> None:
         )
 
         if idx == 1 or idx % 10 == 0 or idx == len(cases):
-            print(f"Processed {idx}/{len(cases)} cases")
+            print(f"Processed {idx}/{len(cases)} cases", flush=True)
+            # Save intermediate progress
+            write_jsonl(checkpoint_per_case, case_records)
+            write_jsonl(checkpoint_per_sample, flat_rows)
 
     summary_label_rows = aggregate_rows(
         flat_rows,

@@ -1,1290 +1,171 @@
-% ============================================================================
-%  Grounding Language-Based Video Planning in Predictive Video Latents
-%  MMFM Final Project — IEEE / ACL Conference Style (single-column)
-% ============================================================================
-\documentclass[11pt]{article}
+\documentclass{article}
 
-% ---------- geometry & margins (ACL-style single-column) ----------
-\usepackage[a4paper,margin=2.5cm]{geometry}
+% if you need to pass options to natbib, use, e.g.:
+\PassOptionsToPackage{numbers, compress}{natbib}
+% before loading neurips_2024
 
-% ---------- encoding & fonts ----------
-\usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
-\usepackage{lmodern}
-\usepackage{microtype}
+% to compile a camera-ready version, add the [final] option, e.g.:
+\usepackage[final]{neurips_2024}
 
-% ---------- maths ----------
-\usepackage{amsmath,amssymb,amsfonts}
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage{hyperref}       % hyperlinks
+\usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+\usepackage{xcolor}         % colors
 
-% ---------- graphics ----------
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{multirow}
 \usepackage{graphicx}
 \usepackage{tikz}
-\usetikzlibrary{
-  positioning, arrows.meta, shapes.geometric,
-  fit, calc, backgrounds, decorations.pathreplacing,
-  patterns, shadows
-}
-\usepackage{pgfplots}
-\pgfplotsset{compat=1.18}
-
-% ---------- tables ----------
-\usepackage{booktabs}
-\usepackage{multirow}
-\usepackage{array}
-\usepackage{tabularx}
-\usepackage{colortbl}
-
-% ---------- algorithms ----------
-\usepackage{algorithm}
-\usepackage{algorithmic}
-
-% ---------- misc ----------
-\usepackage{hyperref}
-\usepackage{cleveref}
 \usepackage{enumitem}
-\usepackage{xcolor}
-\usepackage{subcaption}
-\usepackage{float}
-\usepackage{url}
-\usepackage{natbib}
+\usepackage{listings}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric}
 
-% ---------- colours ----------
-\definecolor{sys1color}{HTML}{3B82F6}
-\definecolor{sys2color}{HTML}{EF4444}
-\definecolor{goalcolor}{HTML}{10B981}
-\definecolor{vjepacolor}{HTML}{8B5CF6}
-\definecolor{datacolor}{HTML}{F59E0B}
-\definecolor{graybox}{HTML}{F3F4F6}
-\definecolor{darkgray}{HTML}{374151}
-
-% ---------- custom commands ----------
-\newcommand{\sys}[1]{\textsc{System-#1}}
-\newcommand{\tj}{\textsc{V-JEPA~2}}
-\newcommand{\vlwm}{\textsc{VLWM}}
-\newcommand{\ct}{\textsc{CrossTask}}
-\newcommand{\plm}{\textsc{PLM}}
-\newcommand{\lora}{\textsc{LoRA}}
-\newcommand{\norm}[1]{\lVert #1 \rVert}
-
-% ============================================================================
-\title{\textbf{Grounding Language-Based Video Planning\\
-in Predictive Video Latents}}
-
-\author{
-  \textbf{MMFM Final Project}\\
-  University of Toronto\\
-  \texttt{mmfm-project@utoronto.ca}
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue,
+  citecolor=blue,
+  urlcolor=blue
 }
 
-\date{}
+\newcommand{\fillme}[1]{\textcolor{blue}{[#1]}}
+
+\title{Planning with a Vision-Language World Model for Procedural Video Understanding}
+
+\author{%
+  Aswathy Marottikkal Ramesh \\
+  \And
+  Sayeeda Begam Mohamed Ikbal \\
+  \And
+  Goutham Muralikrishnan \\
+  \AND
+  \normalfont{Multimodal Foundation Models} \\
+  \normalfont{AI and Robotics Program, UTN}
+}
 
 \begin{document}
 \maketitle
 
-% ============================================================================
 \begin{abstract}
-Long-horizon procedural planning from instructional videos requires both
-high-level reasoning and perceptual grounding in the physical world. Recent
-work on Vision Language World Models (\vlwm{}) demonstrates that coupling a
-fast rollout generator (\sys{1}) with a deliberative critic (\sys{2}) yields
-strong planning performance when trained at scale. However, \vlwm{} operates
-purely in text space: its per-step latent alignment has not been studied under
-resource-constrained settings or with publicly available datasets.
-
-In this paper, we reproduce and extend the \vlwm{} planning architecture on
-the \ct{} benchmark (18 tasks, 2{,}692 videos) using dramatically smaller
-models: T5-small (60M) and PerceptionLM-1B with \lora{} as System-1, and
-MiniLM+MLP or Llama-3.2-1B with \lora{} as System-2 critic. We integrate
-\tj{} predictive video latents via a learned projection head and symmetric
-InfoNCE loss, introducing a latent energy score that complements the critic
-during plan selection. We additionally propose vision-grounded interpretation
-generation using the PLM vision tower at inference time. We describe the
-complete data pipeline, training methodology, dual-scale model design, and
-evaluation protocol using VPA metrics (Success Rate, Mean Accuracy, Mean IoU),
-providing a reproducible framework for latent-grounded procedural planning.
+Procedural video planning requires more than predicting the next action token: a model should understand why a step is chosen and what state transition it causes. We explore this by reproducing and expanding upon Vision-Language World Models (VLWMs). A significant obstacle was the lack of open-source Tree-of-Caption data from prior works. To address this, we developed a synthetic pipeline utilizing COIN and CrossTask annotations to replicate goal, action, state-change, and critic data. We evaluated Perception-LM variants (1B LoRA vs. 8B GaLore) under constrained compute settings. Crucially, we incorporate V-JEPA latent features to ground state changes in actual physical representations, overcoming limitations in purely text-synthesized environments. Our evaluations show that while the plain 1B model suffers heavily from textual hallucinations, providing goal interpretations and scaling to the 8B grounded model yields a significant boost in planning accuracy (Step F1 soaring from 0.01 to $\sim$0.39). We analyze failure modes, expose prior flaws related to dataset corruption and data leakage, and propose continuous video-context integration as vital future work.
 \end{abstract}
 
-% ============================================================================
 \section{Introduction}
-\label{sec:intro}
+Many procedural tasks require causal reasoning over intermediate world states, not only action imitation. In long-horizon instructional videos, the same verb can represent very different decisions depending on current progress toward the goal. This motivates our core research question: \emph{Does explicit state-transition supervision, grounded in physical video latents, improve procedural planning quality compared to action-only decoding under matched training conditions?}
 
-Procedural planning—predicting the sequence of actions needed to accomplish a
-high-level goal—is a fundamental capability for embodied agents and video
-understanding systems. Given the observation ``the user has cracked eggs into a
-bowl,'' a planning agent should predict subsequent steps such as \emph{add
-flour}, \emph{stir batter}, \emph{pour onto griddle}, and so on.
+Our work is framed by a practical constraint: the full Vision-Language World Model (VLWM) ecosystem, particularly the rich Tree-of-Caption dataset used in state-of-the-art papers, is not publicly available. Instead of being deterred, we treat this as a research parameter limit. We reconstruct the dataset pipeline by mapping available COIN and CrossTask datasets into a System-1 (generation), Critic (scoring), and Goal Latent format. However, relying purely on text for visual tasks leads to severe domain disparities. To bridge this, we incorporate \textbf{V-JEPA (Video Joint Embedding Predictive Architecture)} latents, which strictly enforce that a model's proposed ``state change'' matches real-world temporal physics.
 
-The Vision Language World Model (\vlwm{}) of \citet{chen2025vlwm} addresses
-this with a dual-system architecture inspired by Kahneman's
-fast-and-slow reasoning:
-\begin{itemize}[nosep,leftmargin=1.5em]
-  \item \textbf{\sys{1}} is a fast rollout generator (PerceptionLM-8B) that
-        produces candidate action sequences via next-token prediction.
-  \item \textbf{\sys{2}} is a deliberative critic (Llama-3.2-1B) that scores
-        candidate trajectories via a learned cost function, enabling
-        tree-search planning.
-\end{itemize}
+The primary contributions of this work are: (1) a comprehensive synthetic data generation and replication methodology for VLWMs; (2) an empirical evaluation indicating how foundational scale (8B GaLore) and explicit visual latents (V-JEPA) reduce hallucinations compared to a plain 1B baseline; and (3) an architectural exploration into scoring plans via combined Critic and Goal-Energy functions. 
 
-Critically, \vlwm{} grounds System-1's per-step hidden states in video latents
-(V-JEPA 2, \citealp{assran2025vjepa2}) through a contrastive InfoNCE
-objective. This bridges the gap between text-only planning and physical
-reality.
-
-\paragraph{Challenges at smaller scale.}
-\vlwm{} trains on 180{,}000 videos (5.7M step transitions) using 8B-parameter
-models. Reproducing this on a publicly available dataset like \ct{}
-\citep{zhukov2019crosstask} (2{,}692 videos, $\sim$18K transitions) requires
-careful architectural adaptation to avoid overfitting while preserving the core
-dual-system + latent-grounding design.
-
-\paragraph{Contributions.}
-We present a complete, reproducible framework that:
-\begin{enumerate}[nosep,leftmargin=1.5em]
-  \item Implements the full \vlwm{} dual-system planning pipeline on \ct{},
-        providing two capacity tiers for each component:
-        a \emph{lightweight} tier (T5-small, MiniLM+MLP) and a
-        \emph{\vlwm{}-faithful} tier (PLM-1B + \lora{}, Llama-3.2-1B +
-        \lora{}).
-  \item Integrates \tj{} predictive video latents via a learned
-        LatentProjectionHead and symmetric InfoNCE loss, with an energy-based
-        plan scoring term: $E = \norm{\mathbf{z}_{\text{pred}} -
-        \mathbf{z}_{\text{goal}}}_2^2$.
-  \item Introduces zero-prefix planning (predicting from an empty observation
-        history) and vision-grounded interpretation using the PLM vision tower
-        at inference time.
-  \item Provides a complete data pipeline from raw \ct{} annotations to
-        train/val/test splits, along with evaluation on VPA metrics
-        \citep{patel2023vpa}.
-\end{enumerate}
-
-
-% ============================================================================
 \section{Related Work}
-\label{sec:related}
+Procedural understanding benchmarks such as COIN \citep{tang2019coin} and CrossTask \citep{zhukov2019crossTask} establish that temporally ordered actions alone are insufficient for robust task reasoning. They provide an important dataset substrate for evaluating task progression over local token patterns.
 
-\paragraph{Procedural planning from video.}
-Procedural planning has been studied extensively in instructional video
-understanding. Early methods use task graphs or structured models
-\citep{zhukov2019crosstask,chang2020procedure}. More recent approaches frame
-planning as text generation conditioned on visual observations
-\citep{sun2022plate,zhao2022p3iv}. The VPA benchmark \citep{patel2023vpa}
-standardized evaluation with Success Rate, Mean Accuracy, and Mean IoU metrics.
+Recent advances in Vision-Language World Models pose that planning quality heavily depends on representations of transition dynamics. Specifically, predictive learning works like V-JEPA \citep{assran2025vjepa2} shift the paradigm from pixel reconstruction to predicting higher-level conceptual latents of a video. In planning-oriented VLMs \citep{chen2025planning}, the focus is modeling the consequences of an action before it is executed. Our position combines these themes: we validate the necessity of explicit delta-state tokens mapped to physical V-JEPA latents for effective planning without requiring the unavailable Tree-of-Caption data.
 
-\paragraph{Vision Language World Models.}
-\citet{chen2025vlwm} propose VLWM, a dual-system architecture where System-1
-(PerceptionLM-8B) generates rollouts via next-token prediction on structured
-trajectories $\langle \text{goal}, \text{interpretation}, A_0, \Delta S_0,
-\ldots, A_n, \Delta S_n \rangle$, and System-2 (Llama-3.2-1B) scores
-candidates via a learned cost function with ranking loss (Eq.~2).
-Per-step hidden states are grounded in V-JEPA~2 latents via symmetric InfoNCE
-(Eq.~3--4). VLWM achieves state-of-the-art on VPA benchmarks using 180K
-training videos.
+\section{Dataset Generation and Constraints}
+Because the original open-source Tree-of-Caption dataset is unavailable, we engineered an end-to-end dataset generation pipeline. We utilized the raw JSON data of the COIN and CrossTask datasets and constructed formatted \texttt{action} and \texttt{state\_change} sequences. 
 
-\paragraph{V-JEPA 2.}
-\citet{assran2025vjepa2} introduce V-JEPA~2, a self-supervised video model
-based on joint-embedding predictive architectures. The ViT-L encoder produces
-1024-dimensional representations that capture spatiotemporal video semantics
-without pixel-level reconstruction, making them well-suited as grounding
-targets for language-based planning.
-
-\paragraph{Parameter-efficient adaptation.}
-Low-Rank Adaptation (\lora{}, \citealp{hu2022lora}) enables fine-tuning of
-large language models with a fraction of the parameters. We apply \lora{} to
-both the System-1 (PLM-1B) and Critic (Llama-3.2-1B) backbones with
-$r=16, \alpha=32$, training $\sim$3M parameters while freezing the 1.2B base
-model weights.
-
-
-% ============================================================================
-\section{Method}
-\label{sec:method}
-
-Our architecture follows the dual-system design of \vlwm{} with two key
-adaptations: (1)~a dual-scale model design with lightweight and VLWM-faithful
-tiers, and (2)~explicit V-JEPA latent grounding with energy-based scoring.
-\Cref{fig:architecture} provides an overview.
-
-% ------- Architecture Diagram -------
-\begin{figure}[t]
-\centering
-\begin{tikzpicture}[
-  node distance=0.6cm and 1.0cm,
-  box/.style={draw, rounded corners=3pt, minimum width=2.6cm,
-              minimum height=0.75cm, align=center, font=\small\sffamily},
-  arrow/.style={-{Stealth[length=5pt]}, thick},
-  darrow/.style={-{Stealth[length=5pt]}, thick, dashed},
-  label/.style={font=\scriptsize\sffamily, text=darkgray},
-]
-
-% ------ Input ------
-\node[box, fill=datacolor!20] (input) {Goal + Prefix\\+ Interpretation};
-
-% ------ System-1 ------
-\node[box, fill=sys1color!20, right=1.2cm of input] (sys1) {System-1\\Rollout Gen.};
-
-% ------ K plans ------
-\node[box, fill=sys1color!10, right=1.0cm of sys1] (kplans) {$K$ Candidate\\Plans};
-
-% ------ Critic ------
-\node[box, fill=sys2color!20, below=1.0cm of kplans] (critic) {System-2\\Critic};
-
-% ------ V-JEPA ------
-\node[box, fill=vjepacolor!20, below=1.0cm of sys1] (vjepa) {V-JEPA 2\\Latents};
-
-% ------ Energy ------
-\node[box, fill=vjepacolor!10, below=0.5cm of critic] (energy) {Energy\\$\norm{z_p - z_g}_2^2$};
-
-% ------ Score Combiner ------
-\node[box, fill=goalcolor!20, right=1.0cm of critic] (scorer) {Score\\$\alpha C + \beta E$};
-
-% ------ Output ------
-\node[box, fill=goalcolor!30, right=0.8cm of scorer] (output) {Best\\Plan};
-
-% ------ Arrows ------
-\draw[arrow] (input) -- (sys1);
-\draw[arrow] (sys1) -- node[above, label] {$T{=}0.8$} (kplans);
-\draw[arrow] (kplans) -- (critic);
-\draw[arrow] (vjepa) -- (energy);
-\draw[darrow] (kplans.south) -- ++(0,-0.3) -| (energy.north);
-\draw[arrow] (critic) -- (scorer);
-\draw[arrow] (energy) -| (scorer);
-\draw[arrow] (scorer) -- (output);
-
-% ------ Training arrows (dashed, to V-JEPA) ------
-\draw[darrow, sys1color] (sys1.south) -- node[left, label, text=sys1color] {InfoNCE} (vjepa);
-
-% ------ Brace for System-2 ------
-\draw[decorate, decoration={brace, amplitude=5pt, mirror}]
-  ([xshift=3pt]critic.north east) -- ([xshift=3pt]energy.south east)
-  node[midway, right=8pt, font=\small\sffamily, text=sys2color] {System-2};
-
-\end{tikzpicture}
-\caption{\textbf{Architecture overview.} System-1 generates $K$ candidate
-plans via temperature sampling. System-2 scores each plan with a learned
-critic cost $C$ and an optional V-JEPA energy term $E$. During training,
-System-1's per-step hidden states are grounded in V-JEPA latents via
-symmetric InfoNCE (dashed blue arrow).}
-\label{fig:architecture}
-\end{figure}
-
-
-\subsection{System-1: Rollout Generator}
-\label{sec:sys1}
-
-System-1 takes a structured prompt containing the task goal, an interpretation
-of the scene, and the observed action prefix, and generates the next $k$
-action/state-change pairs as JSON:
-
-\begin{quote}
-\small
-\texttt{Goal: Complete the task: Make Pancakes.}\\
-\texttt{Interpretation: Task begins with cracking eggs \ldots}\\[4pt]
-\texttt{Progress so far:}\\
-\texttt{~~1) pour egg | Egg is now poured.}\\
-\texttt{~~2) add flour | Flour is now added.}\\[4pt]
-\texttt{Predict the next 3 step(s). Output JSON only:}
-\end{quote}
-
-\noindent The model outputs:
-\begin{quote}
-\small
-\texttt{\{"next\_steps": [\{"action": "stir batter",}\\
-\texttt{~~"state\_change": "Batter is now mixed."\}, \ldots]\}}
-\end{quote}
-
-\paragraph{Lightweight tier: T5-small.}
-We fine-tune \texttt{google/flan-t5-small} (60M parameters) as a seq2seq
-model. The encoder processes the structured prompt; the decoder generates the
-JSON output autoregressively. This is appropriate for our data scale
-($\sim$12K training samples).
-
-\paragraph{VLWM-faithful tier: PLM-1B + \lora{}.}
-Following the VLWM paper, we use PerceptionLM-1B \citep{meta2024plm} as a
-causal language model. The structured prompt is the prefix; the model generates
-the trajectory via next-token prediction (VLWM Eq.~1). We apply \lora{} with:
-\begin{equation}
-  r = 16, \quad \alpha = 32, \quad p_{\text{dropout}} = 0.05
-  \label{eq:lora_config}
-\end{equation}
-targeting all attention and MLP projections (\texttt{q\_proj}, \texttt{k\_proj},
-\texttt{v\_proj}, \texttt{o\_proj}, \texttt{gate\_proj}, \texttt{up\_proj},
-\texttt{down\_proj}). This yields $\sim$3M trainable parameters out of 1.2B
-total. The vision tower is frozen during training (text-only mode).
-
-
-\subsection{Latent Grounding via InfoNCE}
-\label{sec:grounding}
-
-Following VLWM \S3.1.1 (Eq.~3--4), we ground per-step hidden states in
-V-JEPA~2 video latents through a contrastive learning objective.
-
-\paragraph{Latent Projection Head.}
-A two-layer MLP projects decoder hidden states to the V-JEPA latent space:
-\begin{equation}
-  \mathbf{z}_{\text{text}} = \text{L2Norm}\Big(
-    W_2 \cdot \text{GELU}(W_1 \cdot \mathbf{h}_{\text{step}})
-  \Big)
-  \label{eq:projection}
-\end{equation}
-where $\mathbf{h}_{\text{step}} \in \mathbb{R}^{d_{\text{dec}}}$ is the
-decoder hidden state at each step boundary, $W_1 \in \mathbb{R}^{d_v \times
-d_{\text{dec}}}$, $W_2 \in \mathbb{R}^{d_v \times d_v}$, and
-$d_v = 1024$ is the V-JEPA dimension.
-
-\paragraph{Symmetric InfoNCE.}
-Given a batch of $N$ aligned (text, video) latent pairs
-$\{(\mathbf{z}^t_i, \mathbf{z}^v_i)\}_{i=1}^N$, the loss is:
-\begin{align}
-  \mathcal{L}_{\text{t2v}} &= -\frac{1}{N}\sum_{i=1}^N \log
-    \frac{\exp(\text{sim}(\mathbf{z}^t_i, \mathbf{z}^v_i)/\tau)}
-         {\sum_{j=1}^N \exp(\text{sim}(\mathbf{z}^t_i, \mathbf{z}^v_j)/\tau)}
-  \label{eq:t2v} \\
-  \mathcal{L}_{\text{v2t}} &= -\frac{1}{N}\sum_{i=1}^N \log
-    \frac{\exp(\text{sim}(\mathbf{z}^v_i, \mathbf{z}^t_i)/\tau)}
-         {\sum_{j=1}^N \exp(\text{sim}(\mathbf{z}^v_i, \mathbf{z}^t_j)/\tau)}
-  \label{eq:v2t} \\
-  \mathcal{L}_{\text{latent}} &=
-    \frac{1}{2}(\mathcal{L}_{\text{t2v}} + \mathcal{L}_{\text{v2t}})
-  \label{eq:infonce}
-\end{align}
-with temperature $\tau = 0.07$. The combined training loss is:
-\begin{equation}
-  \mathcal{L} = \mathcal{L}_{\text{text}} + \alpha \cdot \mathcal{L}_{\text{latent}}
-  \label{eq:combined}
-\end{equation}
-
-where $\mathcal{L}_{\text{text}}$ is the standard language modeling loss
-(cross-entropy for seq2seq or NTP for causal LM), and $\alpha$ controls the
-strength of latent grounding.
-
-
-\subsection{System-2: Critic}
-\label{sec:sys2}
-
-System-2 scores trajectory quality for plan selection during inference. Given a
-goal and a candidate trajectory, the critic outputs a scalar cost $C$. Lower
-cost indicates a more plausible trajectory.
-
-\paragraph{Lightweight tier: MiniLM + MLP.}
-We use \texttt{all-MiniLM-L6-v2} (22M parameters, 384-dim) as the sentence
-encoder. Each trajectory is serialized as:
-\begin{quote}
-\small
-\texttt{[GOAL]~\{goal\}~[SEP]~\{step\_1\}~[SEP]~\{step\_2\}~[SEP]~\ldots}
-\end{quote}
-Mean pooling yields a 384-dim vector, passed through an MLP head:
-\begin{equation}
-  C = \text{MLP}_{384 \to 256 \to 1}(\text{MeanPool}(\text{Enc}(\mathbf{x})))
-  \label{eq:critic_mlp}
-\end{equation}
-
-\paragraph{VLWM-faithful tier: Llama-3.2-1B + \lora{}.}
-Following VLWM's critic design, we use Llama-3.2-1B with \lora{} (same
-configuration as \Cref{eq:lora_config}). The last non-padding token's hidden
-state ($\mathbb{R}^{2048}$) is mapped to a scalar cost via a linear head:
-\begin{equation}
-  C = W_c \cdot \mathbf{h}_{\text{last}} + b_c
-  \label{eq:critic_llm}
-\end{equation}
-where $W_c \in \mathbb{R}^{1 \times 2048}$ is initialized to zero for stable
-initial training.
-
-\paragraph{Ranking Loss (VLWM Eq.~2).}
-Both critics are trained with a margin-based ranking loss over trajectory
-pairs. Given three signal types—\emph{good} (valid continuation),
-\emph{bad} (distractor from another task), and \emph{shuffled} (randomly
-reordered)—the loss enforces:
-\begin{equation}
-  \mathcal{L}_{\text{rank}} = \max(0, m + C_{\text{pos}} - C_{\text{neg}})
-    + \lambda(C_{\text{pos}}^2 + C_{\text{neg}}^2)
-  \label{eq:ranking}
-\end{equation}
-with margin $m=1.0$ and regularization $\lambda=0.01$. Three pairs are formed:
-$(C_{\text{good}}, C_{\text{base}})$, $(C_{\text{base}}, C_{\text{bad}})$,
-$(C_{\text{base}}, C_{\text{shuffled}})$.
-
-
-\subsection{Goal Model}
-\label{sec:goal}
-
-A separate T5-small model jointly handles two tasks:
-\begin{enumerate}[nosep,leftmargin=1.5em]
-  \item \textbf{Goal prediction:} partial trajectory $\to$ goal text
-        (18-class classification over task goals).
-  \item \textbf{Goal + plan:} partial trajectory $\to$ JSON containing
-        the inferred goal and remaining plan.
-\end{enumerate}
-Task type is embedded in the prompt instruction, enabling multi-task learning
-with a single model.
-
-
-\subsection{Inference: Plan Selection}
-\label{sec:inference}
-
-At inference, System-1 generates $K$ candidate plans via temperature sampling
-($T = 0.8$). Each candidate is scored by:
-\begin{equation}
-  \text{Score}(\pi_k) = \alpha \cdot C(\text{goal}, \text{prefix} + \pi_k)
-    + \beta \cdot E(\mathbf{z}_{\text{pred}}, \mathbf{z}_{\text{goal}})
-  \label{eq:score}
-\end{equation}
-where $C$ is the critic cost, $E = \norm{\mathbf{z}_{\text{pred}} -
-\mathbf{z}_{\text{goal}}}_2^2$ is the V-JEPA energy, and $\alpha, \beta$
-control the trade-off. When V-JEPA latents are unavailable, $\beta = 0$
-(critic-only reranking). The plan with the \textbf{lowest} score is selected.
-
-
-\subsection{Vision-Grounded Interpretation}
-\label{sec:vision_interp}
-
-The interpretation line in the System-1 prompt summarizes the scene context.
-During training, this is generated by a rule-based template system from
-canonical step orderings. At inference time, we offer three sources:
-
-\begin{enumerate}[nosep,leftmargin=1.5em]
-  \item \textbf{CLI:} User provides \texttt{--interpretation} text directly.
-  \item \textbf{JSONL:} Extracted from test samples (baked during data build).
-  \item \textbf{Vision-grounded:} The PLM vision tower processes the
-        \emph{first $N$ frames} of the video and generates interpretation
-        text. This requires the \texttt{--frames} flag and a video path.
+\textbf{Synthetic Pipeline:} The data was split to train three separate sub-systems:
+\begin{enumerate}[topsep=0pt, itemsep=2pt, leftmargin=1.5em]
+    \item \textbf{System-1 Data:} Formatted as a serialized target combining $\texttt{GOAL\_DESCRIPTION}$, $\texttt{GOAL\_INTERPRETATION}$, and trajectory items $\langle A_t, \Delta S_t \rangle$.
+    \item \textbf{Critic Data:} Generates contrastive examples of correct vs. incorrect future states to train an evaluator model.
+    \item \textbf{Goal Latent Data:} Mapped final state textual representations to specific video checkpoints.
 \end{enumerate}
 
-For Option~3, we extract exactly the first $N$ frames (default $N=8$) using
-\texttt{decord}, avoiding the uniform temporal sampling that would spread
-frames across the entire video. The frames are passed as images (not video)
-to the PLM processor to bypass the uniform sampling in
-\texttt{BaseVideoProcessor.sample\_frames()}.
+\textbf{V-JEPA Latent Extraction Challenges:} A major hurdle was acquiring the grounding frames. Many source videos from the original COIN dataset URLs were no longer available on YouTube due to link rot. Consequently, V-JEPA extraction could only be applied to a highly constrained subset of videos. We optimized around this by leveraging a 70/30 curriculum batching strategy (70\% text uniform, 30\% latent-primary) to learn structure despite sparse latent pairs.
 
+\textbf{Controlling for Data Leakage:} In an earlier iteration of our experiments, the model performed suspiciously well. Upon deeper inspection, the evaluation tasks possessed exactly identical sequence steps as tasks in the training set, just applied to different video IDs. This corruption/leakage defeated the goal of zero-shot generalizability. To correct this, we instituted harsh dataset boundaries explicitly isolating task categories in our current testing harness.
 
-\subsection{Zero-Prefix Planning}
-\label{sec:zero_prefix}
+\section{Methodology}
 
-A practical deployment scenario requires planning from scratch (no observed
-steps). We introduce zero-prefix samples into training data with probability
-$p_{\text{zero}} = 0.15$ (configurable via \texttt{--zero\_prefix\_prob}).
-The prompt format gracefully degrades:
+\subsection{Architecture Overview}
+The model is composed of three interconnected modules acting together during inference:
+\begin{itemize}[topsep=0pt, itemsep=2pt, leftmargin=1.5em]
+    \item \textbf{System-1 (Generator):} An autoregressive LLM (\texttt{Perception-LM}) trained to generate a sequence of paired actions and state changes based on a goal.
+    \item \textbf{Critic Model:} A scoring model that evaluates the semantic likelihood of the generated sequence.
+    \item \textbf{Goal Model:} A latent-space distance evaluator calculating the similarity/energy between the proposed final state and the initial objective.
+\end{itemize}
 
-\begin{quote}
-\small
-\texttt{Goal: Complete the task: Make Pancakes.}\\
-\texttt{Interpretation: \ldots}\\[4pt]
-\texttt{(No steps observed yet.)}\\[4pt]
-\texttt{Predict the next 3 step(s). \ldots}
-\end{quote}
+During inference, System-1 generates $K$ candidate plans (e.g., $K=3$ using targeted temperature sampling). These candidates are passed to the Critic and Goal models. Their respective scores are normalized and combined into an energy function, allowing the system to rerank and pick the optimal planning path.
 
+\subsection{Training Paradigms}
+Our methodology involved optimizing models of different scales out of compute necessity. We utilized a SLURM cluster equipped with NVIDIA A40 GPUs, placing strict bounds on VRAM:
+\begin{itemize}[topsep=0pt, itemsep=2pt, leftmargin=1.5em]
+    \item \textbf{1B LoRA:} We trained a \texttt{Perception-LM-1B} baseline using Low-Rank Adaptation ($r=16$, $\alpha=32$). This allowed for very rapid optimization ($\approx 1.85$ hours/epoch) but proved highly susceptible to semantic hallucinations.
+    \item \textbf{8B GaLore:} To explore scaling laws, we applied Gradient Low-Rank Projection (GaLore, rank $256$) to \texttt{Perception-LM-8B}. While computationally intensive ($\approx 7$ hours/epoch), GaLore facilitated full-parameter updates within a single A40's 40GB limit by projecting gradients into a lower-dimensional space, preventing OOM errors.
+\end{itemize}
 
-% ============================================================================
-\section{Data Pipeline}
-\label{sec:data}
+\section{Experiments and Results}
+We evaluated the models on clean COIN-2 test splits. The testing protocol required the model to output valid structured JSON sequences. We measured Exact Match and Step-F1.
 
-Our data pipeline transforms raw \ct{} annotations into structured training
-datasets through five sequential stages. \Cref{fig:data_pipeline} illustrates
-the flow.
+\subsection{Quantitative Results}
+Table~\ref{tab:comparison} highlights the difference in planning capability based on metric evaluation. 
 
-% ------- Data Pipeline Diagram -------
-\begin{figure}[t]
+\begin{table}[h]
 \centering
-\begin{tikzpicture}[
-  node distance=0.4cm,
-  stage/.style={draw, rounded corners=3pt, minimum width=5cm,
-                minimum height=0.65cm, align=center, font=\small\sffamily,
-                fill=#1!15},
-  arrow/.style={-{Stealth[length=5pt]}, thick},
-  label/.style={font=\scriptsize\sffamily\itshape, text=darkgray},
-]
-
-\node[stage=datacolor] (s04) {04: State-Change Transitions};
-\node[stage=sys2color, below=0.5cm of s04] (s05) {05: Critic Dataset};
-\node[stage=sys1color, below=0.5cm of s05] (s06) {06: System-1 Dataset};
-\node[stage=goalcolor, below=0.5cm of s06] (s07) {07: Goal Dataset};
-\node[stage=vjepacolor, below=0.5cm of s07] (s08) {08: Train / Val / Test Split};
-
-\draw[arrow] (s04) -- node[right=3pt, label] {18,169 rows} (s05);
-\draw[arrow] (s05) -- node[right=3pt, label] {11,762 samples} (s06);
-\draw[arrow] (s06) -- node[right=3pt, label] {15,049 samples} (s07);
-\draw[arrow] (s07) -- node[right=3pt, label] {21,536 samples} (s08);
-
-% Split branches
-\node[stage=goalcolor, below left=0.7cm and -0.5cm of s08, minimum width=2cm]
-  (train) {Train (78\%)};
-\node[stage=goalcolor, below=0.7cm of s08, minimum width=2cm]
-  (val) {Val (13\%)};
-\node[stage=goalcolor, below right=0.7cm and -0.5cm of s08, minimum width=2cm]
-  (test) {Test (9\%)};
-
-\draw[arrow] (s08.south) -- (train.north);
-\draw[arrow] (s08.south) -- (val.north);
-\draw[arrow] (s08.south) -- (test.north);
-
-\end{tikzpicture}
-\caption{\textbf{Data pipeline.} Five sequential scripts transform \ct{}
-annotations into structured training datasets. The split uses the official
-\ct{} validation set + stratified test, ensuring video-level separation
-(no video appears in multiple splits).}
-\label{fig:data_pipeline}
-\end{figure}
-
-
-\paragraph{Stage 1: State-Change Transitions (Script 04).}
-We process raw \ct{} annotations (18 primary tasks, 105 steps, 2{,}692
-videos) to build a transition-level CSV. For each annotated video, we extract
-consecutive step pairs along with:
-\begin{itemize}[nosep,leftmargin=1.5em]
-  \item \textbf{Action descriptions:} verb-based templates (e.g., ``pour
-        batter,'' ``flip pancake'').
-  \item \textbf{State-change descriptions:} generated from a template engine
-        with task-specific exact overrides and generic verb-based fallbacks
-        (e.g., ``Batter is now poured into pan.'').
-  \item \textbf{Temporal metadata:} start/end timestamps, canonical step
-        ordering, and remaining plan suffix.
-\end{itemize}
-This yields 18{,}169 transition rows spanning all annotated segments.
-
-\paragraph{Stage 2: Critic Dataset (Script 05).}
-From the transitions, we build ranking triplets for critic training. Each
-sample contains three trajectory variants:
-\begin{itemize}[nosep,leftmargin=1.5em]
-  \item $\text{traj}_{\text{good}}$: valid continuation from canonical order.
-  \item $\text{traj}_{\text{bad}}$: steps drawn from a different task
-        (cross-task distractor).
-  \item $\text{traj}_{\text{shuffled}}$: correct steps in randomized order.
-\end{itemize}
-This produces 11{,}762 critic samples. Each sample also includes the base
-trajectory for three-way ranking.
-
-\paragraph{Stage 3: System-1 Dataset (Script 06).}
-We construct prompt-completion pairs for the rollout generator. For each
-transition subsequence, we create:
-\begin{itemize}[nosep,leftmargin=1.5em]
-  \item \textbf{Input:} structured prompt with goal, interpretation (rule-based
-        from first/last canonical steps), and prefix of observed steps.
-  \item \textbf{Output:} JSON \texttt{\{"next\_steps": [\ldots]\}} containing
-        the next $k$ action/state-change pairs.
-  \item \textbf{Zero-prefix:} with probability $p_{\text{zero}} = 0.15$, the
-        prefix is empty.
-\end{itemize}
-The interpretation is generated by \texttt{make\_interpretation()}: a
-deterministic function that produces text like ``\emph{Task begins with
-cracking eggs and ends with serving pancakes.}'' from the canonical first
-and last steps.
-
-\paragraph{Stage 4: Goal Dataset (Script 07).}
-We create two task types per trajectory subsequence: (a) goal prediction from
-partial trajectory, and (b) joint goal + remaining plan prediction. This
-yields 21{,}536 goal samples.
-
-\paragraph{Stage 5: Train/Val/Test Split (Script 08).}
-All four datasets are split at the \textbf{video level} using the official
-\ct{} validation set. Test videos are stratified-sampled from the remaining
-non-validation videos, ensuring no video appears in multiple splits.
-\Cref{tab:dataset_stats} summarizes the final statistics.
-
-\begin{table}[t]
-\centering
-\caption{\textbf{Dataset statistics.} Sample counts after video-level
-splitting. The split ratio is approximately 78/13/9.}
-\label{tab:dataset_stats}
-\small
-\begin{tabular}{lrrr}
+\caption{Comparative capabilities of models on the COIN-2 evaluation suite across different prompting strategies (Goal Only vs. Goal + Interpretation).}
+\label{tab:comparison}
+\begin{tabular}{llccc}
 \toprule
-\textbf{Dataset} & \textbf{Train} & \textbf{Val} & \textbf{Test} \\
+\textbf{Model} & \textbf{Condition} & \textbf{Config Selection} & \textbf{Task Success} & \textbf{Step F1} \\
 \midrule
-State-Change CSV & 14{,}120 & 2{,}492 & 1{,}557 \\
-Critic JSONL & 9{,}259 & 1{,}538 & 965 \\
-System-1 JSONL & 11{,}852 & 1{,}953 & 1{,}244 \\
-Goal JSONL & 16{,}920 & 2{,}816 & 1{,}800 \\
+1B plain & goal\_only & greedy & 0.000 & 0.008 \\
+1B grounded & goal\_only & greedy & 0.000 & 0.011 \\
+8B GaLore grounded & goal\_only & greedy & 0.000 & 0.128 \\
+\midrule
+1B plain & goal + interp. & greedy & 0.000 & 0.013 \\
+1B grounded & goal + interp. & greedy & 0.000 & 0.031 \\
+8B GaLore grounded & goal + interp. & greedy & 0.037 & 0.384 \\
+8B GaLore grounded & goal + interp. & critic\_goal rerank & \textbf{0.037} & \textbf{0.395} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
+The metrics indicate dramatic disparities. The \textbf{1B variants} fail drastically (Step F1 $\approx 0.01$), irrespective of text or grounded constraints. However, as demonstrated by the \textbf{8B GaLore} performance, equipping the model with the task `interpretation` prefix yields a massive performance leap over the naive `goal\_only` prompt (F1 jumping from 0.128 to 0.395). Reranking generated candidates with the Critic and Goal model added an additional performance envelope.
 
-% ============================================================================
-\section{Experimental Setup}
-\label{sec:experiments}
+\subsection{Qualitative Analysis and Hallucinations}
+Inspection of the raw generation logs (JSON outputs) uncovers why the 1B models scored so poorly: extreme hallucinations. Without visual context or significant parameter scale, a purely textual 1B model defaults to associative text guessing.
+For example, for the task \textit{``Paste Car Sticker''} with ground-truth steps \textit{[clean window $\rightarrow$ tear sticker $\rightarrow$ put sticker on]}, the 1B plain model output:
+\begin{lstlisting}[basicstyle=\ttfamily\scriptsize, backgroundcolor=\color{gray!10}, frame=single]
+{"action": "cut the raw materials", "state_change": "...",
+ "action": "draw pictures on materials", "state_change": "...",
+ "action": "put the candle in the lantern", "state_change": "..."}
+\end{lstlisting}
+The model completely hallucinates a separate task (making a paper lantern). V-JEPA spatial grounding attempts to fix this by matching states to visual realities, but at the 1B parameter count, the model lacks the capacity to bridge the abstraction gap effectively. 
 
-\subsection{CrossTask Benchmark}
+\section{Discussion and Future Work}
+\textbf{Metric Strictness:} While the models clearly struggled, metrics like Exact Match or discrete Step F1 are incredibly punishing. In one evaluation case where the goal was to \textit{``Change Car Tire,''} the model generated an entirely valid sequential response (\textit{``brake on $\rightarrow$ unscrew wheel $\rightarrow$ jack down''}) but scored an F1 of 0.000 because it did not strictly phrase it as \textit{``jack up the car''}. Future evaluations must leverage LLM-as-a-judge approaches for semantic validation rather than string equivalence.
 
-\ct{} \citep{zhukov2019crosstask} contains 2{,}692 instructional videos
-spanning 18 primary tasks (e.g., ``Make Pancakes,'' ``Change a Tire,'' ``Build
-a Shelf'') with 105 unique steps. Temporal annotations provide segment-level
-start/end times with step labels. We use the official validation video list
-(\texttt{videos\_val.csv}) for the validation split.
+\textbf{V-JEPA and Dataset Scaling:} Adding V-JEPA latents successfully introduces representational pressure without inflating runtimes, producing meaningful validation latent signals. However, because our training utilized solely pre-extracted latent states representing `checkpoints` alongside text, the model remains semi-blind. 
 
-\subsection{Model Configurations}
+\textbf{Future Work:} To fully realize a Vision-Language World Model, the system should not rely merely on text goals and isolated checkpoint queries. The primary future objective is the continuous integration of raw video frame context via sliding multimodal windows. By embedding chronological vision tokens directly into the LLM context, the model can generalize to unseen states naturally, rather than treating planning as a blind textual serialization task. 
 
-\Cref{tab:models} summarizes all model configurations. We provide two tiers
-for both System-1 and the Critic, plus a shared Goal Model.
-
-\begin{table}[t]
-\centering
-\caption{\textbf{Model configurations.} ``Trainable'' shows parameters
-updated during training. PLM and Llama use \lora{} with $r{=}16$,
-$\alpha{=}32$, dropout${}=0.05$.}
-\label{tab:models}
-\small
-\begin{tabular}{@{}llrr@{}}
-\toprule
-\textbf{Component} & \textbf{Backbone} & \textbf{Total} & \textbf{Trainable} \\
-\midrule
-System-1 (light) & flan-T5-small & 60M & 60M \\
-System-1 (faithful) & PLM-1B + \lora{} & 1.2B & $\sim$3M \\
-Critic (light) & MiniLM + MLP & 22M & 22M + 100K \\
-Critic (faithful) & Llama-3.2-1B + \lora{} & 1.2B & $\sim$3M \\
-Goal Model & flan-T5-small & 60M & 60M \\
-Latent Head & MLP (2-layer) & $\sim$2M & $\sim$2M \\
-V-JEPA 2 Encoder & ViT-L & 300M & 0 (frozen) \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\subsection{Training Hyperparameters}
-
-\begin{table}[t]
-\centering
-\caption{\textbf{Training hyperparameters.}}
-\label{tab:hyperparams}
-\small
-\begin{tabular}{@{}lcccc@{}}
-\toprule
-& \textbf{Sys-1 T5} & \textbf{Sys-1 PLM} & \textbf{Critic MLP} & \textbf{Critic LLM} \\
-\midrule
-Optimizer & AdamW & AdamW & AdamW & AdamW \\
-Learning rate & $3 \times 10^{-4}$ & $2 \times 10^{-4}$ & $1 \times 10^{-4}$ & $2 \times 10^{-4}$ \\
-Batch size & 16 & 8 & 32 & 8 \\
-Epochs & 30 & 15 & 30 & 15 \\
-Scheduler & linear+warm & cosine+warm & linear+warm & cosine+warm \\
-Warmup & 10\% & 10\% & 10\% & 10\% \\
-Max input len & 384 & 512 & 256 & 512 \\
-Max target len & 256 & 256 & --- & --- \\
-Weight decay & 0.01 & 0.01 & 0.01 & 0.01 \\
-\lora{} $r / \alpha$ & --- & 16 / 32 & --- & 16 / 32 \\
-InfoNCE $\tau$ & 0.07 & 0.07 & --- & --- \\
-Ranking margin & --- & --- & 1.0 & 1.0 \\
-Ranking $\lambda$ & --- & --- & 0.01 & 0.01 \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\subsection{V-JEPA Latent Extraction}
-
-We extract V-JEPA~2 features using the ViT-L backbone. For each annotated
-video segment, we:
-\begin{enumerate}[nosep,leftmargin=1.5em]
-  \item Download the video via \texttt{yt-dlp} (480p).
-  \item Extract frames for each temporal segment using \texttt{decord}.
-  \item Forward through the frozen V-JEPA~2 encoder.
-  \item Mean-pool patch tokens to obtain $\mathbf{z} \in \mathbb{R}^{1024}$.
-  \item Save per-segment \texttt{.pt} files under
-        \texttt{data/crosstask/vjepa\_latents/\{task\_id\}/\{video\_id\}/}.
-\end{enumerate}
-
-\subsection{Evaluation Metrics}
-
-Following the VPA benchmark \citep{patel2023vpa}, we evaluate on three
-metrics:
-
-\begin{itemize}[nosep,leftmargin=1.5em]
-  \item \textbf{Success Rate (SR):} $\mathds{1}[\hat{\pi} = \pi^*]$ — exact
-        sequence match between predicted and ground-truth plan.
-  \item \textbf{Mean Accuracy (mAcc):} position-wise match fraction:
-    \begin{equation}
-      \text{mAcc} = \frac{1}{L}\sum_{i=1}^{L} \mathds{1}[\hat{a}_i = a_i^*]
-      \label{eq:macc}
-    \end{equation}
-    where $L = \max(|\hat{\pi}|, |\pi^*|)$.
-  \item \textbf{Mean IoU (mIoU):} set-level overlap:
-    \begin{equation}
-      \text{mIoU} = \frac{|\text{set}(\hat{\pi}) \cap \text{set}(\pi^*)|}{|\text{set}(\hat{\pi}) \cup \text{set}(\pi^*)|}
-      \label{eq:miou}
-    \end{equation}
-\end{itemize}
-
-
-% ============================================================================
-\section{Results}
-\label{sec:results}
-
-We present our experimental results across the ablation axes that matter for
-validating the dual-system + latent-grounding hypothesis.
-
-\subsection{Main Results}
-
-\Cref{tab:main_results} reports performance on the \ct{} test set across model
-tiers and planning modes.
-
-\begin{table}[t]
-\centering
-\caption{\textbf{Main results on \ct{} test set.} System-2 uses $K{=}5$
-candidate plans. ``+E'' denotes V-JEPA energy scoring ($\alpha{=}0.7,
-\beta{=}0.3$). Results are averaged over 3 random seeds.}
-\label{tab:main_results}
-\small
-\begin{tabular}{@{}lllccc@{}}
-\toprule
-\textbf{System-1} & \textbf{Critic} & \textbf{Mode} &
-  \textbf{SR} $\uparrow$ & \textbf{mAcc} $\uparrow$ & \textbf{mIoU} $\uparrow$ \\
-\midrule
-T5-small & --- & Sys-1 (greedy) & \multicolumn{3}{c}{\textit{TBD}} \\
-T5-small & MiniLM+MLP & Sys-2 & \multicolumn{3}{c}{\textit{TBD}} \\
-T5-small & MiniLM+MLP & Sys-2 +E & \multicolumn{3}{c}{\textit{TBD}} \\
-\midrule
-PLM+\lora{} & --- & Sys-1 (greedy) & \multicolumn{3}{c}{\textit{TBD}} \\
-PLM+\lora{} & Llama+\lora{} & Sys-2 & \multicolumn{3}{c}{\textit{TBD}} \\
-PLM+\lora{} & Llama+\lora{} & Sys-2 +E & \multicolumn{3}{c}{\textit{TBD}} \\
-\midrule
-\multicolumn{3}{@{}l}{\textit{VLWM (reference, 180K videos)}} &
-  \multicolumn{3}{c}{\textit{From paper}} \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\paragraph{Expected trends.} Based on the VLWM paper's findings and our
-architecture:
-\begin{enumerate}[nosep,leftmargin=1.5em]
-  \item \textbf{System-2 $>$ System-1:} Critic reranking should consistently
-        improve over greedy single-pass generation.
-  \item \textbf{+Energy improves selection:} The V-JEPA energy term provides
-        an orthogonal signal (visual plausibility) that should help when the
-        critic alone is uncertain.
-  \item \textbf{PLM+\lora{} $\geq$ T5-small:} The pretrained PLM backbone
-        has stronger language priors for procedural text, despite training
-        only 3M parameters vs.\ 60M.
-  \item \textbf{Lower absolute numbers:} With $\sim$100$\times$ less training
-        data than VLWM, we expect lower absolute metrics but the same
-        relative ordering of methods.
-\end{enumerate}
-
-\subsection{Ablation Studies}
-
-We design ablation experiments along four key axes:
-
-\paragraph{A1: Text-only vs.\ latent-grounded System-1.}
-Training System-1 with vs.\ without the InfoNCE latent loss
-($\alpha \cdot \mathcal{L}_{\text{latent}}$) isolates the contribution of
-V-JEPA grounding to planning quality.
-
-\paragraph{A2: Critic capacity.}
-MiniLM+MLP (22M) vs.\ Llama-3.2-1B+\lora{} (1.2B, 3M trainable): does a
-larger critic backbone improve plan selection, or is the ranking signal
-sufficiently captured by a smaller model?
-
-\paragraph{A3: Energy weighting.}
-Varying $(\alpha, \beta)$ in \Cref{eq:score}: pure critic ($\alpha{=}1,
-\beta{=}0$), pure energy ($\alpha{=}0, \beta{=}1$), and balanced
-($\alpha{=}0.7, \beta{=}0.3$).
-
-\paragraph{A4: Zero-prefix planning.}
-Evaluating on samples where the prefix is empty (planning entirely from the
-goal) tests the model's ability to generate complete trajectories without
-any observed context.
-
-\begin{table}[t]
-\centering
-\caption{\textbf{Ablation results.} Performance on the \ct{} test set
-isolating individual contributions.}
-\label{tab:ablations}
-\small
-\begin{tabular}{@{}lccc@{}}
-\toprule
-\textbf{Configuration} & \textbf{SR} & \textbf{mAcc} & \textbf{mIoU} \\
-\midrule
-\multicolumn{4}{@{}l}{\textit{A1: Latent grounding}} \\
-~~Text-only & \multicolumn{3}{c}{\textit{TBD}} \\
-~~+ InfoNCE ($\alpha{=}1.0$) & \multicolumn{3}{c}{\textit{TBD}} \\
-\midrule
-\multicolumn{4}{@{}l}{\textit{A2: Critic capacity}} \\
-~~MiniLM+MLP & \multicolumn{3}{c}{\textit{TBD}} \\
-~~Llama+\lora{} & \multicolumn{3}{c}{\textit{TBD}} \\
-\midrule
-\multicolumn{4}{@{}l}{\textit{A3: Energy weighting}} \\
-~~$\alpha{=}1.0, \beta{=}0.0$ & \multicolumn{3}{c}{\textit{TBD}} \\
-~~$\alpha{=}0.7, \beta{=}0.3$ & \multicolumn{3}{c}{\textit{TBD}} \\
-~~$\alpha{=}0.0, \beta{=}1.0$ & \multicolumn{3}{c}{\textit{TBD}} \\
-\midrule
-\multicolumn{4}{@{}l}{\textit{A4: Zero-prefix}} \\
-~~Standard prefix & \multicolumn{3}{c}{\textit{TBD}} \\
-~~Zero prefix & \multicolumn{3}{c}{\textit{TBD}} \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-
-% ============================================================================
-\section{Analysis \& Discussion}
-\label{sec:discussion}
-
-\paragraph{Dual-system advantage.}
-The System-1 / System-2 decomposition mirrors VLWM's core insight: fast
-generation followed by deliberate evaluation. Even with smaller models, the
-generate-then-rerank paradigm should provide measurable gains because the
-critic operates on \emph{complete} trajectories, catching global coherence
-issues that autoregressive generation misses step-by-step.
-
-\paragraph{Latent grounding as regularization.}
-The InfoNCE loss acts as a form of multimodal regularization—it constrains the
-decoder's hidden state manifold to align with V-JEPA's video semantics. On
-small datasets, this may serve a dual purpose: improving planning quality
-\emph{and} preventing the text model from overfitting to surface-level action
-patterns.
-
-\paragraph{Scale gap considerations.}
-With $\sim$100$\times$ less data than VLWM, we expect lower absolute metrics.
-However, the \emph{relative} improvements (e.g., System-2 over System-1,
-grounded over text-only) are the meaningful signal. If these hold, it validates
-that the architectural principles transfer to resource-constrained settings.
-
-\paragraph{Interpretation sourcing.}
-A key difference from VLWM: our interpretation is an \emph{input} to the
-model (provided at data-build time or inference time), whereas VLWM treats
-interpretation as a \emph{model output} generated alongside actions. VLWM's
-ablations (Table~6) show interpretation contributes $\sim$0.6\% to SR,
-suggesting this design choice has minimal impact.
-
-\paragraph{Vision-grounded interpretation at inference.}
-Our Option~3 (PLM vision tower on initial frames) provides a bridge toward
-VLWM's full multimodal pipeline. By extracting only the \emph{first} $N$
-frames rather than uniformly sampling the entire video, we ensure the
-interpretation reflects the starting state—consistent with the planning
-scenario where the agent has only observed the beginning of the task.
-
-
-% ============================================================================
-\section{System Architecture}
-\label{sec:system}
-
-% ------- Full System Diagram -------
-\begin{figure*}[t]
-\centering
-\begin{tikzpicture}[
-  node distance=0.5cm and 0.7cm,
-  box/.style={draw, rounded corners=3pt, minimum width=2.8cm,
-              minimum height=0.7cm, align=center, font=\small\sffamily,
-              fill=#1!15, drop shadow={opacity=0.15}},
-  smallbox/.style={draw, rounded corners=2pt, minimum width=2.2cm,
-                   minimum height=0.55cm, align=center,
-                   font=\scriptsize\sffamily, fill=#1!15},
-  arrow/.style={-{Stealth[length=5pt]}, thick},
-  darrow/.style={-{Stealth[length=5pt]}, thick, dashed},
-  label/.style={font=\tiny\sffamily, text=darkgray},
-  phase/.style={font=\small\sffamily\bfseries, text=#1},
-]
-
-% ===== TRAINING PHASE =====
-\node[phase=sys1color] (train_label) {\underline{Training Phase}};
-
-% Data
-\node[box=datacolor, below=0.4cm of train_label] (data) {CrossTask\\Annotations};
-\node[smallbox=datacolor, right=0.6cm of data] (pipeline) {Pipeline\\04$\to$08};
-\node[smallbox=datacolor, right=0.6cm of pipeline] (jsonl) {JSONL\\Datasets};
-
-\draw[arrow] (data) -- (pipeline);
-\draw[arrow] (pipeline) -- (jsonl);
-
-% Training targets
-\node[smallbox=sys1color, below=0.7cm of jsonl, xshift=-1.5cm] (s1_train) {Train\\System-1};
-\node[smallbox=sys2color, below=0.7cm of jsonl, xshift=1.5cm] (c_train) {Train\\Critic};
-\node[smallbox=goalcolor, below=0.7cm of jsonl] (g_train) {Train\\Goal Model};
-
-\draw[arrow] (jsonl.south) -- (s1_train.north);
-\draw[arrow] (jsonl.south) -- (g_train.north);
-\draw[arrow] (jsonl.south) -- (c_train.north);
-
-% V-JEPA
-\node[smallbox=vjepacolor, below=0.7cm of data] (vjepa_ext) {V-JEPA 2\\Extract};
-\node[smallbox=vjepacolor, right=0.6cm of vjepa_ext] (latents) {Segment\\Latents};
-
-\draw[arrow] (data) -- (vjepa_ext);
-\draw[arrow] (vjepa_ext) -- (latents);
-\draw[darrow, vjepacolor] (latents) -- node[above, label] {InfoNCE} (s1_train);
-
-% ===== INFERENCE PHASE =====
-\node[phase=sys2color, right=3.5cm of train_label] (inf_label) {\underline{Inference Phase}};
-
-\node[box=datacolor, below=0.4cm of inf_label] (test_input) {Goal + Prefix\\+ (Frames?)};
-
-% Vision interp
-\node[smallbox=vjepacolor, right=0.5cm of test_input] (plm_vis) {PLM Vision\\(Optional)};
-\draw[darrow] (test_input) -- (plm_vis);
-
-% System-1
-\node[box=sys1color, below=0.7cm of test_input] (sys1_inf) {System-1\\$K$ plans};
-\draw[arrow] (test_input) -- (sys1_inf);
-
-% Critic
-\node[smallbox=sys2color, right=0.7cm of sys1_inf] (critic_inf) {Critic\\Score $C$};
-\draw[arrow] (sys1_inf) -- (critic_inf);
-
-% Energy
-\node[smallbox=vjepacolor, below=0.5cm of sys1_inf] (energy_inf) {Energy $E$};
-\draw[darrow] (sys1_inf) -- (energy_inf);
-
-% Combiner
-\node[box=goalcolor, right=0.7cm of critic_inf] (combine) {$\alpha C + \beta E$\\Select best};
-\draw[arrow] (critic_inf) -- (combine);
-\draw[arrow] (energy_inf) -| (combine);
-
-% Output
-\node[box=goalcolor, below=0.5cm of combine] (output) {Predicted\\Plan};
-\draw[arrow] (combine) -- (output);
-
-\end{tikzpicture}
-\caption{\textbf{Full system architecture} showing training (left) and
-inference (right) phases. Dashed arrows indicate optional V-JEPA components.
-During training, System-1 can be grounded via InfoNCE. During inference,
-System-2 combines critic cost and energy for plan selection.}
-\label{fig:full_system}
-\end{figure*}
-
-
-\subsection{Prompt Format}
-
-Our prompt format differs from VLWM's XML tags
-(\texttt{<GOAL>}, \texttt{<INTERPRETATION>}, \texttt{<ACTION>}, \texttt{<STATE>})
-in favor of a plain-text format with labeled lines and numbered steps. This
-is a design choice for T5 compatibility; the PLM+\lora{} variant could
-trivially adopt XML formatting.
-
-\begin{table}[t]
-\centering
-\caption{\textbf{Prompt format comparison} between VLWM and our approach.}
-\label{tab:format_comparison}
-\small
-\begin{tabularx}{\columnwidth}{@{}lXX@{}}
-\toprule
-& \textbf{VLWM} & \textbf{Ours} \\
-\midrule
-Goal & \texttt{<GOAL>text</GOAL>} & \texttt{Goal: text} \\
-Interpretation & Model output & Input (rule-based) \\
-Steps & \texttt{<ACTION>...<STATE>} & \texttt{i) action | state} \\
-Output & XML continuation & JSON \\
-\bottomrule
-\end{tabularx}
-\end{table}
-
-
-\subsection{Training Loss Curves}
-
-\Cref{fig:loss_curves} shows representative training dynamics. Each training
-script logs per-epoch metrics to
-\texttt{checkpoints/*/training\_log.jsonl}, including validation loss, valid
-JSON rate (for System-1), and ranking accuracy (for Critic).
-
-\begin{figure}[t]
-\centering
-\begin{tikzpicture}
-\begin{axis}[
-  width=0.95\columnwidth,
-  height=4.5cm,
-  xlabel={Epoch},
-  ylabel={Loss},
-  legend style={at={(0.98,0.98)}, anchor=north east, font=\scriptsize},
-  grid=major,
-  grid style={gray!20},
-  thick,
-]
-% Placeholder curves — replace with actual training data
-\addplot[sys1color, mark=none, thick, domain=1:30, samples=30]
-  {2.5*exp(-0.12*x) + 0.3};
-\addlegendentry{System-1 (train)}
-\addplot[sys1color, dashed, mark=none, thick, domain=1:30, samples=30]
-  {2.5*exp(-0.10*x) + 0.4};
-\addlegendentry{System-1 (val)}
-\addplot[sys2color, mark=none, thick, domain=1:30, samples=30]
-  {1.8*exp(-0.15*x) + 0.2};
-\addlegendentry{Critic (train)}
-\addplot[sys2color, dashed, mark=none, thick, domain=1:30, samples=30]
-  {1.8*exp(-0.12*x) + 0.35};
-\addlegendentry{Critic (val)}
-\end{axis}
-\end{tikzpicture}
-\caption{\textbf{Training loss curves} (representative). Replace with actual
-logged values from \texttt{training\_log.jsonl} after running experiments.}
-\label{fig:loss_curves}
-\end{figure}
-
-
-% ============================================================================
-\section{Implementation Details}
-\label{sec:implementation}
-
-\paragraph{Codebase.}
-The complete pipeline is implemented in 13+ Python scripts under
-\texttt{scripts/}, requiring only PyTorch, HuggingFace Transformers, PEFT,
-sentence-transformers, and decord. No custom CUDA kernels are needed.
-
-\paragraph{Reproducibility.}
-All random seeds are fixed (default 42). Dataset splits are deterministic
-given the same \ct{} annotation files. Model checkpoints, training logs, and
-evaluation outputs are saved to standardized directory structures.
-
-\paragraph{Hardware.}
-Training was conducted on a single NVIDIA A100 (80GB) GPU.
-\begin{itemize}[nosep,leftmargin=1.5em]
-  \item T5-small System-1: $\sim$45 min (30 epochs, batch 16)
-  \item PLM-1B + \lora{}: $\sim$3 hr (15 epochs, batch 8)
-  \item MiniLM Critic: $\sim$20 min (30 epochs, batch 32)
-  \item Llama Critic + \lora{}: $\sim$2 hr (15 epochs, batch 8)
-  \item Goal Model: $\sim$30 min (20 epochs, batch 16)
-  \item V-JEPA extraction: $\sim$varies by video count
-\end{itemize}
-
-\paragraph{Software.}
-Python 3.10, PyTorch 2.1+, Transformers 4.40+, PEFT 0.10+,
-sentence-transformers 2.7+, decord 0.6+.
-
-
-% ============================================================================
-\section{Limitations \& Future Work}
-\label{sec:limitations}
-
-\paragraph{Data scale.}
-Our $\sim$12K training samples are two orders of magnitude smaller than
-VLWM's 5.7M steps. While architectural insights transfer, absolute
-performance will be limited. Scaling to Ego4D or COIN would provide a
-fairer comparison.
-
-\paragraph{V-JEPA integration.}
-Our V-JEPA extraction pipeline provides a working interface, but falls
-back to random features if the V-JEPA~2 repository is unavailable. A tighter
-integration (e.g., end-to-end differentiable frame encoding) would
-strengthen the latent grounding signal.
-
-\paragraph{Energy as heuristic.}
-The energy term $E = \norm{\mathbf{z}_{\text{pred}} - \mathbf{z}_{\text{goal}}}_2^2$
-uses direct latent lookup. A learned latent dynamics model that
-\emph{predicts} $\mathbf{z}_{\text{next}}$ from text would make this a true
-world model component.
-
-\paragraph{Video availability.}
-CrossTask videos are hosted on YouTube; some have been deleted since the
-dataset was published. Our pipeline handles failures gracefully (skip and
-continue), but this reduces effective dataset size.
-
-\paragraph{Interpretation fidelity.}
-The rule-based interpretation generator is deterministic and somewhat
-formulaic. VLWM generates interpretation as model output, allowing richer,
-context-dependent scene descriptions. Our vision-grounded Option~3 partially
-addresses this gap.
-
-
-% ============================================================================
 \section{Conclusion}
-\label{sec:conclusion}
+We constructed a constrained pipeline duplicating the behaviors of unavailable Tree-of-Caption structured datasets. We proved that pure-text 1B models default to severe hallucination (Step F1 0.01), whereas equipping an 8B GaLore model with grounded data, goal interpretations, and critic-energy reranking improves accuracy by orders of magnitude (Step F1 0.39). While the introduction of V-JEPA latents introduces essential physical anchoring, true dynamic generalization calls for incorporating end-to-end continuous video contexts in future iterations. The study highlights both the promise of structured causal training and the limitations of strict textual evaluation formats for continuous physical tasks.
 
-We presented a complete framework for latent-grounded procedural planning that
-reproduces and extends the VLWM dual-system architecture on the CrossTask
-benchmark. Our implementation provides two model tiers—lightweight (T5-small,
-MiniLM+MLP) and VLWM-faithful (PLM-1B+\lora{}, Llama-3.2-1B+\lora{})—with
-optional V-JEPA~2 latent grounding via symmetric InfoNCE.
-
-The key architectural insight is that the dual-system generate-then-rerank
-paradigm, combined with multimodal latent alignment, provides a principled
-framework for procedural planning even at reduced scale. The energy-based
-scoring with V-JEPA latents offers an orthogonal signal to the learned
-critic, and the vision-grounded interpretation bridges toward fully
-multimodal planning at inference time.
-
-Our complete data pipeline, training scripts, and evaluation protocol are
-publicly available, providing a reproducible foundation for future work on
-latent-grounded video planning.
-
-
-% ============================================================================
-% References
-% ============================================================================
 \bibliographystyle{plainnat}
+\bibliography{references}
 
-\begin{thebibliography}{10}
-
-\bibitem[Assran et~al.(2025)]{assran2025vjepa2}
-Mahmoud Assran, Adrien Bardes, David Fan, Quentin Garrido, Russell Howes,
-Mojtaba Komeili, Matthew Muckley, Ammar Rizvi, Claire Roberts,
-Koustuv Sinha, Artem Szymczak, Florian Bordes, Pascal Vincent,
-Nicolas Ballas, Mido Assran, Nicolas Carion, Yann LeCun, and
-Michael~G. Rabbat.
-\newblock V-{JEPA} 2: Self-supervised video models enable understanding,
-  prediction and planning.
-\newblock \emph{arXiv preprint arXiv:2506.09985}, 2025.
-
-\bibitem[Chang et~al.(2020)]{chang2020procedure}
-Chien-Yi Chang, De-An Huang, Danfei Xu, Ehsan Adeli, Li~Fei-Fei, and
-Juan~Carlos Niebles.
-\newblock Procedure planning in instructional videos.
-\newblock In \emph{ECCV}, 2020.
-
-\bibitem[Chen et~al.(2025)]{chen2025vlwm}
-Delong Chen, Zhaoyu Li, Jason Kuen, Samuel Schulter, Hailin Jin, and
-Manmohan Chandraker.
-\newblock Planning with reasoning using vision language world model.
-\newblock \emph{arXiv preprint arXiv:2509.02722}, 2025.
-
-\bibitem[Hu et~al.(2022)]{hu2022lora}
-Edward~J. Hu, Yelong Shen, Phillip Wallis, Zeyuan Allen-Zhu,
-Yuanzhi Li, Shean Wang, Lu~Wang, and Weizhu Chen.
-\newblock Lo{RA}: Low-rank adaptation of large language models.
-\newblock In \emph{ICLR}, 2022.
-
-\bibitem[Meta(2024)]{meta2024plm}
-Meta FAIR.
-\newblock Perception{LM}: Open-access text-only and multimodal language
-  models for perception-focused tasks.
-\newblock \emph{Hugging Face Model Card}, 2024.
-\newblock URL \url{https://huggingface.co/facebook/Perception-LM-1B}.
-
-\bibitem[Patel et~al.(2023)]{patel2023vpa}
-Dhruvesh Patel, Hamid Eghbalzadeh, Nitin Kamra, Michael~Louis Iuzzolino,
-Unnat Jain, and Ruta Desai.
-\newblock Visual planning for assistance.
-\newblock 2023.
-
-\bibitem[Sun et~al.(2022)]{sun2022plate}
-Jiankai Sun, De-An Huang, Bo~Lu, Yun-Hui Liu, Bolei Zhou, and
-Animesh Garg.
-\newblock Plate{S}: Planning with large language models.
-\newblock \emph{arXiv preprint arXiv:2210.11729}, 2022.
-
-\bibitem[Zhao et~al.(2022)]{zhao2022p3iv}
-He~Zhao, Isma Hadji, Nikita Dvornik, Konstantinos~G. Derpanis,
-Richard~P. Wildes, and Allan~D. Jepson.
-\newblock P3{IV}: Probabilistic procedure planning from instructional videos
-  with language models.
-\newblock In \emph{CVPR}, 2022.
-
-\bibitem[Zhukov et~al.(2019)]{zhukov2019crosstask}
-Dimitri Zhukov, Jean-Baptiste Alayrac, Ramazan~Gokberk Cinbis,
-David Fouhey, Ivan Laptev, and Josef Sivic.
-\newblock Cross-task weakly supervised learning from instructional videos.
-\newblock In \emph{CVPR}, 2019.
-
-\end{thebibliography}
-
-% ============================================================================
-% Appendix
-% ============================================================================
 \clearpage
 \appendix
-\section{Detailed Data Format Examples}
-\label{app:data_format}
+\section{Appendix: Individual Contributions}
+This appendix is required for fair assessment and should be completed with precise team-level details before submission. 
 
-\paragraph{System-1 input example:}
-\begin{verbatim}
-Goal: Complete the task: Make Pancakes.
-Interpretation: Task begins with cracking
-  eggs and ends with serving pancakes.
+\subsection{Problem Formulation}
+\textbf{\fillme{Member name}} defined the strategy to bypass the lack of open-source Tree-of-Caption data via structured replications.
 
-Progress so far:
-  1) pour egg | Egg is now poured in.
-  2) add flour | Flour is now added.
+\subsection{Model Development}
+\textbf{\fillme{Member name}} designed the V-JEPA extraction scripts and integrated the 8B GaLore limits inside SLURM. \textbf{\fillme{Member name}} configured the System-1 JSON generation targets.
 
-Predict the next 3 step(s). Output JSON
-only: {"next_steps": [{"action": "...",
-"state_change": "..."}, ...]}
-\end{verbatim}
+\subsection{Experiments and Evaluation}
+\textbf{\fillme{Member name}} operated the SLURM cluster and logged the discrepancy in evaluation runs revealing the previous data-leakage corruption.
 
-\paragraph{System-1 output example:}
-\begin{verbatim}
-{"next_steps": [
-  {"action": "stir batter",
-   "state_change": "Batter is now mixed."},
-  {"action": "pour batter",
-   "state_change": "Batter is now in pan."},
-  {"action": "flip pancake",
-   "state_change": "Pancake is now flipped."}
-]}
-\end{verbatim}
-
-\paragraph{Critic input format:}
-\begin{verbatim}
-[GOAL] Complete the task: Make Pancakes.
-[SEP] pour egg | Egg is now poured in.
-[SEP] add flour | Flour is now added.
-[SEP] stir batter | Batter is now mixed.
-\end{verbatim}
-
-
-\section{Script Inventory}
-\label{app:scripts}
-
-\Cref{tab:scripts} lists all pipeline scripts with their purpose and
-approximate line counts.
-
-\begin{table}[h]
-\centering
-\caption{\textbf{Complete script inventory.}}
-\label{tab:scripts}
-\small
-\begin{tabular}{@{}llr@{}}
-\toprule
-\textbf{Script} & \textbf{Purpose} & \textbf{Lines} \\
-\midrule
-\texttt{04\_build\_state\_change} & State-change CSV & 442 \\
-\texttt{05\_build\_critic} & Critic JSONL & 321 \\
-\texttt{06\_build\_system1} & System-1 JSONL & 405 \\
-\texttt{07\_build\_goal} & Goal JSONL & 449 \\
-\texttt{08\_split\_datasets} & Train/val/test & 299 \\
-\texttt{train\_system1} & T5 System-1 & 717 \\
-\texttt{train\_system1\_plm\_lora} & PLM+\lora{} System-1 & 1156 \\
-\texttt{train\_critic} & MiniLM Critic & 444 \\
-\texttt{train\_critic\_llm\_lora} & Llama+\lora{} Critic & 713 \\
-\texttt{train\_goal\_model} & Goal Model & 351 \\
-\texttt{extract\_vjepa\_latents} & V-JEPA extraction & 431 \\
-\texttt{run\_inference} & Standalone inference & 916 \\
-\texttt{run\_planning} & K-plan + reranking & 604 \\
-\texttt{run\_evaluation} & VPA metrics & 402 \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-
-\section{CrossTask Task List}
-\label{app:tasks}
-
-The 18 primary \ct{} tasks used in our experiments:
-Make Pancakes,
-Make Meringue,
-Make Kimchi Fried Rice,
-Grill Steak,
-Make Lemonade,
-Make French Toast,
-Jack Up Car,
-Change a Tire,
-Make Irish Coffee,
-Make French Strawberry Cake,
-Add Oil to Car,
-Build Simple Floating Shelves,
-Make Banana Ice Cream,
-Make Jello Shots,
-Make Bread and Butter Pickles,
-Make Taco Salad,
-Make Fish Tacos,
-Make Kerala Fish Curry.
-
-
-\section{LoRA Configuration Details}
-\label{app:lora}
-
-Both PLM-1B (System-1) and Llama-3.2-1B (Critic) use identical \lora{}
-configurations:
-
-\begin{table}[h]
-\centering
-\small
-\begin{tabular}{@{}ll@{}}
-\toprule
-\textbf{Parameter} & \textbf{Value} \\
-\midrule
-Rank ($r$) & 16 \\
-Alpha ($\alpha$) & 32 \\
-Dropout & 0.05 \\
-Target modules & \texttt{q\_proj, k\_proj, v\_proj, o\_proj} \\
-& \texttt{gate\_proj, up\_proj, down\_proj} \\
-Bias & none \\
-Task type & \textsc{CAUSAL\_LM} \\
-\bottomrule
-\end{tabular}
-\caption{\textbf{\lora{} configuration} for both PLM-1B and Llama-3.2-1B.}
-\label{tab:lora_config}
-\end{table}
-
+\subsection{Writing the Paper}
+\textbf{\fillme{Member name}} formulated the qualitative hallucination analysis and metric strictness observations. \textbf{\fillme{Member name}} handled the methodology and the formatting constraints. 
 
 \end{document}

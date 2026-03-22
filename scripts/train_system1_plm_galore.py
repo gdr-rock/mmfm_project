@@ -533,7 +533,7 @@ def train(args):
             f"  L_text={avg_text_loss:.4f}"
             f"{latent_str}"
             f"  lat_w={current_latent_weight:.3f}"
-            f"  lat_rows={train_schedule['scheduled_latent_fraction']:.0%}"
+            f"  lat_rows={train_schedule['latent_fraction']:.0%}"
             f"{val_str}{gen_str}"
             f"  lr={optimizer.param_groups[0]['lr']:.2e}"
             f"  [{elapsed:.0f}s]"

@@ -1,0 +1,92 @@
+[
+  {
+    "run_label": "plm_coin2_8b_galore_grounded",
+    "config": "system1_critic",
+    "delta_exact_match": 0.0,
+    "delta_task_success": 0.0741,
+    "delta_ordered_ratio": 0.3516,
+    "delta_step_f1": 0.2819,
+    "delta_step_accuracy": 0.22999999999999998
+  },
+  {
+    "run_label": "plm_coin2_8b_galore_grounded",
+    "config": "system1_critic_goal",
+    "delta_exact_match": 0.0,
+    "delta_task_success": 0.037,
+    "delta_ordered_ratio": 0.3173,
+    "delta_step_f1": 0.258,
+    "delta_step_accuracy": 0.2244
+  },
+  {
+    "run_label": "plm_coin2_8b_galore_grounded",
+    "config": "system1_goal",
+    "delta_exact_match": 0.0,
+    "delta_task_success": 0.037,
+    "delta_ordered_ratio": 0.31020000000000003,
+    "delta_step_f1": 0.2443,
+    "delta_step_accuracy": 0.22619999999999998
+  },
+  {
+    "run_label": "plm_coin2_8b_galore_grounded",
+    "config": "system1_greedy",
+    "delta_exact_match": 0.0,
+    "delta_task_success": 0.037,
+    "delta_ordered_ratio": 0.3226,
+    "delta_step_f1": 0.25529999999999997,
+    "delta_step_accuracy": 0.2096
+  },
+  {
+    "run_label": "plm_coin2_grounded",
+    "config": "system1_critic",
+    "delta_exact_match": 0.0,
+    "delta_task_success": 0.0,
+    "delta_ordered_ratio": 0.022899999999999997,
+    "delta_step_f1": 0.0177,
+    "delta_step_accuracy": 0.0078
+  },
+  {
+    "run_label": "plm_coin2_grounded",
+    "config": "system1_critic_goal",
+    "delta_exact_match": 0.0,
+    "delta_task_success": 0.0,
+    "delta_ordered_ratio": 0.022899999999999997,
+    "delta_step_f1": 0.0201,
+    "delta_step_accuracy": 0.0127
+  },
+  {
+    "run_label": "plm_coin2_grounded",
+    "config": "system1_goal",
+    "delta_exact_match": 0.0,
+    "delta_task_success": 0.0,
+    "delta_ordered_ratio": 0.0377,
+    "delta_step_f1": 0.029799999999999997,
+    "delta_step_accuracy": 0.0040999999999999995
+  },
+  {
+    "run_label": "plm_coin2_grounded",
+    "config": "system1_greedy",
+    "delta_exact_match": 0.0,
+    "delta_task_success": 0.0,
+    "delta_ordered_ratio": 0.022899999999999997,
+    "delta_step_f1": 0.0196,
+    "delta_step_accuracy": 0.0115
+  },
+  {
+    "run_label": "plm_coin2_plain",
+    "config": "system1_critic",
+    "delta_exact_match": 0.0,
+    "delta_task_success": 0.0,
+    "delta_ordered_ratio": 0.0074,
+    "delta_step_f1": 0.005299999999999999,
+    "delta_step_accuracy": 0.0041
+  },
+  {
+    "run_label": "plm_coin2_plain",
+    "config": "system1_greedy",
+    "delta_exact_match": 0.0,
+    "delta_task_success": 0.0,
+    "delta_ordered_ratio": 0.0074,
+    "delta_step_f1": 0.005299999999999999,
+    "delta_step_accuracy": 0.0041
+  }
+]

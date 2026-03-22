@@ -1,0 +1,11 @@
+run_label,config,delta_exact_match,delta_task_success,delta_ordered_ratio,delta_step_f1,delta_step_accuracy
+plm_coin2_8b_galore_grounded,system1_critic,0.0,0.0741,0.3516,0.2819,0.22999999999999998
+plm_coin2_8b_galore_grounded,system1_critic_goal,0.0,0.037,0.3173,0.258,0.2244
+plm_coin2_8b_galore_grounded,system1_goal,0.0,0.037,0.31020000000000003,0.2443,0.22619999999999998
+plm_coin2_8b_galore_grounded,system1_greedy,0.0,0.037,0.3226,0.25529999999999997,0.2096
+plm_coin2_grounded,system1_critic,0.0,0.0,0.022899999999999997,0.0177,0.0078
+plm_coin2_grounded,system1_critic_goal,0.0,0.0,0.022899999999999997,0.0201,0.0127
+plm_coin2_grounded,system1_goal,0.0,0.0,0.0377,0.029799999999999997,0.0040999999999999995
+plm_coin2_grounded,system1_greedy,0.0,0.0,0.022899999999999997,0.0196,0.0115
+plm_coin2_plain,system1_critic,0.0,0.0,0.0074,0.005299999999999999,0.0041
+plm_coin2_plain,system1_greedy,0.0,0.0,0.0074,0.005299999999999999,0.0041

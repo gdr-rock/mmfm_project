@@ -19,6 +19,9 @@ import os
 import random
 import re
 import statistics
+import subprocess
+import tempfile
+from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
@@ -72,6 +75,17 @@ def write_jsonl(path: Path, rows: list[dict]) -> None:
     with path.open("w") as handle:
         for row in rows:
             handle.write(json.dumps(row, ensure_ascii=False, default=str) + "\n")
+
+
+def parse_prompt_text_fields(input_text: str) -> tuple[str, str]:
+    goal = ""
+    interpretation = ""
+    for line in (input_text or "").splitlines():
+        if line.startswith("Goal:"):
+            goal = line[len("Goal:"):].strip()
+        elif line.startswith("Interpretation:"):
+            interpretation = line[len("Interpretation:"):].strip()
+    return goal, interpretation
 
 
 def build_full_plan_prompt(goal: str, interpretation: str = "") -> str:
@@ -457,6 +471,7 @@ def rollout_full_plan(
     tokenizer,
     goal: str,
     interpretation: str,
+    terminal_step: Optional[str],
     device,
     gen_mode: str,
     temperature: float,
@@ -468,6 +483,7 @@ def rollout_full_plan(
     prefix_steps: list[str] = []
     rollout_trace: list[dict] = []
     stalled_rounds = 0
+    terminal_norm = normalize_step(terminal_step) if terminal_step else None
 
     while len(prefix_steps) < max_plan_steps:
         k = min(rollout_chunk_size, max_plan_steps - len(prefix_steps))
@@ -485,6 +501,7 @@ def rollout_full_plan(
         parsed = parse_plan_json(raw)
 
         added_steps = 0
+        stop_on_terminal = False
         for step in parsed:
             if len(prefix_steps) >= max_plan_steps:
                 break
@@ -492,6 +509,9 @@ def rollout_full_plan(
                 continue
             prefix_steps.append(step)
             added_steps += 1
+            if terminal_norm and normalize_step(step) == terminal_norm:
+                stop_on_terminal = True
+                break
 
         rollout_trace.append(
             {
@@ -500,6 +520,7 @@ def rollout_full_plan(
                 "parsed_steps": parsed,
                 "added_steps": added_steps,
                 "plan_len_after_round": len(prefix_steps),
+                "stop_on_terminal": stop_on_terminal,
             }
         )
 
@@ -508,7 +529,7 @@ def rollout_full_plan(
         else:
             stalled_rounds = 0
 
-        if not parsed or stalled_rounds >= 2:
+        if stop_on_terminal or not parsed or stalled_rounds >= 2:
             break
 
     return prefix_steps, rollout_trace
@@ -577,6 +598,136 @@ def resolve_frames_path(frames_root: str, meta: dict) -> str:
     raise FileNotFoundError(f"Could not resolve initial frames for video {video_id}. Checked: {checked}")
 
 
+def normalize_youtube_url(url: str) -> str:
+    if "/embed/" in url:
+        prefix, video_id = url.split("/embed/", 1)
+        video_id = video_id.split("?", 1)[0].strip("/")
+        return f"{prefix}/watch?v={video_id}"
+    return url
+
+
+def load_split_rows(split_csv_path: str) -> dict[str, dict]:
+    rows: dict[str, dict] = {}
+    with open(split_csv_path) as handle:
+        for row in csv.DictReader(handle):
+            rows[row["video_id"]] = row
+    return rows
+
+
+def download_coin_video(
+    video_url: str,
+    out_path: Path,
+    timeout_sec: int,
+    max_height: int,
+    yt_cookies: Optional[str] = None,
+    yt_cookies_from_browser: Optional[str] = None,
+) -> bool:
+    cmd = [
+        "yt-dlp",
+        "-f",
+        f"bestvideo[height<={max_height}][ext=mp4]+bestaudio[ext=m4a]/best[height<={max_height}]/best",
+        "--merge-output-format",
+        "mp4",
+        "-o",
+        str(out_path),
+        "--no-playlist",
+        "--quiet",
+        "--no-warnings",
+        normalize_youtube_url(video_url),
+    ]
+    if yt_cookies:
+        cmd[1:1] = ["--cookies", yt_cookies]
+    elif yt_cookies_from_browser:
+        cmd[1:1] = ["--cookies-from-browser", yt_cookies_from_browser]
+    try:
+        subprocess.run(cmd, check=True, timeout=timeout_sec)
+    except (subprocess.CalledProcessError, subprocess.TimeoutExpired, FileNotFoundError):
+        return False
+    return out_path.exists()
+
+
+def extract_initial_frames(video_path: str, start_sec: float, num_frames: int, output_dir: str) -> None:
+    import cv2
+    from PIL import Image
+
+    cap = cv2.VideoCapture(video_path)
+    if not cap.isOpened():
+        raise RuntimeError(f"Cannot open video: {video_path}")
+
+    cap.set(cv2.CAP_PROP_POS_MSEC, start_sec * 1000.0)
+    Path(output_dir).mkdir(parents=True, exist_ok=True)
+    saved = 0
+    for idx in range(num_frames):
+        ok, frame = cap.read()
+        if not ok:
+            break
+        rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        Image.fromarray(rgb).save(os.path.join(output_dir, f"frame_{idx:03d}.png"))
+        saved += 1
+    cap.release()
+    if saved == 0:
+        raise RuntimeError(f"Failed to extract frames from {video_path}")
+
+
+@contextmanager
+def prepare_frames_dir(
+    sample_meta: dict,
+    frames_root: Optional[str],
+    auto_download: bool,
+    split_rows: Optional[dict[str, dict]],
+    num_frames: int,
+    download_timeout_sec: int,
+    download_max_height: int,
+    yt_cookies: Optional[str],
+    yt_cookies_from_browser: Optional[str],
+):
+    if frames_root:
+        yield resolve_frames_path(frames_root, sample_meta)
+        return
+
+    if not auto_download:
+        raise ValueError("Provide --frames_root or enable --auto_download_frames for frame-based evaluation")
+
+    video_id = str(sample_meta.get("video_id", ""))
+    if not video_id:
+        raise ValueError("Sample is missing meta.video_id; cannot auto-download frames")
+    if split_rows is None or video_id not in split_rows:
+        raise FileNotFoundError(f"Could not find video metadata for {video_id} in split CSV")
+
+    row = split_rows[video_id]
+    video_url = row.get("video_url", "")
+    if not video_url:
+        raise FileNotFoundError(f"Missing video_url for {video_id} in split CSV")
+
+    with tempfile.TemporaryDirectory(prefix=f"coin_eval_{video_id}_") as tmpdir:
+        tmpdir_p = Path(tmpdir)
+        video_path = tmpdir_p / f"{video_id}.mp4"
+        frames_dir = tmpdir_p / "frames"
+        ok = download_coin_video(
+            video_url,
+            video_path,
+            download_timeout_sec,
+            download_max_height,
+            yt_cookies=yt_cookies,
+            yt_cookies_from_browser=yt_cookies_from_browser,
+        )
+        if not ok:
+            cookie_hint = (
+                " Try --yt_cookies <cookies.txt> or --yt_cookies_from_browser <browser> "
+                "for YouTube-authenticated downloads."
+            )
+            raise RuntimeError(
+                f"Failed to download video for {video_id} from {video_url}.{cookie_hint}"
+            )
+        extract_initial_frames(
+            str(video_path),
+            float(row.get("roi_start", sample_meta.get("roi_start", 0.0) or 0.0)),
+            num_frames,
+            str(frames_dir),
+        )
+        yield str(frames_dir)
+
+
 def compute_lookup_energy(latent_dir: str, meta: dict, plan_steps: list[str]) -> float:
     task_id = str(meta.get("task_id", ""))
     video_id = str(meta.get("video_id", ""))
@@ -642,6 +793,56 @@ class SampleOutcome:
     gold_steps: list[str]
     best_steps: list[str]
     plans: list[dict]
+
+
+def outcome_to_row(outcome: SampleOutcome) -> dict:
+    return {
+        "sample_id": outcome.sample_id,
+        "goal": outcome.goal,
+        "interpretation": outcome.interpretation,
+        "gold_steps": outcome.gold_steps,
+        "best_steps": outcome.best_steps,
+        "best_idx": outcome.best_idx,
+        "valid_candidates": outcome.valid_candidates,
+        "critic_score": outcome.critic_score,
+        "goal_score": outcome.goal_score,
+        "combined_score": outcome.combined_score,
+        "metrics": outcome.best_metrics,
+        "plans": outcome.plans,
+    }
+
+
+def row_to_outcome(row: dict) -> SampleOutcome:
+    return SampleOutcome(
+        sample_id=int(row["sample_id"]),
+        goal=row["goal"],
+        interpretation=row.get("interpretation", ""),
+        best_idx=int(row["best_idx"]),
+        valid_candidates=int(row["valid_candidates"]),
+        best_metrics=row["metrics"],
+        combined_score=float(row["combined_score"]),
+        critic_score=float(row["critic_score"]),
+        goal_score=float(row["goal_score"]),
+        gold_steps=row["gold_steps"],
+        best_steps=row["best_steps"],
+        plans=row["plans"],
+    )
+
+
+def load_existing_outcomes(out_dir: Path) -> list[SampleOutcome]:
+    path = out_dir / "per_sample.jsonl"
+    if not path.exists():
+        return []
+
+    outcomes = []
+    with path.open() as handle:
+        for line in handle:
+            line = line.strip()
+            if not line:
+                continue
+            outcomes.append(row_to_outcome(json.loads(line)))
+    outcomes.sort(key=lambda outcome: outcome.sample_id)
+    return outcomes
 
 
 def plot_summary(out_dir: Path, summary: dict, outcomes: list[SampleOutcome]) -> None:
@@ -712,6 +913,8 @@ def summarize_outcomes(outcomes: list[SampleOutcome]) -> dict:
 
 
 def save_tables(out_dir: Path, outcomes: list[SampleOutcome], summary: dict) -> None:
+    outcomes = sorted(outcomes, key=lambda outcome: outcome.sample_id)
+
     with (out_dir / "summary.json").open("w") as handle:
         json.dump(summary, handle, indent=2, ensure_ascii=False)
 
@@ -762,25 +965,7 @@ def save_tables(out_dir: Path, outcomes: list[SampleOutcome], summary: dict) -> 
                 ]
             )
 
-    jsonl_rows = []
-    for outcome in outcomes:
-        jsonl_rows.append(
-            {
-                "sample_id": outcome.sample_id,
-                "goal": outcome.goal,
-                "interpretation": outcome.interpretation,
-                "gold_steps": outcome.gold_steps,
-                "best_steps": outcome.best_steps,
-                "best_idx": outcome.best_idx,
-                "valid_candidates": outcome.valid_candidates,
-                "critic_score": outcome.critic_score,
-                "goal_score": outcome.goal_score,
-                "combined_score": outcome.combined_score,
-                "metrics": outcome.best_metrics,
-                "plans": outcome.plans,
-            }
-        )
-    write_jsonl(out_dir / "per_sample.jsonl", jsonl_rows)
+    write_jsonl(out_dir / "per_sample.jsonl", [outcome_to_row(outcome) for outcome in outcomes])
 
 
 def main() -> None:
@@ -788,6 +973,14 @@ def main() -> None:
     parser.add_argument("--test_data", required=True)
     parser.add_argument("--input_mode", choices=["text", "frames"], default="text")
     parser.add_argument("--frames_root", default=None)
+    parser.add_argument("--auto_download_frames", action="store_true")
+    parser.add_argument("--coin_split_csv", default="data/coin/coin_video_splits.csv")
+    parser.add_argument("--download_timeout_sec", type=int, default=180)
+    parser.add_argument("--download_max_height", type=int, default=360)
+    parser.add_argument("--yt_cookies", default=None,
+                        help="Path to a yt-dlp/Netscape cookies.txt file for YouTube downloads")
+    parser.add_argument("--yt_cookies_from_browser", default=None,
+                        help="Browser spec for yt-dlp, e.g. chrome, firefox, chrome:Profile 1")
     parser.add_argument("--system1_model", required=True)
     parser.add_argument("--system1_type", choices=["t5", "plm"], default="plm")
     parser.add_argument("--plm_base_model", default="facebook/Perception-LM-1B")
@@ -800,7 +993,12 @@ def main() -> None:
     parser.add_argument("--K", type=int, default=5)
     parser.add_argument("--plan_generation_mode", choices=["rollout", "direct"], default="rollout")
     parser.add_argument("--rollout_chunk_size", type=int, default=3)
-    parser.add_argument("--max_plan_steps", type=int, default=16)
+    parser.add_argument(
+        "--max_plan_steps",
+        type=int,
+        default=None,
+        help="Optional hard cap on generated plan length. Defaults to the gold plan length for each sample.",
+    )
     parser.add_argument("--temperature", type=float, default=0.0)
     parser.add_argument("--top_p", type=float, default=0.9)
     parser.add_argument("--max_new_tokens", type=int, default=256)
@@ -826,6 +1024,10 @@ def main() -> None:
         args.latent_dir = resolve_existing_local_path(args.latent_dir)
     if args.frames_root:
         args.frames_root = resolve_existing_local_path(args.frames_root)
+    if args.coin_split_csv:
+        args.coin_split_csv = resolve_existing_local_path(args.coin_split_csv)
+    if args.yt_cookies:
+        args.yt_cookies = resolve_existing_local_path(args.yt_cookies)
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     out_dir = Path(args.output_dir).resolve()
@@ -842,24 +1044,54 @@ def main() -> None:
     )
     critic_model, critic_tokenizer = load_critic(args.critic_model, device)
     goal_model, goal_tokenizer = load_goal_latent_model(args.goal_latent_model, device)
+    split_rows = None
+    if args.input_mode == "frames" and (args.auto_download_frames or not args.frames_root):
+        split_rows = load_split_rows(args.coin_split_csv)
 
-    outcomes: list[SampleOutcome] = []
+    outcomes = [
+        outcome
+        for outcome in load_existing_outcomes(out_dir)
+        if 0 <= outcome.sample_id < len(data)
+    ]
+    completed_sample_ids = {outcome.sample_id for outcome in outcomes}
+    if outcomes:
+        print(
+            f"Resuming from {out_dir}: loaded {len(outcomes)} existing samples, "
+            f"skipping matching sample ids."
+        )
 
     for sample_idx, sample in enumerate(data):
-        goal = sample["goal"]
+        if sample_idx in completed_sample_ids:
+            print(f"[{sample_idx + 1}/{len(data)}] skipping existing result")
+            continue
+
+        goal = sample.get("goal", "")
         interpretation = sample.get("interpretation", "") or ""
+        if args.input_mode == "text" and sample.get("input_text"):
+            parsed_goal, parsed_interpretation = parse_prompt_text_fields(sample["input_text"])
+            goal = parsed_goal or goal
+            interpretation = parsed_interpretation
         if args.input_mode == "frames":
-            if not args.frames_root:
-                raise ValueError("--frames_root is required when --input_mode frames")
-            frames_path = resolve_frames_path(args.frames_root, sample.get("meta", {}))
-            interpretation = generate_interpretation_from_frames(
-                frames_path=frames_path,
-                device=device,
-                model_name=args.interp_model,
-                num_frames=args.num_frames,
-                prompt=args.interp_prompt,
-            )
+            with prepare_frames_dir(
+                sample.get("meta", {}),
+                args.frames_root,
+                args.auto_download_frames or not args.frames_root,
+                split_rows,
+                args.num_frames,
+                args.download_timeout_sec,
+                args.download_max_height,
+                args.yt_cookies,
+                args.yt_cookies_from_browser,
+            ) as frames_path:
+                interpretation = generate_interpretation_from_frames(
+                    frames_path=frames_path,
+                    device=device,
+                    model_name=args.interp_model,
+                    num_frames=args.num_frames,
+                    prompt=args.interp_prompt,
+                )
         gold_steps = sample["gold_steps"]
+        sample_max_plan_steps = args.max_plan_steps or max(len(gold_steps), 1)
 
         plans = []
         for _ in range(args.K):
@@ -869,13 +1101,14 @@ def main() -> None:
                     system1_tokenizer,
                     goal,
                     interpretation,
+                    gold_steps[-1] if gold_steps else None,
                     device,
                     gen_mode,
                     args.temperature,
                     args.top_p,
                     args.max_new_tokens,
                     args.rollout_chunk_size,
-                    args.max_plan_steps,
+                    sample_max_plan_steps,
                 )
                 raw = json.dumps(
                     {
@@ -961,6 +1194,7 @@ def main() -> None:
                 plans=plans,
             )
         )
+        completed_sample_ids.add(sample_idx)
 
         print(
             f"[{sample_idx + 1}/{len(data)}] valid={valid_candidates}/{args.K} "
@@ -969,13 +1203,21 @@ def main() -> None:
             f"iou={best['metrics']['step_iou']:.3f}"
         )
 
+        summary = summarize_outcomes(outcomes)
+        save_tables(out_dir, outcomes, summary)
+        plot_summary(out_dir, summary, outcomes)
+
     summary = summarize_outcomes(outcomes)
-    save_tables(out_dir, outcomes, summary)
-    plot_summary(out_dir, summary, outcomes)
+    if summary:
+        save_tables(out_dir, outcomes, summary)
+        plot_summary(out_dir, summary, outcomes)
 
     print("\nSummary:")
-    for key, value in summary.items():
-        print(f"  {key}: {value}")
+    if summary:
+        for key, value in summary.items():
+            print(f"  {key}: {value}")
+    else:
+        print("  no samples were evaluated")
     print(f"\nSaved outputs to {out_dir}")
 
 
