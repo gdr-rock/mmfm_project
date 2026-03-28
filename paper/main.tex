@@ -61,49 +61,52 @@
 \maketitle
 
 \begin{abstract}
-Procedural video planning demands a predictive understanding of how current actions systematically alter environments toward a defined goal. Recent advancements in Vision-Language World Models (VLWMs) attempt to address this by moving beyond mere textual sequence generation into grounded physical state predictions. In this work, we reproduce and expand upon the core concepts of VLWMs by incorporating V-JEPA 2 (Video Joint Embedding Predictive Architecture) predictive latents into a multimodal reasoning pipeline. Our objective was to force linguistic action modeling to ground itself in verifiable physical video transition spaces, thereby enhancing the model's capability to generalize the learned physics to entirely unknown, zero-shot tasks. To achieve this, we curated a comprehensive procedural dataset from COIN and CrossTask annotations, formatting it into a dual-system paradigm involving a System-1 Rollout Generator and System-2 Scorer (Critic and Goal Model). We integrated V-JEPA latent features via an auxiliary projection head, injecting dynamic energy-score heuristics during test-time reranking. 
+Procedural video planning requires a predictive understanding of how current actions transform an environment toward a defined goal. Recent work on Vision-Language World Models (VLWMs) aims to move beyond surface-level textual sequence generation by modeling grounded physical state transitions. In this work, we reproduce and extend core ideas from VLWMs by incorporating V-JEPA 2 (Video Joint Embedding Predictive Architecture) predictive latents into a multimodal reasoning pipeline. Our objective is to encourage linguistic action modeling to align with verifiable physical video transition spaces, with the goal of improving physical grounding and supporting generalization to previously unseen, zero-shot tasks. To this end, we curate a procedural dataset from COIN and CrossTask annotations and organize it into a dual-system framework consisting of a System-1 Rollout Generator and a System-2 Scorer (Critic and Goal Model). We integrate V-JEPA latent features through an auxiliary projection head and apply dynamic energy-based heuristics during test-time reranking.
 
-Our experimental findings reveal a distinct contrast: while the resulting model exhibits near-perfect task recreation and physical consistency on data it was explicitly trained on, it struggles to effectively generalize these grounded capabilities to previously unseen tasks. In this paper, we extensively analyze the methodology, the training dynamics constrained by compute and scale, the impact of Critic-Goal reranking over greedy decoding, and why our evaluation metrics expose the fundamental generalization gaps of purely heuristic-based text-to-latent world models.
+Our experimental findings reveal a clear contrast. While the resulting model exhibits near-perfect task recreation and physical consistency on tasks seen during training, it struggles to generalize these grounded capabilities to previously unseen tasks. In this paper, we analyze the methodology, the training dynamics under compute and scale constraints, the impact of Critic-Goal reranking relative to greedy decoding, and the extent to which our evaluation metrics expose the fundamental generalization limitations of heuristic-based text-to-latent world models.
 \end{abstract}
 
 \section{Introduction}
-Real-world intelligence relies intricately on a causal understanding of the environment. For artificial agents, generating a sequence of procedural steps requires more than statistical word-matching; it mandates a grounded comprehension of the physical world. In long-horizon instructional scenarios, the semantic meaning of an action heavily depends on its physical consequence and its advancement toward a final state. For example, the action \textit{``add water''} entails differing physical trajectories whether the task is \textit{``making coffee''} or \textit{``mixing cement''} This motivates our core research question: \emph{Does incorporating non-generative, predictive video latents into the representation space of an action-planning Language Model tangibly enhance its physical grounding and its ability to solve unknown tasks?}
+Real-world intelligence depends on a causal understanding of the environment. For artificial agents, generating a sequence of procedural steps requires more than statistical word matching; it requires some degree of grounding in how the physical world changes over time. In long-horizon instructional settings, the meaning of an action depends strongly on its physical consequence and on how it contributes to the final state. For example, the action \textit{``add water''} implies very different physical trajectories in the tasks \textit{``making coffee''} and \textit{``mixing cement''}. This motivates our central research question: \emph{Does incorporating non-generative, predictive video latents into the representation space of an action-planning language model measurably improve its physical grounding and its ability to solve unknown tasks?}
 
-Our research attempts to integrate the powerful predictive representations of V-JEPA 2 \citep{assran2025vjepa2} into the procedural framework of Vision-Language World Models (VLWMs) \citep{chen2025planning}. Standard Large Language Models (LLMs) used for task planning are notorious for physical hallucinations—suggesting plans that are linguistically plausible but physically impossible. By default, textual models do not know what an object looks like or how gravity affects it. By tying the textual hidden states of an LLM to the 1024-dimensional V-JEPA latent vectors corresponding to video segments, we hypothesized that the model acts not only as a language engine but as a spatial transition simulator. At inference time, this allows the pipeline to employ a System-2 reranking framework that judges proposed actions based on a latent \textit{energy score}, measuring the deviation between the predicted state and the target goal state vector.
+Our work attempts to integrate the predictive representations of V-JEPA 2 \citep{assran2025vjepa2} into the procedural framework of Vision-Language World Models (VLWMs) \citep{chen2025planning}. Standard Large Language Models (LLMs) used for task planning are well known to produce physically implausible yet linguistically fluent plans. By default, purely textual models do not directly represent object appearance, material constraints, or physical dynamics. By tying the hidden states of an LLM to 1024-dimensional V-JEPA latent vectors extracted from video segments, we hypothesize that the model can function not only as a language generator but also as an approximate transition model over procedural states. At inference time, this design further enables a System-2 reranking framework that evaluates proposed action sequences using a latent \textit{energy score}, defined by the deviation between the predicted state and the target goal state vector.
 
-Our architecture reconstructs the logic of proprietary VLWM implementations while adapting it to open-source limitations. A major obstacle in current multimodal planning research is the unavailability of the highly curated Tree-of-Caption datasets used by state-of-the-art works. Treating this constraint as an opportunity to innovate, we explicitly reverse-engineered a synthetic dataset generation pipeline utilizing the raw annotations of the COIN \citep{tang2019coin} and CrossTask \citep{zhukov2019crossTask} video datasets. This pipeline systematically formats raw labels into strictly defined visual state transitions ($\langle A_t, \Delta S_t \rangle$) designed for System-1 trajectory rollout generation, alongside specialized data splits to train our Critic and Goal models.
+Our architecture reconstructs the logic of proprietary VLWM pipelines while adapting it to open-source constraints. A major obstacle in multimodal planning research is the lack of access to the highly curated Tree-of-Caption datasets used by several state-of-the-art systems. Rather than treating this only as a limitation, we use it as an opportunity to build a synthetic dataset generation pipeline directly from the raw annotations of COIN \citep{tang2019coin} and CrossTask \citep{zhukov2019crossTask}. This pipeline reformats raw labels into explicit visual state transitions, $\langle A_t, \Delta S_t \rangle$, for System-1 trajectory rollout generation, and also supports the specialized splits required to train our Critic and Goal models.
 
-Through extensive model training across different scales—from 1 billion parameter LoRA models to 8 billion parameter GaLore implementations—our findings demonstrate that when tested on the tasks present within the training distribution, the V-JEPA augmented VLWM recreates the target procedures perfectly, smoothly aligning text and video latent representations. However, we observed a substantial drop-off when applying the model to zero-shot, out-of-distribution tasks. The physical grounding learned by the auxiliary heads struggled to act as a universal physics simulator, reverting instead to linguistic memorization. 
+Through model training across multiple scales---from 1B-parameter LoRA variants to 8B-parameter GaLore implementations---our findings show a consistent pattern. When evaluated on tasks that remain within the training distribution, the V-JEPA-augmented VLWM can closely recreate target procedures and align text and video latent representations. However, we observe a substantial drop when the same system is applied to zero-shot, out-of-distribution tasks. In these settings, the physical grounding encouraged by the auxiliary heads does not fully behave like a general-purpose physics simulator, and the system tends to fall back on linguistic memorization.
 
-We explicitly analyze these shortcomings, focusing on the challenges of scale (~3,000 videos vs. proprietary millions), the bottlenecks of heuristic energy functions, and the limitations of enforcing continuous video contexts onto discrete text tokens. Overall, the primary contributions of this work are mapping out the intricacies of this hybrid architecture framework, executing a comprehensive synthetic dataset reconstruction, evaluating the stark capabilities and boundaries of test-time search (System-2) scaling in VLMs, and providing a transparent post-mortem on why current V-JEPA text hybridizations struggle with zero-shot spatial generalization.
+We analyze these shortcomings in detail, focusing on the effects of limited scale (roughly 3,000 videos versus proprietary datasets with millions of examples), the weaknesses of heuristic energy functions, and the difficulty of mapping continuous video dynamics onto discrete text tokens. Overall, the main contributions of this work are threefold: first, we map out the mechanics of a hybrid V-JEPA + language-model architecture for procedural planning; second, we construct a synthetic dataset reconstruction pipeline for COIN and CrossTask under open-source constraints; and third, we provide a transparent empirical analysis of the capabilities and limitations of test-time System-2 search for zero-shot spatial generalization in VLM-based planning.
 
 \section{Related Work}
 
-\paragraph{Procedural Video Understanding:} Early procedural video tasks relied predominantly on dense video captioning and step localization. Benchmarks like COIN \citep{tang2019coin} and CrossTask \citep{zhukov2019crossTask} elevated the field from basic action recognition into sequential reasoning. Recent trends have shifted toward evaluating how well a model can predict future steps temporally, effectively tasking the neural network with planning rather than historical labeling.
+\paragraph{Procedural Video Understanding:}
+Early work on procedural video understanding focused primarily on dense video captioning and step localization. Benchmarks such as COIN \citep{tang2019coin} and CrossTask \citep{zhukov2019crossTask} moved the field beyond basic action recognition toward structured sequential reasoning. More recent work has shifted toward predicting future steps over time, effectively framing the task as planning rather than retrospective labeling.
 
-\paragraph{Reasoning and Planning in Language Models:} In the NLP domain, planning has been formulated via methodologies like Chain-of-Thought and Tree-of-Thoughts, which allow models to simulate distinct paths before committing to an answer. System-1 and System-2 dual-process theories have been successfully instantiated where a fast language model generates candidate rollouts (System 1) and a deliberate, value-function model scores the logical consistency of those rollouts (System 2). Yet, when applied directly to visual tasks, these models frequently suffer from the ``grounding gap'' simulating steps perfectly aligned textually but drastically unfeasible in real-world application.
+\paragraph{Reasoning and Planning in Language Models:}
+In NLP, planning has been explored through approaches such as Chain-of-Thought and Tree-of-Thoughts, where models simulate multiple candidate paths before committing to an answer. The broader System-1/System-2 perspective has also been instantiated computationally: a fast generator proposes candidate rollouts, while a slower evaluator scores their consistency or value. However, when such methods are applied directly to visually grounded tasks, they often encounter a persistent \textit{grounding gap}: generated steps may remain linguistically coherent while being physically implausible in the real world.
 
-\paragraph{Predictive Video Architectures and VLWMs:} The Joint Embedding Predictive Architecture (JEPA) \citep{assran2025vjepa2}, eschews pixel-level generation in favor of predicting abstract representation spaces. The Vision-Language World Model (VLWM) \citep{chen2025planning} builds on this by attempting to merge LLMs and video latents to foresee the consequence of an action. Our work operates directly at the intersection of these domains. We attempt to isolate whether the structural inclusion of V-JEPA via an auxiliary projection head can inject this transition dynamic into openly-available perception architectures.
+\paragraph{Predictive Video Architectures and VLWMs:}
+The Joint Embedding Predictive Architecture (JEPA) \citep{assran2025vjepa2} avoids pixel-level generation and instead predicts higher-level representation spaces. Vision-Language World Models (VLWMs) \citep{chen2025planning} build on this direction by attempting to combine language modeling and predictive video representations to anticipate the consequences of actions. Our work operates at the intersection of these ideas. Specifically, we investigate whether the inclusion of V-JEPA through an auxiliary projection head can inject useful transition structure into openly available perception-language architectures.
 
 \section{Architecture and Methodology}
 
-We utilize a dual-system paradigm combining sequential text generation with a test-time search guided by V-JEPA transition distances. 
+We adopt a dual-system paradigm that combines sequential text generation with test-time search guided by V-JEPA transition distances.
 
 \subsection{Problem Formulation}
-Given a procedural task defined by an initial environmental observation frame $O_0$ (or a textual goal $G$) and an end-goal description, the objective is to generate a viable sequence of actions $\{A_1, A_2, \ldots, A_T\}$ and their expected state changes $\{\Delta S_1, \Delta S_2, \ldots, \Delta S_T\}$. Traditional decoding relies purely on the conditional probability $P(A_t, \Delta S_t \mid O_0, G, A_{<t})$. Our objective updates this by introducing a latent metric evaluation at inference time. 
+Given a procedural task defined by an initial environmental observation frame $O_0$ (or a textual goal $G$) together with an end-goal description, the objective is to generate a valid sequence of actions $\{A_1, A_2, \ldots, A_T\}$ and their corresponding state changes $\{\Delta S_1, \Delta S_2, \ldots, \Delta S_T\}$. Standard decoding relies only on the conditional probability $P(A_t, \Delta S_t \mid O_0, G, A_{<t})$. Our formulation extends this by introducing a latent-space evaluation mechanism at inference time.
 
 \subsection{System-1: The Rollout Generator}
-System 1 is responsible for the rapid generation of possible future trajectories. We experimented with causal models based on \texttt{facebook/Perception-LM} variants (1B to 8B parameters). 
-The model takes as input the overarching task goal description ($G$), an optional visual interpretation mapping $O_0$ into a textual prefix, and the history of preceding actions and state transitions. During inference, we apply high-temperature ($T=0.8$) nucleus sampling to generate $K$ divergent candidate action sequences. 
+System 1 is responsible for rapidly generating candidate future trajectories. We experimented with causal models based on \texttt{facebook/Perception-LM} variants ranging from 1B to 8B parameters.
+The model receives as input the task goal description ($G$), an optional visual interpretation that maps $O_0$ into a textual prefix, and the history of preceding actions and state transitions. During inference, we apply high-temperature ($T=0.8$) nucleus sampling to produce $K$ diverse candidate action sequences.
 
 \subsection{V-JEPA 2 Latent Projection Heads Setup}
-The core adaptation involves enforcing video-latent physics directly inside the System-1 model. We utilized a \texttt{vjepa2} ViT-L configuration to process 16-frame slices of original videos, yielding 1024-dimensional feature tensors representing the true physical state change. 
+The core architectural modification is the explicit inclusion of video-latent structure within the System-1 model. We use a \texttt{vjepa2} ViT-L configuration to process 16-frame slices of source videos, producing 1024-dimensional feature tensors that represent the underlying physical state transition.
 
-To bridge the LLM text output and the video representations, we attached a 2-layer Multi-Layer Perceptron (MLP) Projection Head to the final hidden state layers of the System-1 text model. The objective is to map the specific token embeddings describing the state-change ($\Delta S_t$) into the identical 1024-dimensional space as the true V-JEPA observation. During training, the total scalar loss is defined as:
+To connect text outputs to video representations, we attach a 2-layer Multi-Layer Perceptron (MLP) projection head to the final hidden-state layers of the System-1 language model. The goal is to map token embeddings associated with the state-change description ($\Delta S_t$) into the same 1024-dimensional space as the corresponding V-JEPA observation. During training, the total scalar loss is defined as:
 \begin{equation}
     \mathcal{L}_{total} = \mathcal{L}_{text-NLL} + \alpha \mathcal{L}_{latent}
 \end{equation}
-$\mathcal{L}_{text-NLL}$ is the standard Negative Log-Likelihood cross-entropy loss. $\mathcal{L}_{latent}$ relies on regression against the pulled V-JEPA vector, forcing the text model's semantic representations to spatially align with the predictive physics engine.
+Here, $\mathcal{L}_{text-NLL}$ is the standard negative log-likelihood cross-entropy objective, while $\mathcal{L}_{latent}$ performs regression against the extracted V-JEPA vector. This encourages the language model's semantic representations to align with the predictive video representation space.
 
 \begin{figure}[t]
 \centering
@@ -161,31 +164,30 @@ $\mathcal{L}_{text-NLL}$ is the standard Negative Log-Likelihood cross-entropy l
 \end{figure}
 
 \subsection{System-2: Test-Time Reranking and Goal Critics}
-System-1 generations can hallucinate impossible intermediate steps. To counter this, System-2 executes a test-time reranking search. We implemented two distinct evaluators:
+System-1 generations can still hallucinate implausible intermediate steps. To mitigate this, System-2 performs test-time reranking over the generated candidates. We implemented two evaluators:
 \begin{enumerate}
-    \item \textbf{The Evaluator Critic:} A classification model explicitly trained to predict whether an action sequence is syntactically logical, outputting a real-value scalar, $Cost_{critic}$. 
-    \item \textbf{The Goal Latent Evaluator:} For a candidate textual plan, the text is routed through System-1 and the Latent Projection Head to derive a continuous predicted embedding sequence. Specifically, the terminal trajectory latent $z_{pred\_final}$ is generated by aggregating the individual projected latent vectors of each derived action and state-change step:
+    \item \textbf{The Evaluator Critic:} A classification model trained to estimate whether an action sequence is syntactically logical, producing a scalar score $Cost_{critic}$.
+    \item \textbf{The Goal Latent Evaluator:} For each candidate textual plan, the text is passed through System-1 and the latent projection head to obtain a sequence of predicted continuous embeddings. The terminal trajectory latent $z_{pred\_final}$ is formed by aggregating the projected latent vectors of the generated action and state-change steps:
     \begin{equation}
         z_{pred\_final} = \sum_{t=1}^T z_{pred\_t}
     \end{equation}
-    The textual goal itself $G$ is embedded by a separate specialized Goal-Model into $z_{goal}$.
+    The textual goal $G$ is separately embedded by a dedicated Goal Model into $z_{goal}$.
 \end{enumerate}
 
-These subsystems collectively output an Energy score $E$, defined as:
+These components jointly define an overall energy score $E$:
 \begin{equation}
    E_{total} = \alpha * Cost_{critic} + \beta * \|z_{pred\_final} - z_{goal}\|^2 
 \end{equation}
-The candidate sequence achieving the lowest energetic deviation is executed. 
+The candidate sequence with the lowest total energy is selected as the final output.
 
 \section{Dataset Generation and Synthetic Labeling}
-A major research bottleneck was the lack of available data mimicking the proprietary datasets referenced by state-of-the-art models. We developed a robust ingestion pipeline to rebuild comparable structures natively based on the COIN and CrossTask datasets. 
+A major bottleneck in this line of research is the absence of openly available datasets that closely match the proprietary resources used in state-of-the-art systems. To address this, we developed a data ingestion and reconstruction pipeline directly on top of the COIN and CrossTask datasets.
 
 \subsection{Raw Video Processing}
-A primary challenge involved widespread link rot across standard dataset URLs. To bypass this, we implemented strict download fallbacks and cached thousands of valid MP4s into a localized storage. Valid videos were temporally split into 16-frame buffers and processed directly through the V-JEPA ViT repository to generate independent foundational tensors. To manage cases where latents couldn't be extracted, the pipeline utilized a randomized tensor fallback to preserve batch integrity during language distribution modeling. 
+A central challenge was the widespread link rot affecting standard dataset URLs. To address this, we implemented download fallbacks and cached thousands of valid MP4 files into local storage. Valid videos were then divided into 16-frame temporal buffers and processed through the V-JEPA ViT repository to generate foundational latent tensors. In cases where latents could not be extracted, the pipeline used a randomized tensor fallback to preserve batch integrity during language-model training.
 
 \subsection{Structuring Target Responses}
-We constructed this explicitly formatted JSON structural data directly from the raw textual annotations and temporal bounds native to the COIN and CrossTask datasets. By mapping the raw descriptive strings into precise semantic structures, we formulated definitions for both the action and the immediate resulting physical state consequence. 
-To demonstrate the synthesized format explicitly curated for the System-1 multimodal parser, an input/output training sample takes the following configuration:
+We constructed a structured JSON format directly from the raw textual annotations and temporal boundaries provided by COIN and CrossTask. By mapping the original descriptions into explicit semantic forms, we defined both the action and its immediate resulting physical state change. The synthesized format, designed for the System-1 multimodal parser, follows the configuration below:
 \begin{lstlisting}[language=json, caption={Sample Dataset Structure formatting State Changes}]
 {
   "goal_description": "Change a car tire",
@@ -197,28 +199,28 @@ To demonstrate the synthesized format explicitly curated for the System-1 multim
 }
 \end{lstlisting}
 
-Crucially, to cleanly validate generalization to unknown procedural configurations, we enforced severe multi-tier dataset splitting. Standard training regimes frequently bleed structurally identical tasks across subsets, resulting in data leakage. We applied a strict horizontal divide; if a higher-level task existed within the evaluation boundary, none of its step-level variations were exposed to the core training corpus. 
+To evaluate generalization on unknown procedural configurations, we enforced a strict multi-tier data split. Standard training pipelines often leak structurally similar tasks across train and evaluation subsets, which leads to inflated performance through task overlap. To minimize this effect, we applied a strict horizontal split: if a higher-level task was assigned to the evaluation partition, its step-level variants were excluded from the training corpus.
 
 \section{Training Regimen and Hardware Capacity}
 
-Our pipeline executed on an academic hardware cluster. To train architectures up to 8 Billion parameters on singular GPUs, full parameter fine-tuning was fundamentally unachievable. We deployed distinct memory-efficient adaptation layers:
+Our pipeline was executed on an academic hardware cluster. Training architectures up to 8B parameters on single GPUs made full-parameter fine-tuning infeasible, so we adopted memory-efficient adaptation strategies:
 \begin{itemize}[topsep=0pt, leftmargin=1.5em]
-    \item \textbf{1B Parameter Variant via LoRA:} For base tests utilizing a 1B model, we implemented Low-Rank Adaptation ($r=16, \alpha=32$). This significantly accelerated training epochs but ultimately constrained the model's structural capacity to map complex semantic manifolds.
-    \item \textbf{8B Parameter Variant via GaLore:} To scale capacity, we utilized Gradient Low-Rank Projection (GaLore) with an orthogonal rank of 256. This allowed near full-parameter update equivalence without exceeding strict memory bounds, effectively avoiding catastrophic forgetting common in standard adaptation methods.
+    \item \textbf{1B Parameter Variant via LoRA:} For smaller-scale experiments with a 1B model, we used Low-Rank Adaptation ($r=16, \alpha=32$). This substantially accelerated training, but ultimately limited the model's capacity to represent more complex semantic manifolds.
+    \item \textbf{8B Parameter Variant via GaLore:} To increase capacity, we used Gradient Low-Rank Projection (GaLore) with an orthogonal rank of 256. This enabled an approximation closer to full-parameter updating without exceeding memory limits, while also reducing the risk of catastrophic forgetting often seen in more restrictive adaptation schemes.
 \end{itemize}
 
-During training, we deployed a curriculum strategy: roughly 70\% of batches applied standard textual objective loss, and 30\% applied the latent projection loss to guarantee that linguistic competency stabilized before incorporating physical grounding mechanisms.
+During training, we used a curriculum strategy in which approximately 70\% of batches optimized the standard textual objective, while 30\% optimized the latent projection loss. This was intended to stabilize linguistic performance before enforcing stronger physical-grounding constraints.
 
 \section{Experiments and Analytical Results}
 
-We evaluated our pipeline utilizing a standard task-planning suite structure, testing how models react to varied prompt prefixes and iterative scoring mechanisms.
+We evaluated the pipeline using a standard task-planning setup, with particular attention to how the model responds to different prompt prefixes and reranking strategies.
 
 \subsection{Evaluation Metrics}
-Results depend fundamentally on how precisely a system enforces its evaluation matrix:
+The interpretation of results depends heavily on the evaluation protocol:
 \begin{enumerate}
-    \item \textbf{Task Success Rate (SR):} Checks whether the entire generated sequence is effectively an exact string match for the expected sequence.
-    \item \textbf{Step F1 / mAcc (Mean Accuracy):} A step-by-step positional alignment evaluating intermediate matches.
-    \item \textbf{mIoU (Mean Intersection over Union):} An unordered similarity tracking whether correct macroscopic events took place even if placed out of sequence.
+    \item \textbf{Task Success Rate (SR):} Measures whether the generated sequence exactly matches the expected full sequence.
+    \item \textbf{Step F1 / mAcc (Mean Accuracy):} Measures alignment at the level of intermediate steps.
+    \item \textbf{mIoU (Mean Intersection over Union):} Measures unordered overlap, capturing whether the correct high-level events occur even when sequence order differs.
 \end{enumerate}
 
 \begin{table}[h]
@@ -245,22 +247,22 @@ Perception-LM 1B (Latent Proj) & Goal + Vision Interpreter Prefix & Critic-Goal 
 \end{table}
 
 \subsection{Generalization Failures at Lower Scales}
-Table~\ref{tab:evaluation} surfaces a potent narrative regarding scale constraints. While evaluating on test sets comprised of previously observed training tasks produced near perfect replication execution, attempting completely unknown procedural domains broke smaller networks. 
+Table~\ref{tab:evaluation} reveals a clear scale-dependent pattern. When evaluated on test sets composed of tasks already present in the training distribution, the models can reproduce procedures almost perfectly. However, performance degrades sharply when the same models are applied to entirely unknown procedural domains.
 
-The 1B model faltered fundamentally. Qualitative inspection generated distinct textual hallucinations—for instance, when prompted to execute \textit{"Paste Car Sticker"} the model outputted sequence logic resembling kitchen recipes rather than automotive maintenance. Moreover, attaching V-JEPA latent projection vectors entirely failed to correct this behavior at the 1B scale. The gradients stabilized the projection layer effectively enough to guess visual states, but they did not reach deep enough into the underlying structural language topology to redirect the hallucination. Consequently, System-2 reranking yielded only a marginal statistical fraction of benefit (e.g., naturally shifting Step F1 from 0.031 to 0.033); sampling multiple candidate rollouts primarily provided varying formats of hallucinated states, rendering the scorer largely ineffective overall. 
+The 1B model fails at a fundamental level. Qualitative inspection shows clear textual hallucinations---for example, when prompted with \textit{"Paste Car Sticker"}, the model can produce sequences more similar to kitchen recipes than to automotive maintenance. Moreover, attaching V-JEPA latent projection vectors does not meaningfully correct this behavior at the 1B scale. Although the projection layer learns enough structure to make coarse guesses about visual states, its gradients do not propagate deeply enough through the language model to alter the underlying generative bias. As a result, System-2 reranking provides only a marginal improvement (for example, Step F1 increases from 0.031 to 0.033), since sampling multiple candidate rollouts mostly yields different forms of hallucinated outputs rather than meaningfully better plans.
 
 \subsection{The Necessity of Scaled Capacity and Search}
-Moving to the \texttt{8B GaLore} implementation raised baseline metrics significantly, confirming a necessary minimum capacity threshold requires mapping multimodalities safely. The 8B baseline (Greedy) achieved a Step F1 of 0.128 on completely blind tasks. 
+Moving to the \texttt{8B GaLore} configuration substantially improves the baseline, indicating that a minimum capacity threshold is necessary for handling multimodal planning reliably. The 8B baseline under greedy decoding reaches a Step F1 of 0.128 on entirely unseen tasks.
 
-By applying a targeted textual prefix interpreting the visual observation, and utilizing System-2 Reranking Search, capabilities jumped drastically to 0.395 Step F1. The scaled capacity naturally suppressed wide-variance semantic hallucinations. Given sensible base sequences, the Critic and Goal-Latent Energy scorers successfully performed granular differentiation—punishing skipped functional steps and mathematically favoring trajectories closer to the true physical goal latent.
+When a targeted visual-interpreter prefix is added and System-2 reranking is enabled, performance increases sharply to 0.395 Step F1. Greater model capacity naturally reduces the variance of semantic hallucinations. Once the base generator produces more plausible candidates, the Critic and Goal-Latent Energy scorers become more effective at ranking them, penalizing omitted functional steps and favoring trajectories that lie closer to the target latent goal representation.
 
 \section{Discussion and Case Analysis}
 
 \subsection{Data Scale Discrepancies}
-Our curated dataset utilized thousands of viable mappings against diverse structural hierarchies. However, massive corporate training distributions commonly parse hundreds of thousands of uninterrupted sources. Scale provides a natural topological smoothness. Our results exhibited stark interpolation rigidness strictly because the spatial data bridging completely disassociated physical tasks was too sparse, limiting broad physical analogies.
+Our curated dataset contains thousands of valid mappings across diverse structural hierarchies. However, large proprietary training corpora often contain hundreds of thousands or even millions of examples. Such scale provides a smoother representation space and broader support for interpolation across tasks. In our case, the limited size of the dataset leads to a more rigid latent structure, which restricts the model's ability to generalize across physically dissimilar tasks.
 
 \subsection{Metric Stringency vs Latent Competency}
-One vital qualitative observation involves how rigidly exact-match metrics misrepresent a model's true structural logic. A generated plan frequently comprehends causal physics yet falls victim to semantic variations. Consider a representative rollout captured during the evaluation phase for an unknown maintenance task:
+One important qualitative observation is that exact-match metrics may underestimate the model's underlying structural competence. A generated plan may reflect causal understanding while still being penalized for lexical variation. Consider the following representative rollout from evaluation on an unknown maintenance task:
 
 \vspace{0.5em}
 \noindent
@@ -269,12 +271,12 @@ One vital qualitative observation involves how rigidly exact-match metrics misre
 \textbf{Model Generated:} \textit{brake on $\rightarrow$ unscrew wheel lug $\rightarrow$ jack the chassis down}
 \vspace{0.5em}
 
-Despite recognizing the correct mechanical tooling (evaluating the progression from brake application to lug interactions and chassis manipulation), the execution output was assigned a nominal F1 score of \textbf{0.000} internally. It deviated from the strict literal requirements \textit{"loosen lug nuts"} and \textit{"jack up"}. This heavily suggests that heuristic metrics fail to accurately reward models for recognizing underlying physics trajectories if the textual domain shifts mildly. Future mechanisms strongly mandate migrating to intelligent semantic-judgement rubrics rather than strict parity checking. 
+Despite capturing the correct mechanical progression---from brake application to lug manipulation and chassis lifting---the generated output receives an F1 score of \textbf{0.000} under strict evaluation because it does not match the exact phrases \textit{"loosen lug nuts"} and \textit{"jack up"}. This suggests that heuristic metrics may fail to reward partial physical understanding when the wording differs from the reference. More semantically aware evaluation protocols are therefore necessary for properly assessing grounded procedural reasoning.
 
 \section{Conclusion}
-This study investigated whether introducing V-JEPA 2 latent physics awareness via an auxiliary projection architecture empowers generic Vision-Language models to cleanly parse procedural tasks. By constructing a custom procedural pipeline mirroring proprietary dataset paradigms, our findings present a multifaceted reality: the architecture flawlessly replicates explicitly trained tasks and physical formats. However, it requires substantive foundational scaling (8B+ parameters) alongside dynamic test-time scoring routines to maintain even partial generalized stability when confronted with unknown zero-shot tasks. 
+This study investigated whether introducing V-JEPA 2 latent physics awareness through an auxiliary projection architecture can improve procedural reasoning in Vision-Language models. By constructing a custom procedural pipeline under open-source constraints, we obtain a mixed picture. The architecture can faithfully reproduce tasks that remain within the training distribution and can align textual and latent representations under those conditions. However, substantial model scale (8B+) and test-time scoring remain necessary even to obtain partial stability on previously unseen zero-shot tasks.
 
-While fully closing the semantic grounding gap on out-of-distribution structures remains an active challenge—constrained here by dataset volume limitations and heuristic parsing rules—the implementation robustly identifies the systemic thresholds required to merge visual physics directly into standard text generation. These outcomes highlight the exact architectural bottlenecks future methodologies must traverse to enable comprehensive multimodal world simulation.
+Although the semantic grounding gap on out-of-distribution procedures remains unresolved---due in part to limited dataset scale and heuristic evaluation mechanisms---our implementation helps identify the practical thresholds and bottlenecks involved in combining predictive video representations with text generation. These findings clarify the architectural challenges that future work must address in order to build more robust multimodal world models for procedural planning.
 
 \bibliographystyle{plainnat}
 \bibliography{references}
@@ -284,18 +286,18 @@ While fully closing the semantic grounding gap on out-of-distribution structures
 \section{Appendix: Individual Contributions}
 
 \subsection{Problem Formulation}
-\textbf{Goutham Muralikrishnan} identified the core research questions, conducted the foundational literature review bridging V-JEPA to multimodal planning, and defined the initial strategic scope to bypass the lack of open-source datasets via synthetic pipeline modeling.
+\textbf{Goutham Muralikrishnan} identified the core research questions, conducted the foundational literature review connecting V-JEPA to multimodal planning, and defined the initial project scope for addressing the lack of open-source datasets through synthetic pipeline modeling.
 
 \subsection{Model Development}
-\textbf{All authors (Aswathy Marottikkal Ramesh, Sayeeda Begam Mohamed Ikbal, Goutham Muralikrishnan)} collaboratively mapped the V-JEPA extraction configurations, implemented the System-1 LLM optimizations (GaLore/LoRA), and structured the continuous integration pipelines mapping Latent Projection head losses.
+\textbf{All authors (Aswathy Marottikkal Ramesh, Sayeeda Begam Mohamed Ikbal, Goutham Muralikrishnan)} collaboratively designed the V-JEPA extraction configurations, implemented the System-1 LLM optimization strategies (GaLore/LoRA), and structured the integration pipeline for the latent projection head losses.
 
 \subsection{Experiments and Evaluation}
-\textbf{All authors} designed the distinct experimental suites enforcing prefix constraints. Shared responsibilities extended across operating the cluster training regimes, conducting the preprocessing of video frames, and diagnosing and repairing data-leakage boundaries before finalizing metrics analysis.
+\textbf{All authors} designed the experimental suites under different prefix constraints. Responsibilities were shared across cluster-based training, video preprocessing, and the diagnosis and repair of data-leakage issues before finalizing the metrics analysis.
 
 \subsection{Writing the Paper}
-\textbf{All authors} contributed structurally to compiling the final manuscript. Responsibilities were shared across structuring the theoretical introduction, formatting methodology tables, detailing the qualitative failure case analyses, and collaboratively editing for academic compliance.
+\textbf{All authors} contributed to preparing the final manuscript. Responsibilities were shared across shaping the introduction, formatting the methodology and tables, detailing the qualitative failure analyses, and editing the paper for technical clarity and academic presentation.
 
 \subsection{Collaboration and Discussion}
-\textbf{Goutham Muralikrishnan} acted as the primary team coordinator, dynamically leading technical update sessions to parse experimental errors, enforcing version-control stability across branches, and ensuring all individual pipelines smoothly connected for final architectural compilation.
+\textbf{Goutham Muralikrishnan} served as the primary team coordinator, led technical discussions around experimental failures, maintained version-control consistency across branches, and ensured that the individual pipeline components were integrated into the final architecture.
 
 \end{document}
