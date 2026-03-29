@@ -1,0 +1,25 @@
+{
+  "run_id": "plm_coin3_grounded_coin3_eval",
+  "model_tag": "plm_coin3_grounded",
+  "system1_model": "/home/hpc/v123be/v123be21/mmfm/mmfm_project/checkpoints/system1_plm_coin3_lora_grounded/best_adapter",
+  "system1_type": "plm",
+  "plm_base_model": "facebook/Perception-LM-1B",
+  "critic_model": "/home/hpc/v123be/v123be21/mmfm/mmfm_project/checkpoints/critic_coin/best_model.pt",
+  "goal_latent_model": "/home/hpc/v123be/v123be21/mmfm/mmfm_project/checkpoints/goal_latent_coin/best_model.pt",
+  "latent_dir": null,
+  "K": 3,
+  "sampling_temperature": 0.8,
+  "top_p": 0.9,
+  "max_new_tokens": 256,
+  "alpha": 1.0,
+  "beta": 1.0,
+  "score_normalization": "minmax",
+  "prefix_lengths": [
+    1,
+    2,
+    3
+  ],
+  "task_success_definition": "gold step sequence appears as an ordered subsequence of the prediction",
+  "note": "Critic/goal ablations reuse the same candidate pool as greedy for each sample.",
+  "n_cases": 127
+}

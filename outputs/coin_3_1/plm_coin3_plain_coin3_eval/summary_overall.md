@@ -1,0 +1,12 @@
+| config | condition_label | n_samples | exact_match | task_success | ordered_ratio | step_f1 | step_accuracy |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| system1_critic | goal_only | 27 | 0.0000 | 0.0000 | 0.0148 | 0.0114 | 0.0000 |
+| system1_critic | goal_plus_interpretation | 27 | 0.0000 | 0.0000 | 0.0074 | 0.0082 | 0.0000 |
+| system1_critic | goal_plus_interpretation_prefix@1 | 27 | 0.0000 | 0.0000 | 0.0278 | 0.0241 | 0.0216 |
+| system1_critic | goal_plus_interpretation_prefix@2 | 26 | 0.0000 | 0.0000 | 0.0224 | 0.0155 | 0.0000 |
+| system1_critic | goal_plus_interpretation_prefix@3 | 20 | 0.0000 | 0.0000 | 0.0417 | 0.0333 | 0.0000 |
+| system1_greedy | goal_only | 27 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 |
+| system1_greedy | goal_plus_interpretation | 27 | 0.0000 | 0.0000 | 0.0074 | 0.0082 | 0.0000 |
+| system1_greedy | goal_plus_interpretation_prefix@1 | 27 | 0.0000 | 0.0000 | 0.0278 | 0.0241 | 0.0216 |
+| system1_greedy | goal_plus_interpretation_prefix@2 | 26 | 0.0000 | 0.0000 | 0.0224 | 0.0155 | 0.0000 |
+| system1_greedy | goal_plus_interpretation_prefix@3 | 20 | 0.0000 | 0.0000 | 0.0167 | 0.0167 | 0.0000 |

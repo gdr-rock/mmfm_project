@@ -1,0 +1,92 @@
+[
+  {
+    "run_label": "Perception-LM 8B (GaLore)",
+    "config": "system1_critic",
+    "delta_exact_match": 0.0,
+    "delta_task_success": 0.0741,
+    "delta_ordered_ratio": 0.2196,
+    "delta_step_f1": 0.17289999999999997,
+    "delta_step_accuracy": 0.1577
+  },
+  {
+    "run_label": "Perception-LM 8B (GaLore)",
+    "config": "system1_critic_goal",
+    "delta_exact_match": 0.0,
+    "delta_task_success": 0.0741,
+    "delta_ordered_ratio": 0.2486,
+    "delta_step_f1": 0.2013,
+    "delta_step_accuracy": 0.16699999999999998
+  },
+  {
+    "run_label": "Perception-LM 8B (GaLore)",
+    "config": "system1_goal",
+    "delta_exact_match": 0.0,
+    "delta_task_success": 0.0741,
+    "delta_ordered_ratio": 0.24730000000000002,
+    "delta_step_f1": 0.2053,
+    "delta_step_accuracy": 0.1674
+  },
+  {
+    "run_label": "Perception-LM 8B (GaLore)",
+    "config": "system1_greedy",
+    "delta_exact_match": 0.0,
+    "delta_task_success": 0.0741,
+    "delta_ordered_ratio": 0.25449999999999995,
+    "delta_step_f1": 0.21850000000000003,
+    "delta_step_accuracy": 0.18180000000000002
+  },
+  {
+    "run_label": "Perception-LM 1B (Latent Proj)",
+    "config": "system1_critic",
+    "delta_exact_match": 0.0,
+    "delta_task_success": 0.0,
+    "delta_ordered_ratio": 0.0093,
+    "delta_step_f1": 0.008400000000000001,
+    "delta_step_accuracy": 0.0103
+  },
+  {
+    "run_label": "Perception-LM 1B (Latent Proj)",
+    "config": "system1_critic_goal",
+    "delta_exact_match": 0.0,
+    "delta_task_success": 0.0,
+    "delta_ordered_ratio": 0.0167,
+    "delta_step_f1": 0.0106,
+    "delta_step_accuracy": 0.0025000000000000005
+  },
+  {
+    "run_label": "Perception-LM 1B (Latent Proj)",
+    "config": "system1_goal",
+    "delta_exact_match": 0.0,
+    "delta_task_success": 0.0,
+    "delta_ordered_ratio": 0.0167,
+    "delta_step_f1": 0.0106,
+    "delta_step_accuracy": 0.0025000000000000005
+  },
+  {
+    "run_label": "Perception-LM 1B (Latent Proj)",
+    "config": "system1_greedy",
+    "delta_exact_match": 0.0,
+    "delta_task_success": 0.0,
+    "delta_ordered_ratio": 0.0167,
+    "delta_step_f1": 0.011600000000000001,
+    "delta_step_accuracy": 0.0029
+  },
+  {
+    "run_label": "Perception-LM 1B (Plain)",
+    "config": "system1_critic",
+    "delta_exact_match": 0.0,
+    "delta_task_success": 0.0,
+    "delta_ordered_ratio": -0.0074,
+    "delta_step_f1": -0.0031999999999999997,
+    "delta_step_accuracy": 0.0
+  },
+  {
+    "run_label": "Perception-LM 1B (Plain)",
+    "config": "system1_greedy",
+    "delta_exact_match": 0.0,
+    "delta_task_success": 0.0,
+    "delta_ordered_ratio": 0.0074,
+    "delta_step_f1": 0.0082,
+    "delta_step_accuracy": 0.0
+  }
+]

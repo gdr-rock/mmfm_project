@@ -1,0 +1,56 @@
+{
+  "tasks_by_source_and_split": {
+    "coin": {
+      "test": 27,
+      "train": 135,
+      "val": 18
+    },
+    "crosstask": {
+      "train": 18
+    }
+  },
+  "rows": {
+    "train": 75426,
+    "val": 5834,
+    "test": 3454
+  },
+  "row_breakdown": {
+    "train": {
+      "coin::full_plan_from_task_with_video_context::goal_only": 9046,
+      "coin::full_plan_from_task_with_video_context::goal_plus_interpretation": 9046,
+      "coin::remaining_plan_from_prefix::goal_only": 18969,
+      "coin::remaining_plan_from_prefix::goal_plus_interpretation": 18969,
+      "crosstask::full_plan_from_task_with_video_context::goal_only": 2692,
+      "crosstask::full_plan_from_task_with_video_context::goal_plus_interpretation": 2692,
+      "crosstask::remaining_plan_from_prefix::goal_only": 7006,
+      "crosstask::remaining_plan_from_prefix::goal_plus_interpretation": 7006
+    },
+    "val": {
+      "coin::full_plan_from_task_with_video_context::goal_only": 1053,
+      "coin::full_plan_from_task_with_video_context::goal_plus_interpretation": 1053,
+      "coin::remaining_plan_from_prefix::goal_only": 1864,
+      "coin::remaining_plan_from_prefix::goal_plus_interpretation": 1864
+    },
+    "test": {
+      "coin::full_plan_from_task_with_video_context::goal_only": 1727,
+      "coin::full_plan_from_task_with_video_context::goal_plus_interpretation": 1727
+    }
+  },
+  "train_token_coverage": {
+    "test": {
+      "min": 0.8235,
+      "mean": 0.8996,
+      "count": 27
+    },
+    "train": {
+      "min": 1.0,
+      "mean": 1.0,
+      "count": 153
+    },
+    "val": {
+      "min": 0.8,
+      "mean": 0.8565,
+      "count": 18
+    }
+  }
+}

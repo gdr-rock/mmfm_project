@@ -1,0 +1,11 @@
+run_label,config,delta_exact_match,delta_task_success,delta_ordered_ratio,delta_step_f1,delta_step_accuracy
+Perception-LM 8B (GaLore),system1_critic,0.0,0.0741,0.2196,0.17289999999999997,0.1577
+Perception-LM 8B (GaLore),system1_critic_goal,0.0,0.0741,0.2486,0.2013,0.16699999999999998
+Perception-LM 8B (GaLore),system1_goal,0.0,0.0741,0.24730000000000002,0.2053,0.1674
+Perception-LM 8B (GaLore),system1_greedy,0.0,0.0741,0.25449999999999995,0.21850000000000003,0.18180000000000002
+Perception-LM 1B (Latent Proj),system1_critic,0.0,0.0,0.0093,0.008400000000000001,0.0103
+Perception-LM 1B (Latent Proj),system1_critic_goal,0.0,0.0,0.0167,0.0106,0.0025000000000000005
+Perception-LM 1B (Latent Proj),system1_goal,0.0,0.0,0.0167,0.0106,0.0025000000000000005
+Perception-LM 1B (Latent Proj),system1_greedy,0.0,0.0,0.0167,0.011600000000000001,0.0029
+Perception-LM 1B (Plain),system1_critic,0.0,0.0,-0.0074,-0.0031999999999999997,0.0
+Perception-LM 1B (Plain),system1_greedy,0.0,0.0,0.0074,0.0082,0.0
