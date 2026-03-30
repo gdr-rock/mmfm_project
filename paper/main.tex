@@ -61,9 +61,11 @@
 \maketitle
 
 \begin{abstract}
-Procedural video planning requires a predictive understanding of how current actions transform an environment toward a defined goal. Recent work on Vision-Language World Models (VLWMs) aims to move beyond surface-level textual sequence generation by modeling grounded physical state transitions. In this work, we reproduce and extend core ideas from VLWMs by incorporating V-JEPA 2 (Video Joint Embedding Predictive Architecture) predictive latents into a multimodal reasoning pipeline. Our objective is to encourage linguistic action modeling to align with verifiable physical video transition spaces, with the goal of improving physical grounding and supporting generalization to previously unseen, zero-shot tasks. To this end, we curate a procedural dataset from COIN and CrossTask annotations and organize it into a dual-system framework consisting of a System-1 Rollout Generator and a System-2 Scorer (Critic and Goal Model). We integrate V-JEPA latent features through an auxiliary projection head and apply dynamic energy-based heuristics during test-time reranking.
+Procedural video planning requires a predictive understanding of how current actions transform an environment toward a defined goal. Recent work on Vision-Language World Models (VLWMs) aims to move beyond surface-level textual sequence generation by modeling grounded physical state transitions. In this work, we reproduce and extend core ideas from VLWMs by incorporating V-JEPA 2 (Video Joint Embedding Predictive Architecture) predictive latents into a multimodal reasoning pipeline. Our objective is to encourage linguistic action modeling to align with verifiable physical video transition spaces, with the goal of improving physical grounding and supporting generalization to previously unseen, zero-shot tasks.
 
-Our experimental findings reveal a clear contrast. While the model exhibits near-perfect task recreation and physical consistency on tasks seen during training, it struggles to generalize these grounded capabilities to previously unseen tasks in zero-shot settings. Moreover, we demonstrate that providing video-specific (instance-level) visual interpretations significantly improves task success rates compared to generic task-level interpretations. In this paper, we analyze the methodology, the training dynamics under compute and scale constraints, the impact of Critic-Goal reranking relative to greedy decoding, and the inherent assumptions of our pipeline---notably, the reliance on global rather than action-by-action local grounding. Finally, we discuss the inherent limitations of measuring physical planning via rigid textual metrics (Task Success, Step F1, and mIoU), demonstrating how these lexical bounds mask the underlying semantic and structural competencies of our predictive text-to-latent architecture.
+To this end, we curate a procedural dataset from COIN and CrossTask annotations and organize it into a dual-system framework consisting of a System-1 Rollout Generator and a System-2 Scorer (Critic and Goal Model). We integrate V-JEPA latent features through an auxiliary projection head and apply dynamic energy-based heuristics during test-time reranking.
+
+Our experimental findings reveal a clear contrast. While the model exhibits near-perfect task recreation and physical consistency on tasks seen during training, it struggles to generalize these grounded capabilities to previously unseen tasks in zero-shot settings. Moreover, we demonstrate that providing video-specific (instance-level) visual interpretations significantly improves task success rates compared to generic task-level interpretations. We further analyze the methodology, training dynamics under compute constraints, the impact of Critic-Goal reranking, and the reliance on global rather than local grounding. Finally, we highlight how rigid textual metrics (Task Success, Step F1, mIoU) can mask underlying semantic improvements in grounded planning.
 \end{abstract}
 
 \section{Introduction}
@@ -245,7 +247,21 @@ Perception-LM 1B (Latent Proj) & Goal + Vision Interpreter Prefix & 0.000 & 0.01
 \end{tabular}
 }
 \end{table}
-
+\begin{table}[h]
+\centering
+\caption{Ablation-style summary highlighting the relative contribution of different components.}
+\label{tab:ablation}
+\begin{tabular}{l c c}
+\toprule
+\textbf{Configuration} & \textbf{Step F1} & \textbf{Observation} \
+\midrule
+1B Base & $\approx 0.00$ & Collapse / hallucination \
+1B + Latent & $\approx 0.02$ & Minimal improvement \
+8B Base & $0.128$ & Capacity helps \
+8B + Reranking & $0.395$ & Strong improvement \
+\bottomrule
+\end{tabular}
+\end{table}
 
 \subsection{Impact of Grounding Granularity}
 We further evaluate whether the specificity of the initial visual context impacts generalization. While V-JEPA latents strictly provide the non-linguistic physical constraints during System-2 search, the model also receives an initial semantic caption of the observation ($O_0$), acting as a textual grounding prefix for System-1. In Table~\ref{tab:granularity}, we compare model performance using \textit{Task-Level Canonical Interpretations} (heuristic rules defining boundaries, e.g., ``The task begins with 'clean inner wall' and is considered complete once 'place weighing sample' is done'') versus \textit{Video-Level Custom Interpretations} (captioned via Perception-LM, e.g., ``From this short video segment, the scene shows: a person is holding a box of cigarettes...''). Both models were evaluated using the identical \texttt{8B GaLore} architecture equipped with the V-JEPA Critic-Goal Reranker.
